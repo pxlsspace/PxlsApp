@@ -12,8 +12,10 @@ import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.ui.CanvasScreen;
 import space.pxls.ui.LoadScreen;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.io.UnsupportedEncodingException;
 
 public class PxlsGame extends Game {
     public static PxlsGame i;
@@ -33,7 +35,7 @@ public class PxlsGame extends Game {
 
     public void handleAuthenticationCallback(String url) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
-        req.setUrl(url.replace("#", ""));
+        req.setUrl(url);
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -120,13 +122,13 @@ public class PxlsGame extends Game {
                     return;
                 }
 
-                JsonObject reqData = new JsonObject();
-                reqData.addProperty("username", text);
-                reqData.addProperty("token", signupToken);
-
                 Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.POST);
                 req.setUrl(Pxls.domain + "/signup");
-                req.setContent(Pxls.gson.toJson(reqData));
+                try {
+                    req.setContent("username=" + URLEncoder.encode(text, "utf-8") + "&token=" + URLEncoder.encode(signupToken, "utf-8"));
+                } catch (UnsupportedEncodingException e) {
+                    System.out.println("uho");
+                }
                 Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
                     @Override
                     public void handleHttpResponse(Net.HttpResponse httpResponse) {

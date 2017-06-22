@@ -34,7 +34,11 @@ public class UndoPopup extends Container<Container<Label>> {
         setActor(container);
 
         setClip(true);
-        fire(new UndoEvent());
+        //fire(new UndoEvent());
+    }
+
+    private float getYPos () {
+        return getPadLeft() / 2.0f;
     }
 
     public void popUp(float time) {
@@ -44,7 +48,7 @@ public class UndoPopup extends Container<Container<Label>> {
         popDownTime = (System.currentTimeMillis() + (long) (time * 1000));
 
         MoveToAction mta = new MoveToAction();
-        mta.setPosition(0, 0);
+        mta.setPosition(getYPos(), 0);
         mta.setDuration(0.2f);
         mta.setInterpolation(Interpolation.exp5Out);
 
@@ -56,7 +60,7 @@ public class UndoPopup extends Container<Container<Label>> {
         up = false;
 
         MoveToAction mta = new MoveToAction();
-        mta.setPosition(0, -container.getHeight());
+        mta.setPosition(getYPos(), -container.getHeight());
         mta.setDuration(0.2f);
         mta.setInterpolation(Interpolation.exp5In);
 
