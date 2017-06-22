@@ -69,14 +69,14 @@ public class LoadScreen extends ScreenAdapter {
                         byte[] data = wrangleBytes(board, info, fancyColors);
 
                         System.out.println("Writing bytes to pixmap...");
-                        final Pixmap p = new Pixmap(info.width, info.height, Pixmap.Format.RGB888);
+                        final Pixmap p = new Pixmap(info.width, info.height, Pixmap.Format.RGBA8888);
                         p.getPixels().put(data).position(0);
 
                         Gdx.app.postRunnable(new Runnable() {
                             @Override
                             public void run() {
                                 System.out.println("Uploading to GPU...");
-                                FrameBuffer canvasTexture = new FrameBuffer(Pixmap.Format.RGB888, info.width, info.height, false);
+                                FrameBuffer canvasTexture = new FrameBuffer(Pixmap.Format.RGBA8888, info.width, info.height, false);
                                 canvasTexture.getColorBufferTexture().draw(p, 0, 0);
                                 canvasTexture.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
                                 p.dispose();
@@ -89,7 +89,8 @@ public class LoadScreen extends ScreenAdapter {
 
                     @Override
                     public void failed(Throwable t) {
-                        PxlsGame.i.alert("Board fetching failed, retrying...", new PxlsGame.ButtonCallback() {
+                        System.out.println("Failed fetching board data");
+                        PxlsGame.i.alert("Board fetching failed, retrying the game...", new PxlsGame.ButtonCallback() {
                             @Override
                             public void clicked() {
                                 PxlsGame.i.setScreen(new LoadScreen());
@@ -124,14 +125,23 @@ public class LoadScreen extends ScreenAdapter {
     private byte[] wrangleBytes(byte[] board, BoardInfo info, int[] fancyColors) {
         // please optimize this jvm thanks
 
-        byte[] data = new byte[info.width * info.height * 3];
+        byte[] data = new byte[info.width * info.height * 4];
         for (int i = 0; i < board.length; i++) {
             byte color = board[i];
 
-            int col = fancyColors[color];
-            data[i * 3] = (byte) (col >> 16 & 0xFF);
-            data[i * 3 + 1] = (byte) (col >> 8 & 0xFF);
-            data[i * 3 + 2] = (byte) (col & 0xFF);
+            if (color == 0xFF || color == -1) {
+                // transparent!
+                data[i * 4] = (byte)0;
+                data[i * 4 + 1] = (byte)0;
+                data[i * 4 + 2] = (byte)0;
+                data[i * 4 + 3] = (byte)0;
+            } else {
+                int col = fancyColors[color];
+                data[i * 4] = (byte) (col >> 16 & 0xFF);
+                data[i * 4 + 1] = (byte) (col >> 8 & 0xFF);
+                data[i * 4 + 2] = (byte) (col & 0xFF);
+                data[i * 4 + 3] = (byte)0xFF;
+            }
         }
         return data;
     }

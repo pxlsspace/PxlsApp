@@ -9,13 +9,22 @@ import de.tomgrill.gdxdialogs.core.GDXDialogsSystem;
 
 public class Pxls {
     public static void init() {
-        boolean debug = false;
-        if (debug) {
-            domain = "http://192.168.0.23.nip.io:4567";
-            wsPath = "ws://192.168.0.23.nip.io:4567/ws";
-        } else {
-            domain = "https://pxls.space";
-            wsPath = "wss://pxls.space/ws";
+        // 0 for no debug
+        // 1 for ske setup
+        // 2 for sorunome setup
+        int debug = 0;
+        switch (debug) {
+            case 1:
+                domain = "http://192.168.0.23.nip.io:4567";
+                wsPath = "ws://192.168.0.23.nip.io:4567/ws";
+                break;
+            case 2:
+                domain = "http://192.168.1.13:4567";
+                wsPath = "ws://192.168.1.13:4567/ws";
+                break;
+            default:
+                domain = "https://pxls.space";
+                wsPath = "wss://pxls.space/ws";
         }
     }
     public static String domain;
