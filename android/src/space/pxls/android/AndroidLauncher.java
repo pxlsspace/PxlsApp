@@ -30,6 +30,13 @@ public class AndroidLauncher extends AndroidApplication {
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
         game = new PxlsGame();
+        Intent intent = getIntent();
+        if (intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
+            String url = intent.getDataString();
+            if (!url.startsWith("/auth")) {
+                game.startupUrl = url;
+            }
+        }
         game.captchaRunner = new PxlsGame.CaptchaRunner() {
             @Override
             public void doCaptcha(String token, PxlsGame.CaptchaCallback captchaCallback) {
@@ -74,7 +81,12 @@ public class AndroidLauncher extends AndroidApplication {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent.getAction().equals(Intent.ACTION_VIEW)) {
-            game.handleAuthenticationCallback(intent.getDataString());
+            String url = intent.getDataString();
+            if (url.startsWith("/auth/")) {
+                game.handleAuthenticationCallback(url);
+            } else {
+                game.handleView(url);
+            }
         }
     }
 

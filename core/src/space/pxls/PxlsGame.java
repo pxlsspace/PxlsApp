@@ -12,16 +12,20 @@ import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.ui.CanvasScreen;
 import space.pxls.ui.LoadScreen;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.io.UnsupportedEncodingException;
 
 public class PxlsGame extends Game {
     public static PxlsGame i;
     public CaptchaRunner captchaRunner;
     public LoginRunner loginRunner;
-
+    public String startupUrl;
     @Override
     public void create() {
         Pxls.init();
@@ -31,6 +35,72 @@ public class PxlsGame extends Game {
 
         Pxls.batch = new SpriteBatch();
         Pxls.skin = new Skin();
+    }
+
+    private Map<String, String> parseQuery(String s) {
+        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+        try {
+            String query = s;
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                String key = URLDecoder.decode(pair.substring(0, idx), "UTF-8");
+                if (!key.isEmpty() && query_pairs.get(key) == null) {
+                    query_pairs.put(key, URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            
+        }
+        return query_pairs;
+    }
+
+    public void handleView(String _url) {
+        if (!(screen instanceof CanvasScreen) || _url.isEmpty()) {
+            return;
+        }
+        CanvasScreen _screen = (CanvasScreen)screen;
+        URI uri;
+        try {
+            uri = new URI(_url);
+        } catch (URISyntaxException e) {
+            return;
+        }
+        String query = uri.getQuery();
+        if (query == null) {
+            query = "";
+        }
+        String hash = uri.getFragment();
+        if (hash == null) {
+            hash = "";
+        }
+        query = hash + "&" + query; // prioritize # over ?
+        Map<String, String> params = parseQuery(query);
+        String url = params.get("template");
+        if (url == null || url.isEmpty()) {
+            return; // nothing to do
+        }
+        String s_x = params.get("ox");
+        if (s_x == null) {
+            s_x = "0";
+        }
+        String s_y = params.get("oy");
+        if (s_y == null) {
+            s_y = "0";
+        }
+        String s_tw = params.get("tw");
+        if (s_tw == null) {
+            s_tw = "-1";
+        }
+        String s_oo = params.get("oo");
+        if (s_oo == null) {
+            s_oo = "0.5";
+        }
+        int x = Integer.parseInt(s_x);
+        int y = Integer.parseInt(s_y);
+        int tw = Integer.parseInt(s_tw);
+        float oo = Float.valueOf(s_oo);
+        _screen.template.load(x, y, tw, oo, url);
     }
 
     public void handleAuthenticationCallback(String url) {
