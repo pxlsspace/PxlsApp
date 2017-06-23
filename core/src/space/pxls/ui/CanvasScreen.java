@@ -32,11 +32,11 @@ import space.pxls.PxlsGame;
 import java.util.Date;
 
 public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCallback {
-    private final LoadScreen.BoardInfo boardInfo;
+    public final LoadScreen.BoardInfo boardInfo;
     private FrameBuffer canvasBuffer;
     private float zoom = 1;
     private Vector2 center = new Vector2();
-    private SpriteBatch batch;
+    public SpriteBatch batch;
 
     private Vector2 focalPoint;
     private float initialZoom;
@@ -54,6 +54,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     private PxlsClient client;
 
+    public Template template;
+
     public CanvasScreen(FrameBuffer buffer, LoadScreen.BoardInfo info) {
         boardInfo = info;
 
@@ -64,6 +66,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         paletteBar = new PixelBar(info.palette);
         login = new LoginBar();
+        template = new Template(this);
 
         bottomContainer = new Container<WidgetGroup>(login).fill();
         bottomContainer.background(Pxls.skin.getDrawable("background"));
@@ -92,7 +95,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Stack stack = new Stack();
         stack.add(login.popup);
         stack.add(undoPopup);
-        table.add(stack).expandX().expandY().bottom().row();
+        table.add(stack).expandX().expandY().center().bottom().row();
         table.add(bottomContainer).fillX().expandX();
         table.setFillParent(true);
         stage.addActor(table);
@@ -214,15 +217,18 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                JsonObject data = Pxls.gson.fromJson(httpResponse.getResultAsString(), JsonObject.class);
+                String resp = httpResponse.getResultAsString();
+                
+                JsonObject data = Pxls.gson.fromJson(resp, JsonObject.class);
 
-                PixelLookupOverlay plo = new PixelLookupOverlay(data.get("x").getAsInt(), data.get("y").getAsInt(), data.get("username").getAsString(), data.get("time").getAsLong());
+                PixelLookupOverlay plo = new PixelLookupOverlay(data.get("x").getAsInt(), data.get("y").getAsInt(), data.get("username").getAsString(), data.get("time").getAsLong(), data.get("pixel_count").getAsInt(), data.get("id").getAsInt(), client.loggedIn);
                 lookupContainer.setActor(plo);
             }
 
             @Override
             public void failed(Throwable t) {
-
+                //PxlsGame.i.alert("pixel not set!!!!");
+                lookupContainer.removeActor(lookupContainer.getActor());
             }
 
             @Override
@@ -268,6 +274,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Vector2 canvasSize = new Vector2(boardInfo.width, boardInfo.height).scl(zoom);
         Vector2 canvasCorner = screenCenter.mulAdd(center, -zoom);
         batch.draw(canvasBuffer.getColorBufferTexture(), canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
+        
+        template.render(zoom, screenCenter);
         batch.end();
 
         stage.act(delta);

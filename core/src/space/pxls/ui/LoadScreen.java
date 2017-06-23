@@ -83,6 +83,7 @@ public class LoadScreen extends ScreenAdapter {
 
                                 System.out.println("Switching states...");
                                 PxlsGame.i.setScreen(new CanvasScreen(canvasTexture, info));
+                                PxlsGame.i.handleView(PxlsGame.i.startupURI);
                             }
                         });
                     }

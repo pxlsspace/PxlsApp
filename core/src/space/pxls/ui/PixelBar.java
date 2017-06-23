@@ -101,6 +101,8 @@ public class PixelBar extends Stack {
 
         this.cooldownContainer.setVisible(timeLeft > 0);
 
+        timeLeft++; // better human-readability
+
         int minutes = (int) (timeLeft / 60);
         int seconds = (int) (timeLeft % 60);
         this.cooldownLabel.setText(String.format("%02d:%02d", minutes, seconds));

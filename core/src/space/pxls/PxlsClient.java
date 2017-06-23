@@ -28,10 +28,12 @@ public class PxlsClient {
     private WebSocketClient client;
     private PendingPixel pendingPixel;
     private Account account;
+    public boolean loggedIn;
 
     public PxlsClient(final UpdateCallback updateCallback) {
         this.updateCallback = updateCallback;
         try {
+            loggedIn = false;
             String wsPath = Pxls.wsPath;
 
             Map<String, String> headers = new HashMap<String, String>();
@@ -57,7 +59,7 @@ public class PxlsClient {
                         updateCallback.users(usersPacket.users);
                     } else if (type.equals("userinfo")) {
                         UserInfoPacket userInfoPacket = Pxls.gson.fromJson(message, UserInfoPacket.class);
-
+                        loggedIn = true;
                         account = new Account(userInfoPacket.username, userInfoPacket.banned, userInfoPacket.role.equals("BANNED") ? 0 : userInfoPacket.banExpiry, userInfoPacket.ban_reason);
                         updateCallback.updateAccount(account);
                     } else if (type.equals("cooldown")) {

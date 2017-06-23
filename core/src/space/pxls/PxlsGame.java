@@ -12,16 +12,20 @@ import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.ui.CanvasScreen;
 import space.pxls.ui.LoadScreen;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.io.UnsupportedEncodingException;
 
 public class PxlsGame extends Game {
     public static PxlsGame i;
     public CaptchaRunner captchaRunner;
     public LoginRunner loginRunner;
-
+    public URI startupURI;
     @Override
     public void create() {
         Pxls.init();
@@ -33,9 +37,74 @@ public class PxlsGame extends Game {
         Pxls.skin = new Skin();
     }
 
+    private Map<String, String> parseQuery(String s) {
+        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+        try {
+            String query = s;
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                if (idx == -1) {
+                    continue;
+                }
+                String key = URLDecoder.decode(pair.substring(0, idx), "UTF-8");
+                if (!key.isEmpty() && query_pairs.get(key) == null) {
+                    query_pairs.put(key, URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            
+        }
+        return query_pairs;
+    }
+
+    public void handleView(URI uri) {
+        if (!(screen instanceof CanvasScreen)) {
+            return;
+        }
+        CanvasScreen _screen = (CanvasScreen)screen;
+        
+        String query = uri.getQuery();
+        if (query == null) {
+            query = "";
+        }
+        String hash = uri.getFragment();
+        if (hash == null) {
+            hash = "";
+        }
+        query = hash + "&" + query; // prioritize # over ?
+        Map<String, String> params = parseQuery(query);
+        String url = params.get("template");
+        if (url == null) {
+            _screen.template.load(0, 0, -1, 0.5f, "");
+            return; // nothing to do
+        }
+        String s_x = params.get("ox");
+        if (s_x == null) {
+            s_x = "0";
+        }
+        String s_y = params.get("oy");
+        if (s_y == null) {
+            s_y = "0";
+        }
+        String s_tw = params.get("tw");
+        if (s_tw == null) {
+            s_tw = "-1";
+        }
+        String s_oo = params.get("oo");
+        if (s_oo == null) {
+            s_oo = "0.5";
+        }
+        int x = Integer.parseInt(s_x);
+        int y = Integer.parseInt(s_y);
+        int tw = Integer.parseInt(s_tw);
+        float oo = Float.valueOf(s_oo);
+        _screen.template.load(x, y, tw, oo, url);
+    }
+
     public void handleAuthenticationCallback(String url) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
-        req.setUrl(url);
+        req.setUrl(url + "&json=1");
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {

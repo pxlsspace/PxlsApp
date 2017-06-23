@@ -30,6 +30,9 @@ android {
             proguardFile 'proguard-project.txt'
         }
     }
+    lintOptions {
+        disable 'GoogleAppIndexingUrlError'
+    }
 }
 
 
