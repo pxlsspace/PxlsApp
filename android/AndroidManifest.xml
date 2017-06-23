@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="space.pxls.android"
-    android:versionCode="2"
-    android:versionName="1.1" >
+    android:versionCode="3"
+    android:versionName="1.1.1" >
 
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="25" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -29,6 +29,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="https" android:host="pxls.space" android:pathPrefix="/auth/google" />
+                <data android:scheme="https" android:host="pxls.space" android:pathPrefix="/auth/discord" />
             </intent-filter>
         </activity>
         <activity android:label="@string/app_name" android:name=".CaptchaActivity"/>
