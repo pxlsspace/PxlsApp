@@ -25,7 +25,7 @@ public class PxlsGame extends Game {
     public static PxlsGame i;
     public CaptchaRunner captchaRunner;
     public LoginRunner loginRunner;
-    public String startupUrl;
+    public URI startupURI;
     @Override
     public void create() {
         Pxls.init();
@@ -58,17 +58,12 @@ public class PxlsGame extends Game {
         return query_pairs;
     }
 
-    public void handleView(String _url) {
+    public void handleView(URI uri) {
         if (!(screen instanceof CanvasScreen)) {
             return;
         }
         CanvasScreen _screen = (CanvasScreen)screen;
-        URI uri;
-        try {
-            uri = new URI(_url);
-        } catch (URISyntaxException e) {
-            return;
-        }
+        
         String query = uri.getQuery();
         if (query == null) {
             query = "";

@@ -14,6 +14,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class AndroidLauncher extends AndroidApplication {
     public static final int CAPTCHA_REQUEST = 1;
@@ -32,9 +34,14 @@ public class AndroidLauncher extends AndroidApplication {
         game = new PxlsGame();
         Intent intent = getIntent();
         if (intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
-            String url = intent.getDataString();
-            if (!url.startsWith("/auth")) {
-                game.startupUrl = url;
+            
+            try {
+                String url = intent.getDataString();
+                URI uri = new URI(url);
+                if (!uri.getPath().startsWith("/auth")) {
+                    game.startupURI = uri;
+                }
+            } catch (URISyntaxException e) {
             }
         }
         game.captchaRunner = new PxlsGame.CaptchaRunner() {
@@ -81,11 +88,15 @@ public class AndroidLauncher extends AndroidApplication {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent.getAction().equals(Intent.ACTION_VIEW)) {
-            String url = intent.getDataString();
-            if (url.startsWith("/auth/")) {
-                game.handleAuthenticationCallback(url);
-            } else {
-                game.handleView(url);
+            try {
+                String url = intent.getDataString();
+                URI uri = new URI(url);
+                if (uri.getPath().startsWith("/auth")) {
+                    game.handleAuthenticationCallback(url);
+                } else {
+                    game.handleView(uri);
+                }
+            } catch (URISyntaxException e) {
             }
         }
     }
