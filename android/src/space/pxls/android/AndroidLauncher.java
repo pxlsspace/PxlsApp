@@ -57,7 +57,7 @@ public class AndroidLauncher extends AndroidApplication {
         game.loginRunner = new PxlsGame.LoginRunner() {
             @Override
             public void doLogin(String method, String url) {
-                if (method.equals("google")) {
+                if (method.equals("google") || method.equals("discord")) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(intent);
                 } else {
