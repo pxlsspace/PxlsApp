@@ -44,6 +44,9 @@ public class PxlsGame extends Game {
             String[] pairs = query.split("&");
             for (String pair : pairs) {
                 int idx = pair.indexOf("=");
+                if (idx == -1) {
+                    continue;
+                }
                 String key = URLDecoder.decode(pair.substring(0, idx), "UTF-8");
                 if (!key.isEmpty() && query_pairs.get(key) == null) {
                     query_pairs.put(key, URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
@@ -56,7 +59,7 @@ public class PxlsGame extends Game {
     }
 
     public void handleView(String _url) {
-        if (!(screen instanceof CanvasScreen) || _url.isEmpty()) {
+        if (!(screen instanceof CanvasScreen)) {
             return;
         }
         CanvasScreen _screen = (CanvasScreen)screen;
@@ -77,7 +80,8 @@ public class PxlsGame extends Game {
         query = hash + "&" + query; // prioritize # over ?
         Map<String, String> params = parseQuery(query);
         String url = params.get("template");
-        if (url == null || url.isEmpty()) {
+        if (url == null) {
+            _screen.template.load(0, 0, -1, 0.5f, "");
             return; // nothing to do
         }
         String s_x = params.get("ox");
