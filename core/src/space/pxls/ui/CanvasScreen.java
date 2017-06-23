@@ -92,7 +92,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Stack stack = new Stack();
         stack.add(login.popup);
         stack.add(undoPopup);
-        table.add(stack).expandX().expandY().bottom().row();
+        table.add(stack).expandX().expandY().center().bottom().row();
         table.add(bottomContainer).fillX().expandX();
         table.setFillParent(true);
         stage.addActor(table);
@@ -214,15 +214,18 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                JsonObject data = Pxls.gson.fromJson(httpResponse.getResultAsString(), JsonObject.class);
+                String resp = httpResponse.getResultAsString();
+                
+                JsonObject data = Pxls.gson.fromJson(resp, JsonObject.class);
 
-                PixelLookupOverlay plo = new PixelLookupOverlay(data.get("x").getAsInt(), data.get("y").getAsInt(), data.get("username").getAsString(), data.get("time").getAsLong());
+                PixelLookupOverlay plo = new PixelLookupOverlay(data.get("x").getAsInt(), data.get("y").getAsInt(), data.get("username").getAsString(), data.get("time").getAsLong(), data.get("pixel_count").getAsInt());
                 lookupContainer.setActor(plo);
             }
 
             @Override
             public void failed(Throwable t) {
-
+                //PxlsGame.i.alert("pixel not set!!!!");
+                lookupContainer.removeActor(lookupContainer.getActor());
             }
 
             @Override

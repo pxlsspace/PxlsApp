@@ -14,13 +14,15 @@ public class PixelLookupOverlay extends Table {
     private int y;
     private String username;
     private long time;
+    private int pixels;
 
-    public PixelLookupOverlay(int x, int y, String username,long time) {
+    public PixelLookupOverlay(int x, int y, String username, long time, int pixels) {
         super(Pxls.skin);
         this.x = x;
         this.y = y;
         this.username = username;
         this.time = time;
+        this.pixels = pixels;
 
         Label coordsLabel = new Label("Coords:", Pxls.skin);
         coordsLabel.setFontScale(0.3f);
@@ -36,6 +38,11 @@ public class PixelLookupOverlay extends Table {
         timeLabel.setFontScale(0.3f);
         Label tme = new Label(new TimeAgo().timeAgo(time), Pxls.skin);
         tme.setFontScale(0.3f);
+
+        Label pixelsLabel = new Label("Pixels by user:", Pxls.skin);
+        pixelsLabel.setFontScale(0.3f);
+        Label pxls = new Label(Integer.toString(pixels), Pxls.skin);
+        pxls.setFontScale(0.3f);
 
         Label close = new Label("Close", Pxls.skin);
         close.setFontScale(0.2f);
@@ -56,6 +63,9 @@ public class PixelLookupOverlay extends Table {
 
         add(timeLabel).expandX().left();
         add(tme).expandX().right().row();
+
+        add(pixelsLabel).expandX().left();
+        add(pxls).expandX().right().row();
 
         add(close).colspan(2).expandX().right().row();
     }
