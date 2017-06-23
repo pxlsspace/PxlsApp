@@ -221,7 +221,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 
                 JsonObject data = Pxls.gson.fromJson(resp, JsonObject.class);
 
-                PixelLookupOverlay plo = new PixelLookupOverlay(data.get("x").getAsInt(), data.get("y").getAsInt(), data.get("username").getAsString(), data.get("time").getAsLong(), data.get("pixel_count").getAsInt());
+                PixelLookupOverlay plo = new PixelLookupOverlay(data.get("x").getAsInt(), data.get("y").getAsInt(), data.get("username").getAsString(), data.get("time").getAsLong(), data.get("pixel_count").getAsInt(), data.get("id").getAsInt(), client.loggedIn);
                 lookupContainer.setActor(plo);
             }
 
