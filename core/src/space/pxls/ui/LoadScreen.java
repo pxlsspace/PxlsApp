@@ -130,7 +130,7 @@ public class LoadScreen extends ScreenAdapter {
         for (int i = 0; i < board.length; i++) {
             byte color = board[i];
 
-            if (color == 0xFF || color == -1) {
+            if (color == -1) {
                 // transparent!
                 data[i * 4] = (byte)0;
                 data[i * 4 + 1] = (byte)0;
