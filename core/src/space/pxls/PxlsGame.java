@@ -104,7 +104,13 @@ public class PxlsGame extends Game {
 
     public void handleAuthenticationCallback(String url) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
-        req.setUrl(url + "&json=1");
+        try {
+            URI uri = new URI(url);
+            req.setUrl(new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString() + "?"+uri.getQuery()+"&json=1");
+        } catch (URISyntaxException e) {
+            alert("Authentification failed");
+            return;
+        }
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
