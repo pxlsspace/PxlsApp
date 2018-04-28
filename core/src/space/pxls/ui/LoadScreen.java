@@ -168,5 +168,6 @@ public class LoadScreen extends ScreenAdapter {
         int height;
         List<String> palette;
         String captchaKey;
+        int maxStacked;
     }
 }
