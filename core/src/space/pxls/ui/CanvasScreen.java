@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -46,7 +47,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private Container<UserBar> topContainer;
     private Container<WidgetGroup> bottomContainer;
     private Container<PixelLookupOverlay> lookupContainer;
+    private Container<StackOverlay> stackOverlayContainer;
     private UndoPopup undoPopup;
+    private Cell centerPopupCell;
     public StackOverlay stackOverlay;
 
     private PixelBar paletteBar;
@@ -78,6 +81,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         lookupContainer = new Container<PixelLookupOverlay>(null).fill();
         lookupContainer.background(Pxls.skin.getDrawable("background"));
 
+        stackOverlayContainer = new Container<StackOverlay>(null).fill();
+
         undoPopup = new UndoPopup();
         undoPopup.addListener(new EventListener() {
             @Override
@@ -91,16 +96,20 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         });
 
         stackOverlay = new StackOverlay(info.maxStacked, info.maxStacked);
+        stackOverlay.empty();
+        stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
 
         Table table = new Table();
-        table.add(topContainer).fillX().expandX().row();
-        table.add(lookupContainer).fillX().expandX().row();
-        Stack stack = new Stack();
-        stack.add(login.popup);
-        stack.add(undoPopup);
-        table.add(stack).expandX().expandY().center().bottom().row();
-        table.add(stackOverlay).expandX().expandY().bottom().left().row();
-        table.add(bottomContainer).fillX().expandX();
+        table.add(topContainer).fillX().expandX().colspan(2).row();
+        table.add(lookupContainer).fillX().expandX().colspan(2).row();
+        Stack centerPopup = new Stack();
+        centerPopup.add(login.popup);
+        centerPopup.add(undoPopup);
+        
+        table.add(stackOverlayContainer).expandY().bottom().left();
+        table.add(centerPopup).center().bottom().expandX().padRight(stackOverlayContainer.getWidth());
+        table.row();
+        table.add(bottomContainer).fillX().expandX().colspan(2);
         table.setFillParent(true);
         stage.addActor(table);
 
@@ -225,7 +234,16 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 
                 JsonObject data = Pxls.gson.fromJson(resp, JsonObject.class);
 
-                PixelLookupOverlay plo = new PixelLookupOverlay(data.get("x").getAsInt(), data.get("y").getAsInt(), data.get("username").getAsString(), data.get("time").getAsLong(), data.get("pixel_count").getAsInt(), data.get("id").getAsInt(), client.loggedIn);
+                PixelLookupOverlay plo = new PixelLookupOverlay(
+                    data.get("x").getAsInt(),
+                    data.get("y").getAsInt(),
+                    data.get("username").getAsString(),
+                    data.get("time").getAsLong(),
+                    data.get("pixel_count").getAsInt(),
+                    data.get("pixel_count_alltime").getAsInt(),
+                    data.get("id").getAsInt(),
+                    client.loggedIn
+                );
                 lookupContainer.setActor(plo);
             }
 
@@ -346,7 +364,13 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     @Override
     public void cooldown(float seconds) {
         paletteBar.updateCooldown(seconds);
-        stackOverlay.updateCooldown(seconds);
+        if (bottomContainer.getActor() != login) {
+            stackOverlayContainer.setActor(stackOverlay);
+            stackOverlay.updateCooldown(seconds);
+        } else {
+            stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
+        }
+        centerPopupCell.padRight(stackOverlay.getWidth());
     }
 
     @Override
@@ -355,7 +379,15 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     }
 
     @Override
-    public void stack(int count, String cause) { stackOverlay.updateStack(count, cause); }
+    public void stack(int count, String cause) {
+        if (bottomContainer.getActor() != login) {
+            stackOverlayContainer.setActor(stackOverlay);
+            stackOverlay.updateStack(count, cause);
+        } else {
+            stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
+        }
+        centerPopupCell.padRight(stackOverlay.getWidth());
+    }
 
     @Override
     public void runCaptcha() {
@@ -370,6 +402,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     public void logout() {
         PxlsGame.i.logOut();
+        stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
         bottomContainer.setActor(login);
     }
 }

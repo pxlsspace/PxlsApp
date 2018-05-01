@@ -24,14 +24,16 @@ public class PixelLookupOverlay extends Table {
     private String username;
     private long time;
     private int pixels;
+    private int pixelsAlltime;
 
-    public PixelLookupOverlay(final int x, final int y, String username, long time, int pixels, final int id, boolean loggedIn) {
+    public PixelLookupOverlay(final int x, final int y, String username, long time, int pixels, int pixelsAlltime, final int id, boolean loggedIn) {
         super(Pxls.skin);
         this.x = x;
         this.y = y;
         this.username = username;
         this.time = time;
         this.pixels = pixels;
+        this.pixelsAlltime = pixelsAlltime;
 
         Label coordsLabel = new Label("Coords:", Pxls.skin);
         coordsLabel.setFontScale(0.3f);
@@ -45,13 +47,19 @@ public class PixelLookupOverlay extends Table {
 
         Label timeLabel = new Label("Placed at:", Pxls.skin);
         timeLabel.setFontScale(0.3f);
-        Label tme = new Label(new TimeAgo().timeAgo(time), Pxls.skin);
+        long current = System.currentTimeMillis();
+        Label tme = new Label(current - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time), Pxls.skin);
         tme.setFontScale(0.3f);
 
         Label pixelsLabel = new Label("Pixels by user:", Pxls.skin);
         pixelsLabel.setFontScale(0.3f);
         Label pxls = new Label(Integer.toString(pixels), Pxls.skin);
         pxls.setFontScale(0.3f);
+
+        Label pixelsAlltimeLabel = new Label("Alltime Pixels:", Pxls.skin);
+        pixelsAlltimeLabel.setFontScale(0.3f);
+        Label pxlsAlltime = new Label(Integer.toString(pixelsAlltime), Pxls.skin);
+        pxlsAlltime.setFontScale(0.3f);
 
         Label close = new Label("Close", Pxls.skin);
         close.setFontScale(0.2f);
@@ -75,6 +83,9 @@ public class PixelLookupOverlay extends Table {
 
         add(pixelsLabel).expandX().left();
         add(pxls).expandX().right().row();
+
+        add(pixelsAlltimeLabel).expandX().left();
+        add(pxlsAlltime).expandX().right().row();
 
         if (loggedIn) {
             Label report = new Label("Report", Pxls.skin);

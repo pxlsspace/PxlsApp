@@ -12,6 +12,7 @@ public class StackOverlay extends Container<Container<Label>> {
     private final Label countLabel;
     private boolean normal;
     private long cooldownExpiry;
+    private boolean isEmpty;
 
     public StackOverlay(final int count, final int maxCount) {
         super();
@@ -39,7 +40,9 @@ public class StackOverlay extends Container<Container<Label>> {
         updateStack();
     }
 
-    public void updateStack() { this.countLabel.setText(count + "/" + maxCount); }
+    public void updateStack() {
+        this.countLabel.setText(count + "/" + maxCount);
+    }
 
     // called on new cooldown
     public void updateCooldown(float cooldown) {
@@ -77,5 +80,9 @@ public class StackOverlay extends Container<Container<Label>> {
     public void act(float delta) {
         super.act(delta);
         updateCooldown();
+    }
+
+    public void empty() {
+        this.countLabel.setText("");
     }
 }
