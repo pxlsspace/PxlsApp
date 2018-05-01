@@ -47,6 +47,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private Container<WidgetGroup> bottomContainer;
     private Container<PixelLookupOverlay> lookupContainer;
     private UndoPopup undoPopup;
+    public StackOverlay stackOverlay;
 
     private PixelBar paletteBar;
     private LoginBar login;
@@ -89,6 +90,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             }
         });
 
+        stackOverlay = new StackOverlay(info.maxStacked, info.maxStacked);
+
         Table table = new Table();
         table.add(topContainer).fillX().expandX().row();
         table.add(lookupContainer).fillX().expandX().row();
@@ -96,6 +99,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         stack.add(login.popup);
         stack.add(undoPopup);
         table.add(stack).expandX().expandY().center().bottom().row();
+        table.add(stackOverlay).expandX().expandY().bottom().left().row();
         table.add(bottomContainer).fillX().expandX();
         table.setFillParent(true);
         stage.addActor(table);
@@ -342,12 +346,16 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     @Override
     public void cooldown(float seconds) {
         paletteBar.updateCooldown(seconds);
+        stackOverlay.updateCooldown(seconds);
     }
 
     @Override
     public void canUndo(float seconds) {
         undoPopup.popUp(seconds);
     }
+
+    @Override
+    public void stack(int count, String cause) { stackOverlay.updateStack(count, cause); }
 
     @Override
     public void runCaptcha() {
