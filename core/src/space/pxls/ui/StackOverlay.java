@@ -31,12 +31,7 @@ public class StackOverlay extends Container<Container<Label>> {
 
     // called on each stack update (gain, consume, etc.)
     public void updateStack(int count, String cause) {
-        this.count = normal ? count + 1 : count;
-        if (count == 0 && normal) {
-            this.count = 1;
-        } else if (count == 0) {
-            this.count = 0;
-        }
+        this.count = count;
         updateStack();
     }
 
@@ -48,9 +43,7 @@ public class StackOverlay extends Container<Container<Label>> {
     public void updateCooldown(float cooldown) {
         cooldownExpiry = System.currentTimeMillis() + (long) (cooldown * 1000);
         if (normal) {
-            count--;
             normal = false;
-            updateStack();
         }
         updateCooldown();
     }

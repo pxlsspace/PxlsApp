@@ -102,8 +102,8 @@ public class PxlsClient {
                     } else if (type.equals("can_undo")) {
                         CanUndoPacket p = Pxls.gson.fromJson(message, CanUndoPacket.class);
                         updateCallback.canUndo(p.time);
-                    } else if (type.equals("stack")) {
-                        StackPacket p = Pxls.gson.fromJson(message, StackPacket.class);
+                    } else if (type.equals("pixels")) {
+                        PixelsStackPacket p = Pxls.gson.fromJson(message, PixelsStackPacket.class);
                         updateCallback.stack(p.count, p.cause);
                     }
                 }
@@ -260,7 +260,7 @@ public class PxlsClient {
         String type = "undo";
     }
 
-    static class StackPacket {
+    static class PixelsStackPacket {
         int count;
         String cause;
     }
