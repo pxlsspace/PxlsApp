@@ -27,6 +27,7 @@ public class StackOverlay extends Container<Container<Label>> {
         setActor(container);
 
         setClip(true);
+        normal = true;
     }
 
     // called on each stack update (gain, consume, etc.)
@@ -61,7 +62,7 @@ public class StackOverlay extends Container<Container<Label>> {
         if (total > 0) {
             normal = false;
         } else {
-            if (!normal) {
+            if (!normal && count == 0) {
                 count++;
             }
             normal = true;
