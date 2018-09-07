@@ -227,9 +227,11 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private void showLookup(int x, int y) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setUrl(Pxls.domain + "/lookup?x=" + x + "&y=" + y);
+        req.setHeader("Cookie", "pxls-token=" + Pxls.getAuthToken());
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                System.out.println("Success! Code " + httpResponse.getStatus().getStatusCode());
                 String resp = httpResponse.getResultAsString();
                 
                 JsonObject data = Pxls.gson.fromJson(resp, JsonObject.class);
@@ -251,6 +253,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             public void failed(Throwable t) {
                 //PxlsGame.i.alert("pixel not set!!!!");
                 lookupContainer.removeActor(lookupContainer.getActor());
+                System.out.println("Failed! " + t.getMessage());
             }
 
             @Override
