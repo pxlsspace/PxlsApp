@@ -8,10 +8,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import java.net.URI;
@@ -27,7 +23,6 @@ public class AndroidLauncher extends AndroidApplication {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MobileAds.initialize(this, "ca-app-pub-3477803366641939~6540178801");
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
@@ -70,16 +65,9 @@ public class AndroidLauncher extends AndroidApplication {
         };
 
         View view = initializeForView(game, config);
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.SMART_BANNER);
-        adView.setAdUnitId("ca-app-pub-3477803366641939/8016912008"); // REAL
-//        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111"); // TEST
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.addView(adView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0));
         layout.addView(view, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-
-        adView.loadAd(new AdRequest.Builder().build());
 
         setContentView(layout);
     }
