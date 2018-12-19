@@ -19,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -345,7 +347,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 @Override
                 public boolean handle(Event event) {
                     if (event instanceof UserBar.LogoutEvent) {
-                        logout();
+                        logout(false);
                         return true;
                     }
                     return false;
@@ -401,6 +403,24 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     }
 
     public void logout() {
+        logout(true);
+    }
+    public void logout(boolean skipConfirm) {
+        if (!skipConfirm) {
+            PxlsGame.i.confirm("Are you sure you want to log out?", new PxlsGame.ConfirmCallback() {
+                @Override
+                public void clicked(boolean confirmed) {
+                    if (confirmed) {
+                        doLogout();
+                    }
+                }
+            });
+        } else {
+            doLogout();
+        }
+    }
+
+    private void doLogout() {
         PxlsGame.i.logOut();
         stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
         bottomContainer.setActor(login);

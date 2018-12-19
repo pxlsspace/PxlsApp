@@ -179,6 +179,27 @@ public class PxlsGame extends Game {
         gdxButtonDialog.build().show();
     }
 
+    public void confirm(String message, final ConfirmCallback callback) {
+        final GDXButtonDialog gdxButtonDialog = Pxls.dialogs.newDialog(GDXButtonDialog.class);
+        gdxButtonDialog.setTitle("pxls.space");
+        gdxButtonDialog.setMessage(message);
+        gdxButtonDialog.addButton("Yes");
+        gdxButtonDialog.addButton("No");
+        gdxButtonDialog.setClickListener(new ButtonClickListener() {
+            @Override
+            public void click(final int button) {
+                gdxButtonDialog.dismiss();
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.clicked(button == 0); //`button` is the Nth button clicked based on `addButton` calls, zero-based. So, if button == 0, then the "yes" button was clicked. return true in that case since this is a confirmation dialog.
+                    }
+                });
+            }
+        });
+        gdxButtonDialog.build().show();
+    }
+
     private void doSignupPrompt(final String signupToken) {
         GDXTextPrompt gdxTextPrompt = Pxls.dialogs.newDialog(GDXTextPrompt.class);
         gdxTextPrompt.setTitle("pxls.space");
@@ -286,5 +307,9 @@ public class PxlsGame extends Game {
 
     public interface ButtonCallback {
         void clicked();
+    }
+
+    public interface ConfirmCallback {
+        void clicked(boolean confirmed);
     }
 }
