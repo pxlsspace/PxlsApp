@@ -6,10 +6,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.MathUtils;
@@ -19,20 +16,15 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
 import space.pxls.Account;
 import space.pxls.Pxls;
 import space.pxls.PxlsClient;
 import space.pxls.PxlsGame;
-
-import java.util.Date;
 
 public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCallback {
     public final LoadScreen.BoardInfo boardInfo;
@@ -63,12 +55,19 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     public Template template;
 
     public CanvasScreen(FrameBuffer buffer, LoadScreen.BoardInfo info) {
+        Pxls.gameState = Pxls.prefsHelper.GetSavedGameState();
+        System.out.println("Initializing CanvasScreen with " + Pxls.gameState);
         boardInfo = info;
 
         batch = new SpriteBatch();
         canvasBuffer = buffer;
 
-        center.set(info.width / 2, info.height / 2);
+        if (Pxls.gameState.canvasState.panX == -1 || Pxls.gameState.canvasState.panY == -1) {
+            center.set(info.width / 2, info.height / 2);
+        } else {
+            center.set(Pxls.gameState.canvasState.panX, Pxls.gameState.canvasState.panY);
+        }
+        zoom = Pxls.gameState.canvasState.zoom;
 
         paletteBar = new PixelBar(info.palette);
         login = new LoginBar();
@@ -131,7 +130,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             public boolean tap(float x, float y, int count, int button) {
                 if (paletteBar.getCurrentColor() >= 0) {
                     Vector2 pos = screenToBoardSpace(new Vector2(x, y));
-                    placePixel((int) pos.x, (int) pos.y);
+                    placePixel((int) pos.x, (int) pos.y, Pxls.prefsHelper.getKeepColorSelected());
                     return true;
                 }
                 return false;
@@ -164,6 +163,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 }
                 center.x = MathUtils.clamp(center.x, 0, boardInfo.width);
                 center.y = MathUtils.clamp(center.y, 0, boardInfo.height);
+                Pxls.gameState.canvasState.panX = (int)center.x;
+                Pxls.gameState.canvasState.panY = (int)center.y;
+                Pxls.prefsHelper.SaveGameState(Pxls.gameState);
                 return true;
             }
 
@@ -182,6 +184,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
                 int hw = Gdx.graphics.getWidth() / 2;
                 int hh = Gdx.graphics.getHeight() / 2;
+                float max = 200f;
                 if (focalPoint == null) {
                     initialZoom = zoom;
                     Vector2 ps = getPinchCenter(initialPointer1, initialPointer2);
@@ -193,9 +196,13 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                     ps.y = Gdx.graphics.getHeight() - ps.y;
                     center = focalPoint.cpy().sub(ps.sub(hw, hh).scl(1 / zoom));
                 }
-                zoom = MathUtils.clamp(zoom, 0.5f, 200f);
+                zoom = MathUtils.clamp(zoom, 0.5f, Pxls.prefsHelper.getAllowGreaterZoom() ? max * 10 : max);
                 center.x = MathUtils.clamp(center.x, 0, boardInfo.width);
                 center.y = MathUtils.clamp(center.y, 0, boardInfo.height);
+                Pxls.gameState.canvasState.zoom = zoom;
+                Pxls.gameState.canvasState.panX = (int)center.x;
+                Pxls.gameState.canvasState.panY = (int)center.y;
+                Pxls.prefsHelper.SaveGameState(Pxls.gameState);
                 return true;
             }
 
@@ -207,6 +214,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             @Override
             public boolean scrolled(int amount) {
                 Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2);
+                int max = 75;
 
                 float oldZoom = zoom;
                 if (amount > 0) {
@@ -214,13 +222,18 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 } else {
                     zoom *= 1.2f;
                 }
-                zoom = MathUtils.clamp(zoom, 1, 75);
+                zoom = MathUtils.clamp(zoom, 1, Pxls.prefsHelper.getAllowGreaterZoom() ? max * 10 : max);
 
                 center.x += delta.x / oldZoom;
                 center.y += delta.y / oldZoom;
 
                 center.x -= delta.x / zoom;
                 center.y -= delta.y / zoom;
+
+                Pxls.gameState.canvasState.zoom = zoom;
+                Pxls.gameState.canvasState.panX = (int)center.x;
+                Pxls.gameState.canvasState.panY = (int)center.y;
+                Pxls.prefsHelper.SaveGameState(Pxls.gameState);
                 return true;
             }
         }));
@@ -251,7 +264,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
             @Override
             public void failed(Throwable t) {
-                //PxlsGame.i.alert("pixel not set!!!!");
                 lookupContainer.removeActor(lookupContainer.getActor());
             }
 
@@ -262,10 +274,12 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         });
     }
 
-    private void placePixel(int x, int y) {
+    private void placePixel(int x, int y, boolean keepSelected) {
         if (paletteBar.getCurrentColor() >= 0) {
             client.placePixel(x, y, paletteBar.getCurrentColor());
-            paletteBar.changeColor(-1);
+            if (!keepSelected) {
+                paletteBar.changeColor(-1);
+            }
         }
     }
 
@@ -336,18 +350,23 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     }
 
     @Override
-    public void updateAccount(Account account) {
+    public void updateAccount(final Account account) {
         if (account != null && bottomContainer.getActor() == login) {
             bottomContainer.setActor(paletteBar);
         }
 
         if (account != null) {
+            final CanvasScreen self = this;
             userBar = new UserBar(account.getName());
             userBar.addListener(new EventListener() {
                 @Override
                 public boolean handle(Event event) {
                     if (event instanceof UserBar.LogoutEvent) {
                         logout(false);
+                        return true;
+                    }
+                    if (event instanceof UserBar.MenuOpenRequestedEvent) {
+                        PxlsGame.i.setScreen(new MenuScreen(self, account));
                         return true;
                     }
                     return false;

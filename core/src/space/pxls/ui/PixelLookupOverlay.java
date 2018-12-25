@@ -39,32 +39,26 @@ public class PixelLookupOverlay extends Table {
 
         Label coordsLabel = new Label("Coords:", Pxls.skin);
         coordsLabel.setFontScale(0.3f);
-        Label coords = new PxlsLabel("(" + x + ", " + y + ")", Pxls.skin);
-        coords.setFontScale(0.3f);
+        Label coords = new PxlsLabel("(" + x + ", " + y + ")");
 
         Label userLabel = new Label("Placed by:", Pxls.skin);
         userLabel.setFontScale(0.3f);
-        Label user = new PxlsLabel(username, Pxls.skin);
-        user.setFontScale(0.3f);
+        Label user = new PxlsLabel(username);
 
         Label timeLabel = new Label("Placed at:", Pxls.skin);
         timeLabel.setFontScale(0.3f);
         long current = System.currentTimeMillis();
-        Label tme = new PxlsLabel(current - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time), Pxls.skin);
-        tme.setFontScale(0.3f);
+        Label tme = new PxlsLabel(current - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time));
 
         Label pixelsLabel = new Label("Pixels by user:", Pxls.skin);
         pixelsLabel.setFontScale(0.3f);
-        Label pxls = new PxlsLabel(Integer.toString(pixels), Pxls.skin);
-        pxls.setFontScale(0.3f);
+        Label pxls = new PxlsLabel(Integer.toString(pixels));
 
         Label pixelsAlltimeLabel = new Label("Alltime Pixels:", Pxls.skin);
         pixelsAlltimeLabel.setFontScale(0.3f);
-        Label pxlsAlltime = new PxlsLabel(Integer.toString(pixelsAlltime), Pxls.skin);
-        pxlsAlltime.setFontScale(0.3f);
+        Label pxlsAlltime = new PxlsLabel(Integer.toString(pixelsAlltime));
 
-        Label close = new PxlsLabel("Close", Pxls.skin);
-        close.setFontScale(0.2f);
+        Label close = new PxlsLabel("Close").setFontScaleChain(0.2f);
         close.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -131,7 +125,7 @@ public class PixelLookupOverlay extends Table {
                 } catch (UnsupportedEncodingException e) {
                     System.out.println("uho");
                 }
-                req.setHeader("Cookie", "pxls-token=" + Pxls.getAuthToken());
+                req.setHeader("Cookie", "pxls-token=" + Pxls.prefsHelper.getToken());
                 Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
                     @Override
                     public void handleHttpResponse(Net.HttpResponse httpResponse) {

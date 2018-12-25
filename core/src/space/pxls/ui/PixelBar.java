@@ -113,9 +113,12 @@ public class PixelBar extends Stack {
     }
 
     public void changeColor(int newColor) {
-        if (currentColor >= 0 && newColor != currentColor) {
+        if (newColor == currentColor) {
+            newColor = -1;
+        }
+        if (currentColor >= 0) {
             MoveByAction mba = new MoveByAction();
-            mba.setAmountY(-16);
+            mba.setAmountY(-8);
             mba.setDuration(0.1f);
             mba.setInterpolation(Interpolation.exp5);
             table.getChildren().get(currentColor).addAction(mba);
@@ -126,7 +129,7 @@ public class PixelBar extends Stack {
 
         if (currentColor >= 0 && lastColor != newColor) {
             MoveByAction mba = new MoveByAction();
-            mba.setAmountY(16);
+            mba.setAmountY(8);
             mba.setDuration(0.1f);
             mba.setInterpolation(Interpolation.exp5);
             table.getChildren().get(currentColor).addAction(mba);

@@ -36,6 +36,13 @@ public class Template {
     }
 
     public void load(int _x, int _y, final float _tw, float _opacity, String _url) {
+        if (Pxls.prefsHelper.getRememberTemplate()) { //These should be serialized as something that gets called to `load`, so we'll just store these params.
+            Pxls.gameState.templateState.offsetX = _x;
+            Pxls.gameState.templateState.offsetY = _y;
+            Pxls.gameState.templateState.totalWidth = _tw;
+            Pxls.gameState.templateState.opacity = _opacity;
+            Pxls.gameState.templateState.URL = _url;
+        }
         x = _x;
         y = _y;
         opacity = _opacity;

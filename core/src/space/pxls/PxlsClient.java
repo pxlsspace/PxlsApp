@@ -37,8 +37,8 @@ public class PxlsClient {
             String wsPath = Pxls.wsPath;
 
             Map<String, String> headers = new HashMap<String, String>();
-            if (Pxls.getAuthToken() != null) {
-                headers.put("Cookie", "pxls-token=" + Pxls.getAuthToken());
+            if (Pxls.prefsHelper.getToken() != null) {
+                headers.put("Cookie", "pxls-token=" + Pxls.prefsHelper.getToken());
             }
             client = new WebSocketClient(new URI(wsPath), new Draft_17(), headers, 30) {
                 @Override

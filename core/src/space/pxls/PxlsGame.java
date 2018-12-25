@@ -3,6 +3,7 @@ package space.pxls;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.google.gson.JsonObject;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
@@ -11,6 +12,7 @@ import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.ui.CanvasScreen;
 import space.pxls.ui.LoadScreen;
+import space.pxls.ui.MenuScreen;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,6 +31,7 @@ public class PxlsGame extends Game {
     @Override
     public void create() {
         Pxls.init();
+        Pxls.prefsHelper = new PrefsHelper(Gdx.app.getPreferences("pxls"));
 
         i = this;
         setScreen(new LoadScreen());
@@ -63,6 +66,7 @@ public class PxlsGame extends Game {
             return;
         }
         CanvasScreen _screen = (CanvasScreen)screen;
+        if (uri == null) return;
         
         String query = uri.getQuery();
         if (query == null) {
@@ -143,6 +147,13 @@ public class PxlsGame extends Game {
 
             }
         });
+    }
+
+    public void gridState(boolean isEnabled) {
+        //
+    }
+    public void heatmapState(boolean isEnabled) {
+        //
     }
 
     public void alert(String message) {
@@ -273,7 +284,7 @@ public class PxlsGame extends Game {
     }
 
     private void applyToken(String token) {
-        Pxls.setAuthToken(token);
+        Pxls.prefsHelper.setToken(token);
         if (screen instanceof CanvasScreen) {
             ((CanvasScreen) screen).reconnect();
         }
