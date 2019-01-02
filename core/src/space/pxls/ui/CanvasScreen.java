@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -49,6 +51,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private PixelBar paletteBar;
     private LoginBar login;
     private UserBar userBar;
+    private UserCountOverlay userCountOverlay;
 
     private PxlsClient client;
 
@@ -100,21 +103,37 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         stackOverlay.empty();
         stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
 
+        userCountOverlay = new UserCountOverlay();
+
         Table table = new Table();
-        table.add(topContainer).fillX().expandX().colspan(2).row();
-        table.add(lookupContainer).fillX().expandX().colspan(2).row();
+        table.add(topContainer).fillX().expandX().colspan(3).row();
+        table.add(lookupContainer).fillX().expandX().colspan(3).row();
         Stack centerPopup = new Stack();
         centerPopup.add(login.popup);
         centerPopup.add(undoPopup);
         
         table.add(stackOverlayContainer).expandY().bottom().left();
         table.add(centerPopup).center().bottom().expandX().padRight(stackOverlayContainer.getWidth());
+        table.add(userCountOverlay).expandX().bottom().right();
         table.row();
-        table.add(bottomContainer).fillX().expandX().colspan(2);
+
+        table.add(bottomContainer).fillX().expandX().colspan(3);
         table.setFillParent(true);
         stage.addActor(table);
 
         client = new PxlsClient(this);
+    }
+
+    public void menuClosed() {
+        if (Pxls.prefsHelper.getHeatmapEnabled()) {
+            //TODO BLOCKING
+        }
+
+        if (Pxls.prefsHelper.getGridEnabled()) {
+            //TODO BLOCKING
+        }
+
+        if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
     }
 
     @Override
@@ -346,7 +365,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     @Override
     public void users(int users) {
-
+        if (userCountOverlay == null) return;
+        userCountOverlay.setCount(users);
     }
 
     @Override

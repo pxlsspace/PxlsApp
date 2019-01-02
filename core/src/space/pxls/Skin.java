@@ -14,17 +14,20 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
     public Skin() {
-        add("pixel", new TextureRegionDrawable(new TextureRegion(new Texture("pixel.png"))), Drawable.class);
-        add("palette", new TextureRegionDrawable(new TextureRegion(new Texture("palette.png"))), Drawable.class);
-        add("cog", new TextureRegionDrawable(new TextureRegion(new Texture("cog_black.png"))), Drawable.class);
-        add("menu", new TextureRegionDrawable(new TextureRegion(new Texture("menu.png"))), Drawable.class);
-        add("logout", new TextureRegionDrawable(new TextureRegion(new Texture("logout_black.png"))), Drawable.class);
-        add("times", new TextureRegionDrawable(new TextureRegion(new Texture("times.png"))), Drawable.class);
-        add("checked", new TextureRegionDrawable(new TextureRegion(new Texture("checked.png"))), Drawable.class);
-        add("unchecked", new TextureRegionDrawable(new TextureRegion(new Texture("unchecked.png"))), Drawable.class);
+        addDrawable("pixel", "pixel.png");
+        addDrawable("palette", "palette.png");
+        addDrawable("cog", "cog_black.png");
+        addDrawable("menu", "menu.png");
+        addDrawable("logout", "logout_black.png");
+        addDrawable("times", "times.png");
+        addDrawable("checked", "checked.png");
+        addDrawable("unchecked", "unchecked.png");
+        addDrawable("user", "user.png");
 
-        add("light-patch", new NinePatch(new Texture("light.9.png"), 13, 14, 14, 14), NinePatch.class);
-        add("white-patch", new NinePatch(new Texture("white.9.png"), 5, 5, 5, 5), NinePatch.class);
+        addPatch("light-patch", "light.9.png", 13, 14, 14, 14);
+        addPatch("white-patch", "white.9.png", 5, 5, 5, 5);
+        addPatch("rounded.topLeft", "rounded.topLeft.9.png", 5,5,5,5);
+        addPatch("rounded.topRight", "rounded.topRight.9.png", 5,5,5,5);
 
         add("default-horizontal", new Slider.SliderStyle(new TextureRegionDrawable(new TextureRegion(new Texture("slider.png"))), new TextureRegionDrawable(new TextureRegion(new Texture("slider-knob.png")))));
 
@@ -39,5 +42,13 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         TintedDrawable td = new TintedDrawable();
         td.color = new Color(1, 1, 1, 0.7f);
         add("background", newDrawable("pixel", 1, 1, 1, 0.85f), Drawable.class);
+    }
+
+    private void addDrawable(String name, String textureLoc) {
+        add(name, new TextureRegionDrawable(new TextureRegion(new Texture(textureLoc))), Drawable.class);
+    }
+
+    private void addPatch(String name, String textureLoc, int left, int right, int top, int bottom) {
+        add(name, new NinePatch(new Texture(textureLoc), left, right, top, bottom));
     }
 }

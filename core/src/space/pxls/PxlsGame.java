@@ -149,13 +149,6 @@ public class PxlsGame extends Game {
         });
     }
 
-    public void gridState(boolean isEnabled) {
-        //
-    }
-    public void heatmapState(boolean isEnabled) {
-        //
-    }
-
     public void alert(String message) {
         final GDXButtonDialog gdxButtonDialog = Pxls.dialogs.newDialog(GDXButtonDialog.class);
         gdxButtonDialog.setTitle("pxls.space");

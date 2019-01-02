@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -23,16 +22,15 @@ import java.util.Map;
 import space.pxls.Account;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
-import space.pxls.structs.GridState;
 
 public class MenuScreen extends ScreenAdapter {
     private Stage stage;
     private Account account;
-    private CanvasScreen lastScreen;
+    private CanvasScreen canvasScreen;
 
-    public MenuScreen(CanvasScreen lastScreen, Account loggedInAccount) {
+    public MenuScreen(CanvasScreen canvasScreen, Account loggedInAccount) {
         this.stage = new Stage();
-        this.lastScreen = lastScreen;
+        this.canvasScreen = canvasScreen;
         this.account = loggedInAccount;
         build();
     }
@@ -50,6 +48,7 @@ public class MenuScreen extends ScreenAdapter {
         final PxlsCheckBox cbRememberTemplate = new PxlsCheckBox("Save last template", Pxls.prefsHelper.getRememberTemplate());
         final PxlsCheckBox cbHeatmap = new PxlsCheckBox("Enable Heatmap", Pxls.prefsHelper.getHeatmapEnabled());
         final PxlsCheckBox cbGrid = new PxlsCheckBox("Enable Grid", Pxls.prefsHelper.getGridEnabled());
+        final PxlsCheckBox cbHideUserCount = new PxlsCheckBox("Hide UserCount", Pxls.prefsHelper.getHideUserCount());
 
         //placeholder
         final Slider sliderHeatmapOpacity = new Slider(0f, 1f, 0.1f, false, Pxls.skin);
@@ -106,6 +105,7 @@ public class MenuScreen extends ScreenAdapter {
         tcMisc.add(cbKeepSelected).padTop(6).padLeft(5).colspan(2).expandX().left().row();
         tcMisc.add(cbGreaterZoom).padTop(6).padLeft(5).colspan(2).expandX().left().row();
         tcMisc.add(cbRememberState).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcMisc.add(cbHideUserCount).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 
         Table tcHeatmap = new TitledTableHelper("Heatmap");
         tcHeatmap.add(cbHeatmap).padTop(6).padLeft(5).colspan(2).expandX().left().row();
@@ -151,6 +151,7 @@ public class MenuScreen extends ScreenAdapter {
                 Pxls.prefsHelper.setRememberTemplate(cbRememberTemplate.isChecked());
                 Pxls.prefsHelper.setGridEnabled(cbGrid.isChecked());
                 Pxls.prefsHelper.setHeatmapEnabled(cbGrid.isChecked());
+                Pxls.prefsHelper.setHideUerCount(cbHideUserCount.isChecked());
 
                 // Set colors/etc for some overlay stuff
 //                Pxls.prefsHelper.setGridColor(gridColorChooser.getValue()); //TODO BLOCKING
@@ -162,12 +163,11 @@ public class MenuScreen extends ScreenAdapter {
                     Pxls.prefsHelper.SaveGameState(Pxls.gameState);
                 }
 
-                //Flag overlay states on main canvas screen
-                PxlsGame.i.heatmapState(cbHeatmap.isChecked());
-                PxlsGame.i.gridState(cbGrid.isChecked());
-
                 //Return to canvas
-                PxlsGame.i.setScreen(self.lastScreen);
+                PxlsGame.i.setScreen(self.canvasScreen);
+
+                //Tell the canvasScreen settings have closed. Will handle showing/hiding the grid/heatmap/etc
+                self.canvasScreen.menuClosed();
             }
         });
 
@@ -197,8 +197,8 @@ public class MenuScreen extends ScreenAdapter {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    PxlsGame.i.setScreen(self.lastScreen);
-                    self.lastScreen.logout(false);
+                    PxlsGame.i.setScreen(self.canvasScreen);
+                    self.canvasScreen.logout(false);
                 }
             });
 

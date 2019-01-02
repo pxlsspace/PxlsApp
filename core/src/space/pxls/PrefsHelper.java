@@ -20,6 +20,7 @@ public class PrefsHelper {
     private boolean cachedAllowGreaterZoom = false;
     private boolean cachedRememberCanvasState = true;
     private boolean cachedRememberTemplate = false;
+    private boolean cachedHideUserCount = false;
 
     //Overlays
     private boolean cachedGridEnabled = false;
@@ -36,6 +37,7 @@ public class PrefsHelper {
         getAllowGreaterZoom(true);
         getRememberCanvasState(true);
         getRememberTemplate(true);
+        getHideUserCount(true);
         stateFlushTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -115,7 +117,7 @@ public class PrefsHelper {
         this.preferences.flush();
     }
     public boolean getGridEnabled() {
-        return getGridEnabled(true);
+        return getGridEnabled(false);
     }
     public boolean getGridEnabled(boolean reload) {
         if (!reload) return this.cachedGridEnabled;
@@ -129,12 +131,26 @@ public class PrefsHelper {
         this.preferences.flush();
     }
     public boolean getHeatmapEnabled() {
-        return getHeatmapEnabled(true);
+        return getHeatmapEnabled(false);
     }
     public boolean getHeatmapEnabled(boolean reload) {
         if (!reload) return this.cachedHeatmapEnabled;
         this.cachedHeatmapEnabled = this.preferences.getBoolean("heatmapEnabled", false);
         return this.cachedHeatmapEnabled;
+    }
+
+    public void setHideUerCount(boolean toSet) {
+        this.cachedHideUserCount = toSet;
+        this.preferences.putBoolean("hideUserCount", toSet);
+        this.preferences.flush();
+    }
+    public boolean getHideUserCount() {
+        return getHideUserCount(false);
+    }
+    public boolean getHideUserCount(boolean reload) {
+        if (!reload) return this.cachedHideUserCount;
+        this.cachedHideUserCount = this.preferences.getBoolean("hideUserCount", false);
+        return this.cachedHideUserCount;
     }
 
     public PxlsGameState GetSavedGameState() {

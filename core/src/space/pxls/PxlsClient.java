@@ -56,7 +56,7 @@ public class PxlsClient {
                         }
                     } else if (type.equals("users")) {
                         UsersPacket usersPacket = Pxls.gson.fromJson(message, UsersPacket.class);
-                        updateCallback.users(usersPacket.users);
+                        updateCallback.users(usersPacket.count);
                     } else if (type.equals("userinfo")) {
                         UserInfoPacket userInfoPacket = Pxls.gson.fromJson(message, UserInfoPacket.class);
                         loggedIn = true;
@@ -199,7 +199,7 @@ public class PxlsClient {
     }
 
     static class UsersPacket {
-        int users;
+        int count;
     }
 
     static class UserInfoPacket {
