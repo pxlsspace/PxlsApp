@@ -38,6 +38,7 @@ public class PrefsHelper {
         getRememberCanvasState(true);
         getRememberTemplate(true);
         getHideUserCount(true);
+        getHeatmapEnabled(true);
         stateFlushTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {

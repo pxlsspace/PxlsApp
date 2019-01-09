@@ -16,13 +16,12 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
+
 import space.pxls.Account;
 import space.pxls.Pxls;
 import space.pxls.PxlsClient;
@@ -56,25 +55,31 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private PxlsClient client;
 
     public Template template;
+    public Heatmap heatmap;
+    public Canvas canvas;
 
-    public CanvasScreen(FrameBuffer buffer, LoadScreen.BoardInfo info) {
+    public CanvasScreen(Canvas canvas) {
         Pxls.gameState = Pxls.prefsHelper.GetSavedGameState();
         System.out.println("Initializing CanvasScreen with " + Pxls.gameState);
-        boardInfo = info;
+        boardInfo = canvas.info;
 
         batch = new SpriteBatch();
-        canvasBuffer = buffer;
 
         if (Pxls.gameState.canvasState.panX == -1 || Pxls.gameState.canvasState.panY == -1) {
-            center.set(info.width / 2, info.height / 2);
+            center.set(canvas.info.width / 2, canvas.info.height / 2);
         } else {
             center.set(Pxls.gameState.canvasState.panX, Pxls.gameState.canvasState.panY);
         }
         zoom = Pxls.gameState.canvasState.zoom;
 
-        paletteBar = new PixelBar(info.palette);
+        paletteBar = new PixelBar(canvas.info.palette);
         login = new LoginBar();
+        this.canvas = canvas.setParent(this);
         template = new Template(this);
+        heatmap = new Heatmap(this);
+        if (Pxls.prefsHelper.getHeatmapEnabled()) {
+            heatmap.loadHeatmap();
+        }
 
         bottomContainer = new Container<WidgetGroup>(login).fill();
         bottomContainer.background(Pxls.skin.getDrawable("background"));
@@ -99,7 +104,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             }
         });
 
-        stackOverlay = new StackOverlay(info.maxStacked, info.maxStacked);
+        stackOverlay = new StackOverlay(canvas.info.maxStacked, canvas.info.maxStacked);
         stackOverlay.empty();
         stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
 
@@ -111,7 +116,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Stack centerPopup = new Stack();
         centerPopup.add(login.popup);
         centerPopup.add(undoPopup);
-        
+
         table.add(stackOverlayContainer).expandY().bottom().left();
         table.add(centerPopup).center().bottom().expandX().padRight(stackOverlayContainer.getWidth());
         table.add(userCountOverlay).expandX().bottom().right();
@@ -125,12 +130,11 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     }
 
     public void menuClosed() {
-        if (Pxls.prefsHelper.getHeatmapEnabled()) {
-            //TODO BLOCKING
-        }
-
         if (Pxls.prefsHelper.getGridEnabled()) {
             //TODO BLOCKING
+        }
+        if (Pxls.prefsHelper.getHeatmapEnabled() && heatmap != null) {
+            heatmap.updateTexture();
         }
 
         if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
@@ -330,9 +334,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Vector2 screenCenter = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()).scl(0.5f);
         Vector2 canvasSize = new Vector2(boardInfo.width, boardInfo.height).scl(zoom);
         Vector2 canvasCorner = screenCenter.mulAdd(center, -zoom);
-        batch.draw(canvasBuffer.getColorBufferTexture(), canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
-        
-        template.render(zoom, screenCenter);
+        canvas.render(zoom, screenCenter, canvasSize, canvasCorner);
+        heatmap.render(zoom, screenCenter, canvasSize, canvasCorner);
+//        template.render(zoom, screenCenter);
         batch.end();
 
         stage.act(delta);
@@ -352,13 +356,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             public void run() {
                 String colorString = boardInfo.palette.get(color);
                 Color c = Color.valueOf(colorString);
-
-                canvasBuffer.begin();
-                batch.getProjectionMatrix().setToOrtho2D(0, 0, boardInfo.width, boardInfo.height);
-                batch.begin();
-                Pxls.skin.newDrawable("pixel", c).draw(batch, x, y, 1, 1);
-                batch.end();
-                canvasBuffer.end();
+                canvas.pixel(x, y, color);
+                heatmap.pixel(x, y, color);
+//                virginmap.pixel(x, y, color);
             }
         });
     }

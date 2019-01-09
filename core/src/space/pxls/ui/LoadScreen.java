@@ -66,23 +66,16 @@ public class LoadScreen extends ScreenAdapter {
 
                         System.out.println("Wrangling bytes...");
 
-                        byte[] data = wrangleBytes(board, info, fancyColors);
-
-                        System.out.println("Writing bytes to pixmap...");
-                        final Pixmap p = new Pixmap(info.width, info.height, Pixmap.Format.RGBA8888);
-                        p.getPixels().put(data).position(0);
+                        final byte[] data = wrangleBytes(board, info, fancyColors);
 
                         Gdx.app.postRunnable(new Runnable() {
                             @Override
                             public void run() {
                                 System.out.println("Uploading to GPU...");
                                 FrameBuffer canvasTexture = new FrameBuffer(Pixmap.Format.RGBA8888, info.width, info.height, false);
-                                canvasTexture.getColorBufferTexture().draw(p, 0, 0);
-                                canvasTexture.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-                                p.dispose();
 
                                 System.out.println("Switching states...");
-                                PxlsGame.i.setScreen(new CanvasScreen(canvasTexture, info));
+                                PxlsGame.i.setScreen(new CanvasScreen(new Canvas(data, info)));
                                 PxlsGame.i.handleView(PxlsGame.i.startupURI);
                             }
                         });
@@ -90,8 +83,9 @@ public class LoadScreen extends ScreenAdapter {
 
                     @Override
                     public void failed(Throwable t) {
+                        t.printStackTrace();
                         System.out.println("Failed fetching board data");
-                        PxlsGame.i.alert("Board fetching failed, retrying the game...", new PxlsGame.ButtonCallback() {
+                        PxlsGame.i.alert("Failed to load the game. Press OK to try again", new PxlsGame.ButtonCallback() {
                             @Override
                             public void clicked() {
                                 PxlsGame.i.setScreen(new LoadScreen());
@@ -108,7 +102,8 @@ public class LoadScreen extends ScreenAdapter {
 
             @Override
             public void failed(Throwable t) {
-                PxlsGame.i.alert("Board info fetching failed, retrying...", new PxlsGame.ButtonCallback() {
+                t.printStackTrace();
+                PxlsGame.i.alert("Connection failed. Press OK to try again", new PxlsGame.ButtonCallback() {
                     @Override
                     public void clicked() {
                         PxlsGame.i.setScreen(new LoadScreen());

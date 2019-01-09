@@ -152,6 +152,7 @@ public class MenuScreen extends ScreenAdapter {
                 Pxls.prefsHelper.setGridEnabled(cbGrid.isChecked());
                 Pxls.prefsHelper.setHeatmapEnabled(cbGrid.isChecked());
                 Pxls.prefsHelper.setHideUerCount(cbHideUserCount.isChecked());
+                Pxls.prefsHelper.setHeatmapEnabled(cbHeatmap.isChecked());
 
                 // Set colors/etc for some overlay stuff
 //                Pxls.prefsHelper.setGridColor(gridColorChooser.getValue()); //TODO BLOCKING
