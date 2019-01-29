@@ -6,17 +6,15 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Align;
 import com.google.gson.Gson;
-import de.tomgrill.gdxdialogs.core.dialogs.GDXProgressDialog;
+
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.renderers.Canvas;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LoadScreen extends ScreenAdapter {
@@ -30,6 +28,7 @@ public class LoadScreen extends ScreenAdapter {
 
         Net.HttpRequest infoReq = new Net.HttpRequest(Net.HttpMethods.GET);
         infoReq.setUrl(Pxls.domain + "/info");
+        infoReq.setHeader("User-Agent", Pxls.getUA());
 
         Gdx.net.sendHttpRequest(infoReq, new Net.HttpResponseListener() {
             @Override
@@ -56,6 +55,7 @@ public class LoadScreen extends ScreenAdapter {
                 System.out.println("Creating board data request");
                 Net.HttpRequest boardDataReq = new Net.HttpRequest(Net.HttpMethods.GET);
                 boardDataReq.setUrl(Pxls.domain + "/boarddata");
+                boardDataReq.setHeader("User-Agent", Pxls.getUA());
 
                 System.out.println("Requesting board data...");
 
@@ -158,11 +158,11 @@ public class LoadScreen extends ScreenAdapter {
         Pxls.batch.end();
     }
 
-    static class BoardInfo {
-        int width;
-        int height;
-        List<String> palette;
-        String captchaKey;
-        int maxStacked;
+    public static class BoardInfo {
+        public int width;
+        public int height;
+        public List<String> palette;
+        public String captchaKey;
+        public int maxStacked;
     }
 }

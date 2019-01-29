@@ -6,10 +6,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
@@ -31,6 +33,8 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
 
         add("default-horizontal", new Slider.SliderStyle(new TextureRegionDrawable(new TextureRegion(new Texture("slider.png"))), new TextureRegionDrawable(new TextureRegion(new Texture("slider-knob.png")))));
 
+        add("default", new Button.ButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 5, 5, 5, 5)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.9.png"), 5, 5, 5, 5)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 5, 5, 5, 5))));
+
         BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
         font.setUseIntegerPositions(false);
         for (TextureRegion textureRegion : font.getRegions()) {
@@ -38,6 +42,10 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         }
         add("default", font);
         add("default", new Label.LabelStyle(font, Color.BLACK));
+
+        add("default", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 7,7,7,7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 7,7,7,7)), font));
+        add("red", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.red.9.png"), 7,7,7,7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.red.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.red.9.png"), 7,7,7,7)), font));
+        add("blue", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.blue.9.png"), 7,7,7,7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.blue.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.blue.9.png"), 7,7,7,7)), font));
 
         TintedDrawable td = new TintedDrawable();
         td.color = new Color(1, 1, 1, 0.7f);

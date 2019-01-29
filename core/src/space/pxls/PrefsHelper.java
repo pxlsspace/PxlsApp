@@ -22,6 +22,9 @@ public class PrefsHelper {
     private boolean cachedRememberTemplate = false;
     private boolean cachedHideUserCount = false;
 
+    //misc
+    private boolean hasSeenMoveModeTutorial = false;
+
     //Overlays
     private boolean cachedGridEnabled = false;
     private boolean cachedHeatmapEnabled = false;
@@ -39,6 +42,8 @@ public class PrefsHelper {
         getRememberTemplate(true);
         getHideUserCount(true);
         getHeatmapEnabled(true);
+        getHasSeenMoveModeTutorial(true);
+        getVirginmapEnabled(true);
         stateFlushTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -100,11 +105,27 @@ public class PrefsHelper {
         }
     }
 
+    public void setHasSeenMoveModeTutorial(boolean b) {
+        hasSeenMoveModeTutorial = b;
+        this.preferences.putBoolean("hasSeenMoveModeTutorial", b);
+        this.preferences.flush();
+    }
+    public boolean getHasSeenMoveModeTutorial() {
+        return getHasSeenMoveModeTutorial(false);
+    }
+    public boolean getHasSeenMoveModeTutorial(boolean reload) {
+        if (!reload) return hasSeenMoveModeTutorial;
+        hasSeenMoveModeTutorial = this.preferences.getBoolean("hasSeenMoveModeTutorial", false);
+        return hasSeenMoveModeTutorial;
+    }
+
     public void setRememberTemplate(boolean toSet) {
         this.cachedRememberTemplate = toSet;
+        this.preferences.putBoolean("rememberTemplate", toSet);
+        this.preferences.flush();
     }
     public boolean getRememberTemplate() {
-        return getRememberTemplate(true);
+        return getRememberTemplate(false);
     }
     public boolean getRememberTemplate(boolean reload) {
         if (!reload) return this.cachedRememberTemplate;
@@ -124,6 +145,20 @@ public class PrefsHelper {
         if (!reload) return this.cachedGridEnabled;
         this.cachedGridEnabled = this.preferences.getBoolean("gridEnabled", false);
         return this.cachedGridEnabled;
+    }
+
+    public void setVirginmapEnabled(boolean toSet) {
+        this.cachedVirginmapEnabled = toSet;
+        this.preferences.putBoolean("virginmapEnabled", toSet);
+        this.preferences.flush();
+    }
+    public boolean getVirginmapEnabled() {
+        return getVirginmapEnabled(false);
+    }
+    public boolean getVirginmapEnabled(boolean reload) {
+        if (!reload) return this.cachedVirginmapEnabled;
+        this.cachedVirginmapEnabled = this.preferences.getBoolean("virginmapEnabled", false);
+        return this.cachedVirginmapEnabled;
     }
 
     public void setHeatmapEnabled(boolean toSet) {
@@ -181,6 +216,9 @@ public class PrefsHelper {
             }
             if (this.toFlush.gridState != null) {
                 this.preferences.put(this.toFlush.gridState.deserialize());
+            }
+            if (this.toFlush.virginmapState != null) {
+                this.preferences.put(this.toFlush.virginmapState.deserialize());
             }
             this.preferences.flush();
             this.toFlush = null;

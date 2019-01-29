@@ -3,18 +3,25 @@ package space.pxls.structs;
 import java.util.HashMap;
 import java.util.Map;
 
+import space.pxls.renderers.Canvas;
+import space.pxls.renderers.Template;
+import space.pxls.renderers.Virginmap;
+import space.pxls.ui.CanvasScreen;
+
 public class PxlsGameState {
     public CanvasState canvasState = new CanvasState();
     public TemplateState templateState = new TemplateState();
     public HeatmapState heatmapState = new HeatmapState();
     public GridState gridState = new GridState();
+    public VirginmapState virginmapState = new VirginmapState();
 
     public PxlsGameState() {}
-    public PxlsGameState(CanvasState canvasState, TemplateState templateState, HeatmapState heatmapState, GridState gridState) {
+    public PxlsGameState(CanvasState canvasState, TemplateState templateState, HeatmapState heatmapState, GridState gridState, VirginmapState virginmapState) {
         this.canvasState = canvasState;
         this.templateState = templateState;
         this.heatmapState = heatmapState;
         this.gridState = gridState;
+        this.virginmapState = virginmapState;
     }
 
     public void serialize(Map<String, ?> prefs) {
@@ -23,6 +30,8 @@ public class PxlsGameState {
             this.templateState.offsetX = (Integer) prefs.get(TemplateState.ConfigKeys.offsetX);
             this.templateState.offsetY = (Integer) prefs.get(TemplateState.ConfigKeys.offsetY);
             this.templateState.totalWidth = (Float) prefs.get(TemplateState.ConfigKeys.totalWidth);
+            this.templateState.URL = (String) prefs.get(TemplateState.ConfigKeys.URL);
+            this.templateState.opacity = (Float) prefs.get(TemplateState.ConfigKeys.opacity);
         }
         if (prefs.get(HeatmapState.ConfigKeys.opacity) != null) {
             //assume we can serialize heatmap
@@ -35,6 +44,10 @@ public class PxlsGameState {
             this.canvasState.panX = (Integer) prefs.get(CanvasState.ConfigKeys.panX);
             this.canvasState.panY = (Integer) prefs.get(CanvasState.ConfigKeys.panY);
             this.canvasState.zoom = (Float) prefs.get(CanvasState.ConfigKeys.zoom);
+        }
+        if (prefs.get(VirginmapState.ConfigKeys.opacity) != null) {
+            if (this.virginmapState == null) this.virginmapState = new VirginmapState();
+            this.virginmapState.opacity = (Float) prefs.get(VirginmapState.ConfigKeys.opacity);
         }
     }
     public Map<String, ?> deserialize() {
@@ -56,6 +69,12 @@ public class PxlsGameState {
             toRet.putAll(this.heatmapState.deserialize());
         } else {
             toRet.putAll(HeatmapState.DefaultValuesMap);
+        }
+
+        if (this.virginmapState != null) {
+            toRet.putAll(this.virginmapState.deserialize());
+        } else {
+            toRet.putAll(VirginmapState.DefaultValuesMap);
         }
 
         return toRet;
@@ -81,6 +100,11 @@ public class PxlsGameState {
         return this.templateState;
     }
 
+    public VirginmapState getSafeVirginmapState() {
+        if (this.virginmapState == null) this.virginmapState = new VirginmapState();
+        return this.virginmapState;
+    }
+
     public PxlsGameState setCanavsLocation(CanvasState canvasState) {
         this.canvasState = canvasState;
         return this;
@@ -96,8 +120,12 @@ public class PxlsGameState {
         return this;
     }
 
+    public void setVirginmapState(VirginmapState virginmapState) {
+        this.virginmapState = virginmapState;
+    }
+
     @Override
     public String toString() {
-        return String.format("GameState {canvasState: {%s}; TemplateState: {%s}; HeatmapState: {%s};}", this.canvasState.toString(), this.templateState.toString(), this.heatmapState.toString());
+        return String.format("GameState {canvasState: {%s}; TemplateState: {%s}; HeatmapState: {%s}; VirginmapState: {%s}; }", this.canvasState.toString(), this.templateState.toString(), this.heatmapState.toString(), this.virginmapState.toString());
     }
 }

@@ -1,6 +1,8 @@
 package space.pxls.android;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -26,7 +28,13 @@ public class AndroidLauncher extends AndroidApplication {
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-        game = new PxlsGame();
+        String _v = "0.0.0";
+        try {
+            PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getPackageName(), 0);
+            _v = String.format("%s-%s", packageInfo.versionName, packageInfo.versionCode);
+        } catch (PackageManager.NameNotFoundException e) {/* ignored */}
+
+        game = new PxlsGame(_v);
         Intent intent = getIntent();
         if (intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             

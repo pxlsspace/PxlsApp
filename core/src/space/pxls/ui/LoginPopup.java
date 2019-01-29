@@ -90,6 +90,7 @@ public class LoginPopup extends Container<Container<Table>> {
     private void launchLogin(final String id) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setUrl(Pxls.domain + "/signin/" + id);
+        req.setHeader("User-Agent", Pxls.getUA());
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {

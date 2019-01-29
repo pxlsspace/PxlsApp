@@ -3,21 +3,21 @@ package space.pxls;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.google.gson.JsonObject;
+
 import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
 import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.ui.CanvasScreen;
 import space.pxls.ui.LoadScreen;
-import space.pxls.ui.MenuScreen;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -28,6 +28,13 @@ public class PxlsGame extends Game {
     public CaptchaRunner captchaRunner;
     public LoginRunner loginRunner;
     public URI startupURI;
+    public String VersionString = "0.0.0";
+
+    public PxlsGame() {}
+    public PxlsGame(String versionString) {
+        VersionString = versionString;
+    }
+
     @Override
     public void create() {
         Pxls.init();
@@ -79,6 +86,26 @@ public class PxlsGame extends Game {
         query = hash + "&" + query; // prioritize # over ?
         Map<String, String> params = parseQuery(query);
         String url = params.get("template");
+        String paramX = params.get("x");
+        if (paramX != null && paramX.length() > 0) {
+            String paramY = params.get("y");
+            if (paramY != null && paramY.length() > 0) {
+                String paramScale = params.get("scale");
+                int posX = 0;
+                int posY = 0;
+                try {
+                    int scale = -1;
+                    posX = Integer.parseInt(paramX);
+                    posY = Integer.parseInt(paramY);
+                    try {
+                        scale = Integer.parseInt(paramScale);
+                    } catch (Exception e) { /* ignored */ }
+                    _screen.moveTo(posX, posY, scale);
+                } catch (Exception e) {
+                    /*ignored*/
+                }
+            }
+        }
         if (url == null) {
             _screen.template.load(0, 0, -1, 0.5f, "");
             return; // nothing to do
@@ -108,6 +135,7 @@ public class PxlsGame extends Game {
 
     public void handleAuthenticationCallback(String url) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
+        req.setHeader("User-Agent", Pxls.getUA());
         try {
             URI uri = new URI(url);
             req.setUrl(new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString() + "?"+uri.getQuery()+"&json=1");
@@ -196,12 +224,37 @@ public class PxlsGame extends Game {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        callback.clicked(button == 0); //`button` is the Nth button clicked based on `addButton` calls, zero-based. So, if button == 0, then the "yes" button was clicked. return true in that case since this is a confirmation dialog.
+                        callback.done(button == 0); //`button` is the Nth button clicked based on `addButton` calls, zero-based. So, if button == 0, then the "yes" button was clicked. return true in that case since this is a confirmation dialog.
                     }
                 });
             }
         });
         gdxButtonDialog.build().show();
+    }
+
+    public void input(String prompt, final InputCallback callback) {
+        input(prompt, "", callback);
+    }
+    public void input(String prompt, Object defaultResponse, final InputCallback callback) {
+        GDXTextPrompt gdxTextPrompt = Pxls.dialogs.newDialog(GDXTextPrompt.class);
+        gdxTextPrompt.setMaxLength(2147483646);
+        gdxTextPrompt.setTitle("pxls.space");
+        gdxTextPrompt.setMessage(prompt);
+        gdxTextPrompt.setCancelButtonLabel("Cancel");
+        gdxTextPrompt.setConfirmButtonLabel("OK");
+        gdxTextPrompt.setTextPromptListener(new TextPromptListener() {
+            @Override
+            public void cancel() {
+                callback.cancelled();
+            }
+
+            @Override
+            public void confirm(String text) {
+                callback.input(text);
+            }
+        });
+        gdxTextPrompt.setValue(String.valueOf(defaultResponse));
+        gdxTextPrompt.build().show();
     }
 
     private void doSignupPrompt(final String signupToken) {
@@ -224,6 +277,7 @@ public class PxlsGame extends Game {
 
                 Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.POST);
                 req.setUrl(Pxls.domain + "/signup");
+                req.setHeader("User-Agent", Pxls.getUA());
                 try {
                     req.setContent("username=" + URLEncoder.encode(text, "utf-8") + "&token=" + URLEncoder.encode(signupToken, "utf-8"));
                 } catch (UnsupportedEncodingException e) {
@@ -314,6 +368,40 @@ public class PxlsGame extends Game {
     }
 
     public interface ConfirmCallback {
-        void clicked(boolean confirmed);
+        void done(boolean confirmed);
+    }
+
+    public interface InputCallback {
+        void cancelled();
+        void input(String response);
+    }
+
+    public Map<String, String> parseTemplateURL(String URL) {
+        try {
+            URI uri = URI.create(URL);
+            //https://pxls.space/#template=https://i.trg0d.com/2mL4534Ka6Z&tw=100&oo=1&ox=10&oy=15&x=0&y=0&scale=30
+            if (uri.getFragment().length() > 0) {
+                String[] split = uri.getFragment().split("&");
+                Map<String, String> uriArgs = new HashMap<String,String>();
+                for (String arg : split) {
+                    String[] argSplit = arg.split("=");
+                    uriArgs.put(argSplit[0], argSplit[1]);
+                }
+                if (uriArgs.containsKey("template") && uriArgs.containsKey("tw") && uriArgs.containsKey("ox") && uriArgs.containsKey("oy")) {
+                    Map<String, String> toRet = new HashMap<String, String>(uriArgs);
+                    if (!toRet.containsKey("tw")) {
+                        toRet.put("tw", "-1");
+                    }
+                    if (!toRet.containsKey("oo")) {
+                        toRet.put("oo", "0.5");
+                    }
+                    return toRet;
+                } else {
+                    return null;
+                }
+            }
+        } catch (Exception e) {/*ignored*/}
+
+        return null;
     }
 }

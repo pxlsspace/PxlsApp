@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.renderers;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 
-import space.pxls.Pxls;
+import space.pxls.ui.CanvasScreen;
+import space.pxls.ui.LoadScreen;
 
 public class Canvas {
     private CanvasScreen parent;

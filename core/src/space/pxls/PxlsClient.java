@@ -40,6 +40,7 @@ public class PxlsClient {
             if (Pxls.prefsHelper.getToken() != null) {
                 headers.put("Cookie", "pxls-token=" + Pxls.prefsHelper.getToken());
             }
+            headers.put("User-Agent", Pxls.getUA());
             client = new WebSocketClient(new URI(wsPath), new Draft_17(), headers, 30) {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {

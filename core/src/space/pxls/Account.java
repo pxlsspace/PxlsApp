@@ -29,4 +29,9 @@ public class Account {
     public String getBanReason() {
         return banReason;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Name: %s, Banned: %s, banExpiry: %s, banReason: %s", name, banned, banExpiry, banReason);
+    }
 }

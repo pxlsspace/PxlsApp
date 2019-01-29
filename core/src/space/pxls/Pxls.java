@@ -15,7 +15,7 @@ public class Pxls {
         // 2 for sorunome setup
         // 3 for GlowingSocc setup
         int debug = 3;
-        switch (0) {
+        switch (3) {
             case 1:
                 domain = "http://192.168.0.23.nip.io:4567";
                 wsPath = "ws://192.168.0.23.nip.io:4567/ws";
@@ -42,4 +42,11 @@ public class Pxls {
     public static Skin skin;
     public static SpriteBatch batch;
     public static PxlsGameState gameState;
+    public static String getUA() {
+        String _v = "0.0.0";
+        if (PxlsGame.i != null) {
+            _v = PxlsGame.i.VersionString;
+        }
+        return String.format("PxlsAndroid/%s (Android %s) ", _v, Gdx.app.getVersion());
+    }
 }

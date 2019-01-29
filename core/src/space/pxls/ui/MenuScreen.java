@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -47,57 +48,147 @@ public class MenuScreen extends ScreenAdapter {
         final PxlsCheckBox cbRememberState = new PxlsCheckBox("Save last scroll/zoom", Pxls.prefsHelper.getRememberCanvasState());
         final PxlsCheckBox cbRememberTemplate = new PxlsCheckBox("Save last template", Pxls.prefsHelper.getRememberTemplate());
         final PxlsCheckBox cbHeatmap = new PxlsCheckBox("Enable Heatmap", Pxls.prefsHelper.getHeatmapEnabled());
+        final PxlsCheckBox cbTemplate = new PxlsCheckBox("Enable Template", Pxls.gameState.getSafeTemplateState().enabled);
+        final PxlsCheckBox cbMoveMode = new PxlsCheckBox("Move Mode", Pxls.gameState.getSafeTemplateState().moveMode);
         final PxlsCheckBox cbGrid = new PxlsCheckBox("Enable Grid", Pxls.prefsHelper.getGridEnabled());
         final PxlsCheckBox cbHideUserCount = new PxlsCheckBox("Hide UserCount", Pxls.prefsHelper.getHideUserCount());
+        final PxlsCheckBox cbVirginmapEnabled = new PxlsCheckBox("Enable VirginMap", Pxls.prefsHelper.getVirginmapEnabled());
 
-        //placeholder
-        final Slider sliderHeatmapOpacity = new Slider(0f, 1f, 0.1f, false, Pxls.skin);
-        final PxlsLabel lblHeatmapOpacityPercent = new PxlsLabel(((int) Math.floor(Pxls.gameState.getSafeHeatmapState().opacity * 100)) + "%");
-        sliderHeatmapOpacity.setValue(Pxls.gameState.getSafeHeatmapState().opacity);
-        sliderHeatmapOpacity.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                lblHeatmapOpacityPercent.setText(((int) Math.floor(sliderHeatmapOpacity.getValue() * 100)) + "%");
-            }
-        });
+        final Label lblTemplateOX = makeLabel("Offset X: " + Pxls.gameState.getSafeTemplateState().offsetX);
+        final Label lblTemplateOY = makeLabel("Offset Y: " + Pxls.gameState.getSafeTemplateState().offsetY);
 
-        //Debug buttons
-        final PxlsLabel lblPrintPrefs = new PxlsLabel("Print Prefs").setFontScaleChain(0.6f);
-        final PxlsLabel lblPrintGameState = new PxlsLabel("Print GameState").setFontScaleChain(0.6f);
-        final PxlsLabel lblClearGameState = new PxlsLabel("Clear GameState").setFontScaleChain(0.6f);
+        final PxlsButton btnEditTemplateOX = new PxlsButton("Edit");
+        final PxlsButton btnEditTemplateOY = new PxlsButton("Edit");
+        final PxlsButton btnGetTemplateURL = new PxlsButton("Get current template link");
 
-        lblPrintGameState.addListener(new ClickListener() {
+        btnEditTemplateOX.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                PxlsGame.i.alert(Pxls.gameState.toString());
-            }
-        });
-        lblClearGameState.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                PxlsGame.i.confirm("Clear GameState?", new PxlsGame.ConfirmCallback() {
+                PxlsGame.i.input("Input a new OffsetX value", Pxls.gameState.getSafeTemplateState().offsetX, new PxlsGame.InputCallback() {
                     @Override
-                    public void clicked(boolean confirmed) {
-                        if (confirmed) {
-                            Pxls.prefsHelper.ClearGameState();
-                            PxlsGame.i.alert("Cleared GameState");
+                    public void cancelled() {}
+
+                    @Override
+                    public void input(String response) {
+                        Integer newValue = null;
+                        try {
+                            newValue = Integer.parseInt(response.trim());
+                        } catch (Exception e) {/*ignored*/}
+                        if (newValue == null) {
+                            PxlsGame.i.alert("Invalid value supplied");
+                        } else {
+                            Pxls.gameState.getSafeTemplateState().offsetX = newValue;
+                            lblTemplateOX.setText("Offset X: " + newValue);
                         }
                     }
                 });
             }
         });
-        lblPrintPrefs.addListener(new ClickListener() {
+
+        btnEditTemplateOY.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                StringBuilder builder = new StringBuilder();
-                Map<String, ?> prefs = Pxls.prefsHelper.getAll();
-                for (Map.Entry<String, ?> stringEntry : prefs.entrySet()) {
-                    builder.append(stringEntry.getKey()).append(": ").append(String.valueOf(stringEntry.getValue())).append("\n");
+                PxlsGame.i.input("Input a new OffsetY value", Pxls.gameState.getSafeTemplateState().offsetY, new PxlsGame.InputCallback() {
+                    @Override
+                    public void cancelled() {}
+
+                    @Override
+                    public void input(String response) {
+                        Integer newValue = null;
+                        try {
+                            newValue = Integer.parseInt(response.trim());
+                        } catch (Exception e) {/*ignored*/}
+                        if (newValue == null) {
+                            PxlsGame.i.alert("Invalid value supplied");
+                        } else {
+                            Pxls.gameState.getSafeTemplateState().offsetY = newValue;
+                            lblTemplateOY.setText("Offset Y: " + newValue);
+                        }
+                    }
+                });
+            }
+        });
+
+        btnGetTemplateURL.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                PxlsGame.i.input("Pxls.space template URL", canvasScreen.getTemplate().makePxlsURL(), new PxlsGame.InputCallback() {
+                    @Override
+                    public void cancelled() { /* ignored */ }
+
+                    @Override
+                    public void input(String response) { /* ignored */ }
+                });
+            }
+        });
+
+        final Slider sliderHeatmapOpacity = new Slider(0f, 1f, 0.1f, false, Pxls.skin);
+        final Label lblHeatmapOpacityPercent = new Label("Opacity: " + ((int) Math.floor(Pxls.gameState.getSafeHeatmapState().opacity * 100)) + "%", Pxls.skin);
+        lblHeatmapOpacityPercent.setFontScale(0.3f);
+        sliderHeatmapOpacity.setValue(Pxls.gameState.getSafeHeatmapState().opacity);
+        sliderHeatmapOpacity.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                lblHeatmapOpacityPercent.setText("Opacity: " + ((int) Math.floor(sliderHeatmapOpacity.getValue() * 100)) + "%");
+            }
+        });
+
+        final Slider sliderTemplateOpacity = new Slider(0f, 1f, 0.1f, false, Pxls.skin);
+        final Label lblTemplateOpacityPercent = new Label("Opacity: " + ((int) Math.floor(Pxls.gameState.getSafeTemplateState().opacity * 100)) + "%", Pxls.skin);
+        lblTemplateOpacityPercent.setFontScale(0.3f);
+        sliderTemplateOpacity.setValue(Pxls.gameState.getSafeTemplateState().opacity);
+        sliderTemplateOpacity.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                lblTemplateOpacityPercent.setText("Opacity: " + ((int) Math.floor(sliderTemplateOpacity.getValue() * 100)) + "%");
+            }
+        });
+
+        final PxlsButton btnLoadTemplateFromClipboard = new PxlsButton("Load From Clipboard");
+        btnLoadTemplateFromClipboard.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                System.out.printf("clipboard: %s%n", Gdx.app.getClipboard().getContents());
+                final Map<String, String> templateValues = PxlsGame.i.parseTemplateURL(Gdx.app.getClipboard().getContents());
+                if (templateValues != null) {
+                    System.out.println("Parsed:");
+                    for (Map.Entry<String, String> stringStringEntry : templateValues.entrySet()) {
+                        System.out.printf("    %s: %s%n", stringStringEntry.getKey(), stringStringEntry.getValue());
+                    }
+                    PxlsGame.i.confirm("Are you sure you want to load a template from your clipboard?", new PxlsGame.ConfirmCallback() {
+                        @Override
+                        public void done(boolean confirmed) {
+                            if (confirmed) {
+                                canvasScreen.template.load(Integer.parseInt(templateValues.get("ox")), Integer.parseInt(templateValues.get("oy")), Float.valueOf(templateValues.get("tw")), Float.valueOf(templateValues.get("oo")), templateValues.get("template"));
+                                sliderTemplateOpacity.setValue(Float.valueOf(templateValues.get("oo")));
+                                System.out.printf("%s (%s)%n", Float.valueOf(templateValues.get("oo")), sliderTemplateOpacity.getValue());
+                                lblTemplateOpacityPercent.setText(String.format("Opacity: %s%%", (int)(Float.valueOf(templateValues.get("oo")) * 100)));
+
+                                lblTemplateOX.setText("Offset X: " + templateValues.get("ox"));
+                                lblTemplateOY.setText("Offset Y: " + templateValues.get("oy"));
+
+                                cbTemplate.setChecked(true);
+                            }
+                        }
+                    });
+                } else {
+                    PxlsGame.i.alert("Clipboard was not a valid pxls.space template URL.");
                 }
-                PxlsGame.i.alert(builder.toString());
+            }
+        });
+
+        final Slider sliderVirginmapOpacity = new Slider(0f, 1f, 0.1f, false, Pxls.skin);
+        final Label lblVirginmapOpacityPercent = new Label("Opacity: " + ((int) Math.floor(Pxls.gameState.getSafeVirginmapState().opacity * 100)) + "%", Pxls.skin);
+        lblVirginmapOpacityPercent.setFontScale(0.3f);
+        sliderVirginmapOpacity.setValue(Pxls.gameState.getSafeVirginmapState().opacity);
+        sliderVirginmapOpacity.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                lblVirginmapOpacityPercent.setText("Opacity: " + ((int) Math.floor(sliderVirginmapOpacity.getValue() * 100)) + "%");
             }
         });
 
@@ -109,32 +200,25 @@ public class MenuScreen extends ScreenAdapter {
 
         Table tcHeatmap = new TitledTableHelper("Heatmap");
         tcHeatmap.add(cbHeatmap).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcHeatmap.add(lblHeatmapOpacityPercent).left();
-        tcHeatmap.add(sliderHeatmapOpacity).growX().fillY().center().row();
+        tcHeatmap.add(lblHeatmapOpacityPercent).left().padRight(4);
+        tcHeatmap.add(sliderHeatmapOpacity).growX().fillY().row();
 
         Table tcGrid = new TitledTableHelper("Grid");
         tcGrid.add(cbGrid).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 
         Table tcTemplate = new TitledTableHelper("Template");
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        tcTemplate.add(new PxlsLabel("Not yet").setFontScaleChain(0.4f)).growX().left().row();
-        //normal controls (opacity slider, totalWidth, offset, URL) TODO NON-BLOCKING
-        //btn: "add from clipboard" TODO NON-BLOCKING
-        //checkbox: "move mode" TODO NON-BLOCKING
+        tcTemplate.add(cbTemplate).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcTemplate.add(cbRememberTemplate).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcTemplate.add(cbMoveMode).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcTemplate.add(lblTemplateOpacityPercent).padLeft(8).left().padRight(8);
+        tcTemplate.add(sliderTemplateOpacity).growX().fillY().row();
+        tcTemplate.add(btnLoadTemplateFromClipboard).pad(8).colspan(2).growX().center().row();
+        tcTemplate.add(btnGetTemplateURL).pad(8).colspan(2).growX().center().row();
 
-        Table tcDebug = new TitledTableHelper("Debug");
-        tcDebug.add(lblPrintGameState).expandX().padTop(16).left().row();
-        tcDebug.add(lblClearGameState).expandX().padTop(16).left().row();
-        tcDebug.add(lblPrintPrefs).expandX().padTop(16).left().row();
+        Table tcVirginmap = new TitledTableHelper("Virginmap");
+        tcVirginmap.add(cbVirginmapEnabled).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcVirginmap.add(lblVirginmapOpacityPercent).padLeft(8).left().padRight(8);
+        tcVirginmap.add(sliderVirginmapOpacity).growX().fillY().row();
 
         Button closeButton = new Button(Pxls.skin.getDrawable("times"));
         Table table = new Table();
@@ -153,14 +237,16 @@ public class MenuScreen extends ScreenAdapter {
                 Pxls.prefsHelper.setHeatmapEnabled(cbGrid.isChecked());
                 Pxls.prefsHelper.setHideUerCount(cbHideUserCount.isChecked());
                 Pxls.prefsHelper.setHeatmapEnabled(cbHeatmap.isChecked());
+                Pxls.prefsHelper.setVirginmapEnabled(cbVirginmapEnabled.isChecked());
+                Pxls.gameState.getSafeTemplateState().enabled = cbTemplate.isChecked();
+                Pxls.gameState.getSafeTemplateState().moveMode = cbMoveMode.isChecked();
 
-                // Set colors/etc for some overlay stuff
-//                Pxls.prefsHelper.setGridColor(gridColorChooser.getValue()); //TODO BLOCKING
-//                Pxls.prefsHelper.setHeatmapOpacity(0f); //TODO BLOCKING
                 Pxls.gameState.getSafeHeatmapState().opacity = sliderHeatmapOpacity.getValue();
+                Pxls.gameState.getSafeTemplateState().opacity = sliderTemplateOpacity.getValue();
+                Pxls.gameState.getSafeVirginmapState().opacity = sliderVirginmapOpacity.getValue();
 
                 //Save state if necessary
-                if (cbRememberState.isChecked() || cbGrid.isChecked() || cbHeatmap.isChecked()) {
+                if (cbRememberState.isChecked() || cbGrid.isChecked() || cbHeatmap.isChecked() || cbVirginmapEnabled.isChecked()) {
                     Pxls.prefsHelper.SaveGameState(Pxls.gameState);
                 }
 
@@ -179,12 +265,11 @@ public class MenuScreen extends ScreenAdapter {
         table.add(new Stack(new SolidContainer(shadeColor), topBarTable)).growX().row();
 
         Table contentTable = new Table();
-        //!! cbRememberTemplate is not exposed by design. not fully implemented. TODO NON-BLOCKING
         contentTable.add(tcMisc).padTop(24).growX().row();
         contentTable.add(tcHeatmap).padTop(48).growX().row();
-        contentTable.add(tcGrid).padTop(48).growX().row();
-        contentTable.add(tcDebug).padTop(48).growX().row();
+//        contentTable.add(tcGrid).padTop(48).growX().row();
         contentTable.add(tcTemplate).padTop(48).growX().row();
+        contentTable.add(tcVirginmap).padTop(48).growX().row();
 
         ScrollPane contentPane = new ScrollPane(contentTable);
         contentPane.setCancelTouchFocus(false);
@@ -222,5 +307,11 @@ public class MenuScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
+    }
+
+    private Label makeLabel(String text) {
+        Label toReturn = new Label(text, Pxls.skin);
+        toReturn.setFontScale(0.3f);
+        return toReturn;
     }
 }

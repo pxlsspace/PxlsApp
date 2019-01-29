@@ -2,23 +2,27 @@ package space.pxls.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
 
@@ -26,10 +30,15 @@ import space.pxls.Account;
 import space.pxls.Pxls;
 import space.pxls.PxlsClient;
 import space.pxls.PxlsGame;
+import space.pxls.renderers.Canvas;
+import space.pxls.renderers.GridOverlay;
+import space.pxls.renderers.Heatmap;
+import space.pxls.renderers.Template;
+import space.pxls.renderers.Virginmap;
+import space.pxls.structs.TemplateState;
 
 public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCallback {
     public final LoadScreen.BoardInfo boardInfo;
-    private FrameBuffer canvasBuffer;
     private float zoom = 1;
     private Vector2 center = new Vector2();
     public SpriteBatch batch;
@@ -39,7 +48,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     private Stage stage = new Stage(new ExtendViewport(640, 0));
 
-    private Container<UserBar> topContainer;
+    private Container<WidgetGroup> topContainer;
     private Container<WidgetGroup> bottomContainer;
     private Container<PixelLookupOverlay> lookupContainer;
     private Container<StackOverlay> stackOverlayContainer;
@@ -57,6 +66,10 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     public Template template;
     public Heatmap heatmap;
     public Canvas canvas;
+    private GridOverlay gridOverlay;
+    public Virginmap virginmap;
+
+    private TemplateMoveModeHelper templateMoveModeHelper;
 
     public CanvasScreen(Canvas canvas) {
         Pxls.gameState = Pxls.prefsHelper.GetSavedGameState();
@@ -81,10 +94,18 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             heatmap.loadHeatmap();
         }
 
+        virginmap = new Virginmap(this);
+        if (Pxls.prefsHelper.getVirginmapEnabled()) {
+            virginmap.loadMap();
+        }
+        gridOverlay = new GridOverlay(this);
+
+        templateMoveModeHelper = new TemplateMoveModeHelper();
+
         bottomContainer = new Container<WidgetGroup>(login).fill();
         bottomContainer.background(Pxls.skin.getDrawable("background"));
 
-        topContainer = new Container<UserBar>(null).fill();
+        topContainer = new Container<WidgetGroup>(null).fill();
         topContainer.background(Pxls.skin.getDrawable("background"));
 
         lookupContainer = new Container<PixelLookupOverlay>(null).fill();
@@ -130,20 +151,99 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     }
 
     public void menuClosed() {
-        if (Pxls.prefsHelper.getGridEnabled()) {
-            //TODO BLOCKING
-        }
         if (Pxls.prefsHelper.getHeatmapEnabled() && heatmap != null) {
             heatmap.updateTexture();
         }
+        if (Pxls.prefsHelper.getVirginmapEnabled() && virginmap != null) {
+            virginmap.updateTexture();
+        }
 
         if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
+        if (Pxls.gameState.getSafeTemplateState().moveMode) {
+            PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nUse the nudge buttons for precision after jumping", new PxlsGame.ButtonCallback() {
+                @Override
+                public void clicked() {
+                    Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);
+                }
+            });
+            if (!Pxls.prefsHelper.getHasSeenMoveModeTutorial()) {
+            }
+            Pxls.gameState.getSafeTemplateState().stageForMoving();
+            topContainer.setActor(templateMoveModeHelper.moveModeControls);
+        } else {
+            topContainer.setActor(userBar);
+        }
     }
 
     @Override
     public void show() {
         super.show();
-        Gdx.input.setInputProcessor(new InputMultiplexer(stage, new GestureDetector(new GestureDetector.GestureListener() {
+        Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputProcessor() {
+            @Override
+            public boolean keyDown(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyTyped(char character) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDown(int x, int y, int pointer, int button) {
+                if (!templateMoveModeHelper.pointerDown[pointer]) ++templateMoveModeHelper.numPointersDown;
+                templateMoveModeHelper.pointerDown[pointer] = true;
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(int x, int y, int pointer, int button) {
+                if (templateMoveModeHelper.pointerDown[pointer]) --templateMoveModeHelper.numPointersDown;
+                templateMoveModeHelper.pointerDown[pointer] = false;
+                return false;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                return false;
+            }
+
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(int amount) {
+                Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2);
+                int max = 75;
+
+                float oldZoom = zoom;
+                if (amount > 0) {
+                    zoom /= 1.2f;
+                } else {
+                    zoom *= 1.2f;
+                }
+                zoom = MathUtils.clamp(zoom, 1, Pxls.prefsHelper.getAllowGreaterZoom() ? max * 10 : max);
+
+                center.x += delta.x / oldZoom;
+                center.y += delta.y / oldZoom;
+
+                center.x -= delta.x / zoom;
+                center.y -= delta.y / zoom;
+
+                Pxls.gameState.canvasState.zoom = zoom;
+                Pxls.gameState.canvasState.panX = (int)center.x;
+                Pxls.gameState.canvasState.panY = (int)center.y;
+                Pxls.prefsHelper.SaveGameState(Pxls.gameState);
+                return true;
+            }
+        }, new GestureDetector(new GestureDetector.GestureListener() {
             @Override
             public boolean touchDown(float x, float y, int pointer, int button) {
                 return false;
@@ -151,7 +251,12 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
             @Override
             public boolean tap(float x, float y, int count, int button) {
-                if (paletteBar.getCurrentColor() >= 0) {
+                if (Pxls.gameState.getSafeTemplateState().moveMode && count == 2) {
+                    Vector2 pos = screenToBoardSpace(new Vector2(x, y));
+                    Pxls.gameState.getSafeTemplateState().setOffsetX((int)pos.x);
+                    Pxls.gameState.getSafeTemplateState().setOffsetY((int)pos.y);
+                    return true;
+                } else if (paletteBar.getCurrentColor() >= 0) {
                     Vector2 pos = screenToBoardSpace(new Vector2(x, y));
                     placePixel((int) pos.x, (int) pos.y, Pxls.prefsHelper.getKeepColorSelected());
                     return true;
@@ -233,38 +338,16 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             public void pinchStop() {
                 focalPoint = null;
             }
-        }) {
-            @Override
-            public boolean scrolled(int amount) {
-                Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2);
-                int max = 75;
+        })));
+    }
 
-                float oldZoom = zoom;
-                if (amount > 0) {
-                    zoom /= 1.2f;
-                } else {
-                    zoom *= 1.2f;
-                }
-                zoom = MathUtils.clamp(zoom, 1, Pxls.prefsHelper.getAllowGreaterZoom() ? max * 10 : max);
-
-                center.x += delta.x / oldZoom;
-                center.y += delta.y / oldZoom;
-
-                center.x -= delta.x / zoom;
-                center.y -= delta.y / zoom;
-
-                Pxls.gameState.canvasState.zoom = zoom;
-                Pxls.gameState.canvasState.panX = (int)center.x;
-                Pxls.gameState.canvasState.panY = (int)center.y;
-                Pxls.prefsHelper.SaveGameState(Pxls.gameState);
-                return true;
-            }
-        }));
+    void canvasPan(float x, float y) {
     }
 
     private void showLookup(int x, int y) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setUrl(Pxls.domain + "/lookup?x=" + x + "&y=" + y);
+        req.setHeader("User-Agent", Pxls.getUA());
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -325,22 +408,29 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     @Override
     public void render(float delta) {
-        super.render(delta);
-        Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        try {
+            super.render(delta);
+            Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.begin();
-        Vector2 screenCenter = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()).scl(0.5f);
-        Vector2 canvasSize = new Vector2(boardInfo.width, boardInfo.height).scl(zoom);
-        Vector2 canvasCorner = screenCenter.mulAdd(center, -zoom);
-        canvas.render(zoom, screenCenter, canvasSize, canvasCorner);
-        heatmap.render(zoom, screenCenter, canvasSize, canvasCorner);
-//        template.render(zoom, screenCenter);
-        batch.end();
+            batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.begin();
+            Vector2 screenCenter = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()).scl(0.5f);
+            Vector2 canvasSize = new Vector2(boardInfo.width, boardInfo.height).scl(zoom);
+            Vector2 canvasCorner = screenCenter.mulAdd(center, -zoom);
+            canvas.render(zoom, screenCenter, canvasSize, canvasCorner);
+            heatmap.render(zoom, screenCenter, canvasSize, canvasCorner);
+            virginmap.render(zoom, screenCenter, canvasSize, canvasCorner);
+            template.render(zoom, screenCenter);
+            gridOverlay.render(zoom, screenCenter, canvasSize, canvasCorner);
+            batch.end();
 
-        stage.act(delta);
-        stage.draw();
+            stage.act(delta);
+            stage.draw();
+        } catch (java.lang.StringIndexOutOfBoundsException sioobe) {
+            sioobe.printStackTrace();
+            System.err.println("got a StringIndexOutOfBounds?");
+        }
     }
 
     public void reconnect() {
@@ -358,7 +448,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 Color c = Color.valueOf(colorString);
                 canvas.pixel(x, y, color);
                 heatmap.pixel(x, y, color);
-//                virginmap.pixel(x, y, color);
+                virginmap.pixel(x, y, color);
             }
         });
     }
@@ -441,6 +531,13 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         });
     }
 
+    public void moveTo(int x, int y, int scale) {
+        System.out.printf("should jump to %s %s @%s%n", x, y, scale);
+        center.x = x;
+        center.y = y;
+        zoom = scale;
+    }
+
     public void logout() {
         logout(true);
     }
@@ -448,7 +545,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (!skipConfirm) {
             PxlsGame.i.confirm("Are you sure you want to log out?", new PxlsGame.ConfirmCallback() {
                 @Override
-                public void clicked(boolean confirmed) {
+                public void done(boolean confirmed) {
                     if (confirmed) {
                         doLogout();
                     }
@@ -463,5 +560,110 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         PxlsGame.i.logOut();
         stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
         bottomContainer.setActor(login);
+    }
+
+    public Template getTemplate() {
+        return template;
+    }
+
+    private class TemplateMoveModeHelper {
+        private int numPointersDown = 0;
+        private boolean[] pointerDown = new boolean[] {false, false, false, false, false, false, false, false, false, false};
+
+        public Table moveModeControls;
+        public TemplateMoveModeHelper() {
+            PxlsButton btnCancel = new PxlsButton(" Cancel ").setFontScale(0.2f).red();
+            PxlsButton btnConfirm = new PxlsButton(" Confirm ").setFontScale(0.2f).blue();
+
+            PxlsButton btnUp = new PxlsButton(" up ").setFontScale(0.2f);
+            PxlsButton btnDown = new PxlsButton(" down ").setFontScale(0.2f);
+            PxlsButton btnLeft = new PxlsButton(" left ").setFontScale(0.2f);
+            PxlsButton btnRight = new PxlsButton(" right ").setFontScale(0.2f);
+
+            btnUp.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    Pxls.gameState.getSafeTemplateState().movingOffsetY -= 1;
+                }
+            });
+
+            btnDown.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    Pxls.gameState.getSafeTemplateState().movingOffsetY += 1;
+                }
+            });
+
+            btnLeft.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    Pxls.gameState.getSafeTemplateState().movingOffsetX -= 1;
+                }
+            });
+
+            btnRight.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    Pxls.gameState.getSafeTemplateState().movingOffsetX += 1;
+                }
+            });
+
+            btnCancel.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    PxlsGame.i.confirm("Are you sure you want to cancel template movement?", new PxlsGame.ConfirmCallback() {
+                        @Override
+                        public void done(boolean confirmed) {
+                            if (confirmed) {
+                                Pxls.gameState.getSafeTemplateState().finalizeMove(true);
+                                topContainer.setActor(userBar);
+                            }
+                        }
+                    });
+                }
+            });
+
+            btnConfirm.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    PxlsGame.i.confirm("Is this where you want to move the template to?", new PxlsGame.ConfirmCallback() {
+                        @Override
+                        public void done(boolean confirmed) {
+                            if (confirmed) {
+                                Pxls.gameState.getSafeTemplateState().finalizeMove(false);
+                                topContainer.setActor(userBar);
+                                Pxls.prefsHelper.SaveGameState(Pxls.gameState);
+                            }
+                        }
+                    });
+                }
+            });
+
+            moveModeControls = new Table(Pxls.skin);
+            moveModeControls.add(btnCancel).padRight(8).padTop(4).padBottom(4).center();
+            moveModeControls.add(new Container()).padRight(8).padTop(4).padBottom(4).center();
+            moveModeControls.add(btnConfirm).padRight(16).padTop(4).padBottom(4).center().row();
+            moveModeControls.add(new SolidContainer()).growX().height(2).pad(2,0,2,0).colspan(3).row();
+
+            moveModeControls.add(new PxlsLabel("Nudge:").setFontScaleChain(0.3f)).pad(0,4,0,4).center().colspan(3).row();
+
+            moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(btnUp).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX().row();
+
+            moveModeControls.add(btnLeft).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(btnRight).pad(4, 4, 4, 4).fillX().row();
+
+            moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(btnDown).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX().row();
+        }
     }
 }

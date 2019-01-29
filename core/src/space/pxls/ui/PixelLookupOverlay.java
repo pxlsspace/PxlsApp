@@ -120,6 +120,7 @@ public class PixelLookupOverlay extends Table {
                 }
                 Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.POST);
                 req.setUrl(Pxls.domain + "/report");
+                req.setHeader("User-Agent", Pxls.getUA());
                 try {
                     req.setContent("id=" + Integer.toString(id) + "&x=" + Integer.toString(x) + "&y=" + Integer.toString(y) + "&message=" + URLEncoder.encode(text, "utf-8"));
                 } catch (UnsupportedEncodingException e) {

@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.renderers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -14,6 +14,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import space.pxls.Pxls;
+import space.pxls.ui.CanvasScreen;
 
 public class Heatmap {
     public final Color fillStyle = Color.valueOf("#CD5C5C");
@@ -49,7 +50,6 @@ public class Heatmap {
             public void run() {
                 if (!loadedHeatmap) return;
                 if (heatmapData == null) return;
-                System.out.printf("heatmap timer ticking%n");
                 for (int i = 0; i < heatmapData.length; i++) {
                     if (heatmapData[i] != 0) heatmapData[i] -= 4;
                 }
@@ -59,6 +59,7 @@ public class Heatmap {
     }
 
     public void pixel(final int x, final int y, final int color) {
+        if (heatmapData == null) return;
         heatmapData[x + parent.boardInfo.width * y] = (byte)0xff;
         updateTexture();
     }
@@ -76,7 +77,7 @@ public class Heatmap {
 
         Net.HttpRequest heatmapReq = new Net.HttpRequest(Net.HttpMethods.GET);
         heatmapReq.setUrl(Pxls.domain + "/heatmap?r=" + ((int) Math.floor(Math.random() * 10000)));
-        System.out.println("req: " + heatmapReq.getUrl());
+        heatmapReq.setHeader("User-Agent", Pxls.getUA());
         Gdx.net.sendHttpRequest(heatmapReq, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
