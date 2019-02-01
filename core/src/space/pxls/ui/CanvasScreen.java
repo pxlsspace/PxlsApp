@@ -348,6 +348,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setUrl(Pxls.domain + "/lookup?x=" + x + "&y=" + y);
         req.setHeader("User-Agent", Pxls.getUA());
+        req.setHeader("Cookie", String.format("pxls-token=%s", Pxls.prefsHelper.getToken()));
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
