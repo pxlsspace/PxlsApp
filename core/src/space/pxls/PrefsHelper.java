@@ -200,7 +200,11 @@ public class PrefsHelper {
     }
 
     public void SaveGameState(PxlsGameState gameState) {
+        SaveGameState(gameState, false);
+    }
+    public void SaveGameState(PxlsGameState gameState, boolean immediate) {
         this.toFlush = gameState;
+        if (immediate) doGameStateFlush();
     }
     private void doGameStateFlush() {
         if (this.toFlush != null) {

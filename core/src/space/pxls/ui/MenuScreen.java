@@ -53,6 +53,7 @@ public class MenuScreen extends ScreenAdapter {
         final PxlsCheckBox cbGrid = new PxlsCheckBox("Enable Grid", Pxls.prefsHelper.getGridEnabled());
         final PxlsCheckBox cbHideUserCount = new PxlsCheckBox("Hide UserCount", Pxls.prefsHelper.getHideUserCount());
         final PxlsCheckBox cbVirginmapEnabled = new PxlsCheckBox("Enable VirginMap", Pxls.prefsHelper.getVirginmapEnabled());
+        final PxlsCheckBox cbCanvasLocked = new PxlsCheckBox("Lock Canvas", Pxls.gameState.getSafeCanvasState().locked);
 
         final Label lblTemplateOX = makeLabel("Offset X: " + Pxls.gameState.getSafeTemplateState().offsetX);
         final Label lblTemplateOY = makeLabel("Offset Y: " + Pxls.gameState.getSafeTemplateState().offsetY);
@@ -197,6 +198,7 @@ public class MenuScreen extends ScreenAdapter {
         tcMisc.add(cbGreaterZoom).padTop(6).padLeft(5).colspan(2).expandX().left().row();
         tcMisc.add(cbRememberState).padTop(6).padLeft(5).colspan(2).expandX().left().row();
         tcMisc.add(cbHideUserCount).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcMisc.add(cbCanvasLocked).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 
         Table tcHeatmap = new TitledTableHelper("Heatmap");
         tcHeatmap.add(cbHeatmap).padTop(6).padLeft(5).colspan(2).expandX().left().row();
@@ -238,6 +240,7 @@ public class MenuScreen extends ScreenAdapter {
                 Pxls.prefsHelper.setHideUerCount(cbHideUserCount.isChecked());
                 Pxls.prefsHelper.setHeatmapEnabled(cbHeatmap.isChecked());
                 Pxls.prefsHelper.setVirginmapEnabled(cbVirginmapEnabled.isChecked());
+                Pxls.gameState.getSafeCanvasState().locked = (cbCanvasLocked.isChecked());
                 Pxls.gameState.getSafeTemplateState().enabled = cbTemplate.isChecked();
                 Pxls.gameState.getSafeTemplateState().moveMode = cbMoveMode.isChecked();
 
@@ -245,10 +248,8 @@ public class MenuScreen extends ScreenAdapter {
                 Pxls.gameState.getSafeTemplateState().opacity = sliderTemplateOpacity.getValue();
                 Pxls.gameState.getSafeVirginmapState().opacity = sliderVirginmapOpacity.getValue();
 
-                //Save state if necessary
-                if (cbRememberState.isChecked() || cbGrid.isChecked() || cbHeatmap.isChecked() || cbVirginmapEnabled.isChecked()) {
-                    Pxls.prefsHelper.SaveGameState(Pxls.gameState);
-                }
+                //Flush modified GameState immediately
+                Pxls.prefsHelper.SaveGameState(Pxls.gameState, true);
 
                 //Return to canvas
                 PxlsGame.i.setScreen(self.canvasScreen);

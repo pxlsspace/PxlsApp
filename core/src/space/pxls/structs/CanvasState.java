@@ -22,6 +22,8 @@ public final class CanvasState {
     public int panX = (Integer) DefaultValuesMap.get(ConfigKeys.panX);
     public int panY = (Integer) DefaultValuesMap.get(ConfigKeys.panY);
     public float zoom = (Float) DefaultValuesMap.get(ConfigKeys.zoom);
+    public boolean locked = false; //not stateful by design
+
     public CanvasState() {}
     public CanvasState(int panX, int panY, float zoom) {
         this.panX = panX;
@@ -43,6 +45,6 @@ public final class CanvasState {
 
     @Override
     public String toString() {
-        return String.format("panX: %s, panY: %s, zoom: %s", panX, panY, zoom);
+        return String.format("panX: %s, panY: %s, zoom: %s, locked: %s", panX, panY, zoom, locked);
     }
 }

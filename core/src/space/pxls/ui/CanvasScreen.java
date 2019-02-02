@@ -160,13 +160,13 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
         if (Pxls.gameState.getSafeTemplateState().moveMode) {
-            PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nUse the nudge buttons for precision after jumping", new PxlsGame.ButtonCallback() {
-                @Override
-                public void clicked() {
-                    Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);
-                }
-            });
             if (!Pxls.prefsHelper.getHasSeenMoveModeTutorial()) {
+                PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nUse the nudge buttons for precision after jumping", new PxlsGame.ButtonCallback() {
+                    @Override
+                    public void clicked() {
+                        Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);
+                    }
+                });
             }
             Pxls.gameState.getSafeTemplateState().stageForMoving();
             topContainer.setActor(templateMoveModeHelper.moveModeControls);
@@ -220,6 +220,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
             @Override
             public boolean scrolled(int amount) {
+                if (Pxls.gameState.getSafeCanvasState().locked) return true;
+
                 Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2);
                 int max = 75;
 
@@ -278,6 +280,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
             @Override
             public boolean pan(float x, float y, float deltaX, float deltaY) {
+                if (Pxls.gameState.getSafeCanvasState().locked) return true;
+
                 int hw = Gdx.graphics.getWidth() / 2;
                 int hh = Gdx.graphics.getHeight() / 2;
                 if (focalPoint == null) {
@@ -310,6 +314,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
             @Override
             public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+                if (Pxls.gameState.getSafeCanvasState().locked) return true;
+
                 int hw = Gdx.graphics.getWidth() / 2;
                 int hh = Gdx.graphics.getHeight() / 2;
                 float max = 200f;
@@ -339,9 +345,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 focalPoint = null;
             }
         })));
-    }
-
-    void canvasPan(float x, float y) {
     }
 
     private void showLookup(int x, int y) {
