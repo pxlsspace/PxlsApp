@@ -17,7 +17,6 @@ public class Virginmap {
     private boolean loading = false;
     private boolean updating = false;
     private byte[] mapData;
-    private Texture backdropTexture;
     private Texture mapTexture;
 
     public Virginmap(CanvasScreen screen) {
@@ -26,10 +25,6 @@ public class Virginmap {
         final Pixmap p = new Pixmap(parent.boardInfo.width, parent.boardInfo.height, Pixmap.Format.RGBA8888);
         p.setColor(new Color(0f, 0f, 0f, 0f));
         p.fill();
-
-        backdropTexture = new Texture(parent.boardInfo.width, parent.boardInfo.height, Pixmap.Format.RGBA8888);
-        backdropTexture.draw(p, 0, 0);
-        backdropTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         mapTexture = new Texture(parent.boardInfo.width, parent.boardInfo.height, Pixmap.Format.RGBA8888);
         mapTexture.draw(p, 0, 0);
@@ -90,35 +85,24 @@ public class Virginmap {
         updating = true;
 
         byte[] toRender = new byte[parent.boardInfo.width * parent.boardInfo.height * 4];
-        byte[] backdropPixels = new byte[parent.boardInfo.width * parent.boardInfo.height * 4];
         byte opacity = (byte)(Pxls.gameState.getSafeVirginmapState().opacity * 0xFF);
-        int color = Color.rgb888(fillStyle);
+
         for (int i = 0; i < mapData.length; i++) {
             toRender[i * 4] = (byte) 0x00;
             toRender[i * 4 + 1] = (byte) (mapData[i] != 0 ? 0xff : 0x00);
             toRender[i * 4 + 2] = (byte) 0x00;
             toRender[i * 4 + 3] = opacity;
-
-            backdropPixels[i * 4] = (byte) 0x00;
-            backdropPixels[i * 4 + 1] = (byte) 0x00;
-            backdropPixels[i * 4 + 2] = (byte) 0x00;
-            backdropPixels[i * 4 + 3] = opacity;
         }
 
         final Pixmap mapPixmap = new Pixmap(parent.boardInfo.width, parent.boardInfo.height, Pixmap.Format.RGBA8888);
         mapPixmap.getPixels().put(toRender).position(0);
 
-        final Pixmap backdropPixmap = new Pixmap(parent.boardInfo.width, parent.boardInfo.height, Pixmap.Format.RGBA8888);
-        backdropPixmap.getPixels().put(backdropPixels).position(0);
 
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
                 mapTexture.draw(mapPixmap, 0, 0);
                 mapPixmap.dispose();
-
-                backdropTexture.draw(backdropPixmap, 0, 0);
-                backdropPixmap.dispose();
 
                 updating = false;
             }
@@ -135,9 +119,7 @@ public class Virginmap {
         if (parent == null) throw new IllegalStateException("Parent is null");
         if (parent.batch == null) throw new IllegalStateException("Parent's batch is null");
         if (mapTexture== null) throw new IllegalStateException("mapTexture is null");
-        if (backdropTexture == null) throw new IllegalStateException("backdropTexture is null");
 
-        parent.batch.draw(backdropTexture, canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
         parent.batch.draw(mapTexture, canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
     }
 }
