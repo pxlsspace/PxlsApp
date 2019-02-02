@@ -32,6 +32,7 @@ public class PxlsGameState {
             this.templateState.totalWidth = (Float) prefs.get(TemplateState.ConfigKeys.totalWidth);
             this.templateState.URL = (String) prefs.get(TemplateState.ConfigKeys.URL);
             this.templateState.opacity = (Float) prefs.get(TemplateState.ConfigKeys.opacity);
+            this.templateState.enabled = (Boolean) prefs.get(TemplateState.ConfigKeys.enabled);
         }
         if (prefs.get(HeatmapState.ConfigKeys.opacity) != null) {
             //assume we can serialize heatmap

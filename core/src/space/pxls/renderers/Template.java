@@ -28,6 +28,8 @@ public class Template {
     private float scale;
     private FrameBuffer buffer;
     private CanvasScreen parent;
+    private boolean _initial = false;
+
     public Template(CanvasScreen _parent) {
         parent = _parent;
         _width = 0;
@@ -35,9 +37,8 @@ public class Template {
         //load(x, y, 211, "https://i.imgur.com/Pr8tuTT.png");
         TemplateState templateState = Pxls.gameState.getSafeTemplateState();
         if (Pxls.prefsHelper.getRememberTemplate() && templateState.URL.length() > 0) {
+            _initial = true;
             load(templateState.offsetX, templateState.offsetY, templateState.totalWidth, templateState.opacity, templateState.URL);
-        } else {
-            System.out.printf("template preload check failed. (%s, %s) (%s)%n", Pxls.prefsHelper.getRememberTemplate(), templateState.URL.length() > 0, templateState.URL);
         }
     }
 
@@ -89,7 +90,11 @@ public class Template {
                         }
                         width = _width * scale;
                         height = _height * scale;
-                        Pxls.gameState.getSafeTemplateState().enabled = true;
+                        if (_initial) {
+                            _initial = false;
+                        } else {
+                            Pxls.gameState.getSafeTemplateState().enabled = true;
+                        }
                     }
                 });
             }
