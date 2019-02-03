@@ -18,6 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -168,6 +170,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                     }
                 });
             }
+            templateMoveModeHelper.moveStart();
             Pxls.gameState.getSafeTemplateState().stageForMoving();
             topContainer.setActor(templateMoveModeHelper.moveModeControls);
         } else {
@@ -573,16 +576,18 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private class TemplateMoveModeHelper {
         private int numPointersDown = 0;
         private boolean[] pointerDown = new boolean[] {false, false, false, false, false, false, false, false, false, false};
+        private PxlsSlider sliderOpacity = new PxlsSlider().setPrepend("Opacity ");
+        private float _lastOpacity = 0f;
 
         public Table moveModeControls;
         public TemplateMoveModeHelper() {
             PxlsButton btnCancel = new PxlsButton(" Cancel ").setFontScale(0.2f).red();
             PxlsButton btnConfirm = new PxlsButton(" Confirm ").setFontScale(0.2f).blue();
 
-            PxlsButton btnUp = new PxlsButton(" up ").setFontScale(0.2f);
-            PxlsButton btnDown = new PxlsButton(" down ").setFontScale(0.2f);
-            PxlsButton btnLeft = new PxlsButton(" left ").setFontScale(0.2f);
-            PxlsButton btnRight = new PxlsButton(" right ").setFontScale(0.2f);
+            Image btnUp = new Image(Pxls.skin.getDrawable("arrow.gray.up"));
+            Image btnDown = new Image(Pxls.skin.getDrawable("arrow.gray.down"));
+            Image btnLeft = new Image(Pxls.skin.getDrawable("arrow.gray.left"));
+            Image btnRight = new Image(Pxls.skin.getDrawable("arrow.gray.right"));
 
             btnUp.addListener(new ClickListener() {
                 @Override
@@ -626,6 +631,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                             if (confirmed) {
                                 Pxls.gameState.getSafeTemplateState().finalizeMove(true);
                                 topContainer.setActor(userBar);
+                                moveDone();
                             }
                         }
                     });
@@ -642,7 +648,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                             if (confirmed) {
                                 Pxls.gameState.getSafeTemplateState().finalizeMove(false);
                                 topContainer.setActor(userBar);
-                                Pxls.prefsHelper.SaveGameState(Pxls.gameState);
+                                Pxls.prefsHelper.SaveGameState(Pxls.gameState, true);
+                                moveDone();
                             }
                         }
                     });
@@ -655,19 +662,36 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             moveModeControls.add(btnConfirm).padRight(16).padTop(4).padBottom(4).center().row();
             moveModeControls.add(new SolidContainer()).growX().height(2).pad(2,0,2,0).colspan(3).row();
 
-            moveModeControls.add(new PxlsLabel("Nudge:").setFontScaleChain(0.3f)).pad(0,4,0,4).center().colspan(3).row();
+            moveModeControls.add(sliderOpacity).colspan(3).growX().row();
 
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
-            moveModeControls.add(btnUp).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(btnUp).size(48,48).pad(4, 4, 4, 4);
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX().row();
 
-            moveModeControls.add(btnLeft).pad(4, 4, 4, 4).fillX();
-            moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
-            moveModeControls.add(btnRight).pad(4, 4, 4, 4).fillX().row();
+            moveModeControls.add(btnLeft).size(48,48).right().pad(4, 4, 4, 4);
+            moveModeControls.add(new Container()).pad(4, 4, 4, 4);
+            moveModeControls.add(btnRight).size(48,48).left().pad(4, 4, 4, 4).row();
 
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
-            moveModeControls.add(btnDown).pad(4, 4, 4, 4).fillX();
+            moveModeControls.add(btnDown).size(48,48).pad(4, 4, 4, 4);
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX().row();
+
+            sliderOpacity.setValue(Pxls.gameState.getSafeTemplateState().opacity);
+            sliderOpacity.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Pxls.gameState.getSafeTemplateState().opacity = sliderOpacity.getValue();
+                }
+            });
+        }
+
+        void moveStart() {
+            _lastOpacity = Pxls.gameState.getSafeTemplateState().opacity;
+            sliderOpacity.setValue(_lastOpacity);
+        }
+
+        void moveDone() {
+            Pxls.gameState.getSafeTemplateState().opacity = _lastOpacity;
         }
     }
 }

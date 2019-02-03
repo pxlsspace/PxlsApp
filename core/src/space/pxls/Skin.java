@@ -26,6 +26,11 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         addDrawable("unchecked", "unchecked.png");
         addDrawable("user", "user.png");
 
+        addDrawable("arrow.gray.left", "arrows/left.up.png");
+        addDrawable("arrow.gray.right", "arrows/right.up.png");
+        addDrawable("arrow.gray.up", "arrows/up.up.png");
+        addDrawable("arrow.gray.down", "arrows/down.up.png");
+
         addPatch("light-patch", "light.9.png", 13, 14, 14, 14);
         addPatch("white-patch", "white.9.png", 5, 5, 5, 5);
         addPatch("rounded.topLeft", "rounded.topLeft.9.png", 5,5,5,5);
@@ -52,6 +57,9 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         add("background", newDrawable("pixel", 1, 1, 1, 0.85f), Drawable.class);
     }
 
+    private void addDrawable(String name, Drawable drawable) {
+        add(name, drawable, Drawable.class);
+    }
     private void addDrawable(String name, String textureLoc) {
         add(name, new TextureRegionDrawable(new TextureRegion(new Texture(textureLoc))), Drawable.class);
     }
