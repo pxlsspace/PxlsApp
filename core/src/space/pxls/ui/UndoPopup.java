@@ -1,5 +1,6 @@
 package space.pxls.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -8,7 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+
+import javax.swing.GroupLayout;
+
 import space.pxls.Pxls;
 
 public class UndoPopup extends Container<Container<Label>> {
@@ -20,6 +26,7 @@ public class UndoPopup extends Container<Container<Label>> {
 
         Label label = new Label("Undo", Pxls.skin);
         label.setFontScale(0.4f);
+        label.setAlignment(Align.center);
         label.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -31,6 +38,10 @@ public class UndoPopup extends Container<Container<Label>> {
         container = new Container<Label>(label);
         container.setBackground(Pxls.skin.getDrawable("background"));
         container.pad(8);
+//        container.setFillParent(true);
+        container.fillX();
+//        setFillParent(true);
+        fillX();
         setActor(container);
 
         setClip(true);

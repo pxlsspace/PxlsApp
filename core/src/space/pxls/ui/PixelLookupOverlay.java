@@ -83,6 +83,8 @@ public class PixelLookupOverlay extends Table {
         add(pixelsAlltimeLabel).expandX().left();
         add(pxlsAlltime).expandX().right().row();
 
+        add(new SolidContainer()).colspan(2).growX().height(2).row();
+
         if (loggedIn) {
             Label report = new Label("Report", Pxls.skin);
             report.setFontScale(0.2f);

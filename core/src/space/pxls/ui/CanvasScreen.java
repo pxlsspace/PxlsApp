@@ -140,13 +140,14 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         centerPopup.add(login.popup);
         centerPopup.add(undoPopup);
 
-        table.add(stackOverlayContainer).expandY().bottom().left();
-        table.add(centerPopup).center().bottom().expandX().padRight(stackOverlayContainer.getWidth());
-        table.add(userCountOverlay).expandX().bottom().right();
+        table.add(stackOverlayContainer).bottom().left();
+        table.add(centerPopup).center().bottom().expandX();
+        table.add(userCountOverlay).bottom().right().growY();
         table.row();
 
         table.add(bottomContainer).fillX().expandX().colspan(3);
         table.setFillParent(true);
+        table.setDebug(true);
         stage.addActor(table);
 
         client = new PxlsClient(this);
@@ -163,7 +164,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
         if (Pxls.gameState.getSafeTemplateState().moveMode) {
             if (!Pxls.prefsHelper.getHasSeenMoveModeTutorial()) {
-                PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nUse the nudge buttons for precision after jumping", new PxlsGame.ButtonCallback() {
+                PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nUse the nudge buttons for precision after jumping as necessary", new PxlsGame.ButtonCallback() {
                     @Override
                     public void clicked() {
                         Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);
