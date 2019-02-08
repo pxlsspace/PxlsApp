@@ -1,6 +1,7 @@
 package space.pxls.ui;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,10 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 
 import space.pxls.Pxls;
+import space.pxls.PxlsGame;
 
 public class UserCountOverlay extends Stack {
     private Label lblOnlineCount;
     private Boolean receivedCount = false;
+    private Cell userIconCell;
 
     public UserCountOverlay(int count) {
         this();
@@ -26,13 +29,15 @@ public class UserCountOverlay extends Stack {
         lblOnlineCount.setFontScale(0.3f);
         Table onlineCount = new Table();
         onlineCount.pad(8);
-        onlineCount.add(new Image(Pxls.skin.getDrawable("user"))).growX().right().size(32, 32);
+        userIconCell = onlineCount.add(new Image(Pxls.skin.getDrawable("user"))).growX().right().size(32, 32);
         onlineCount.add(lblOnlineCount).right().row();
 
         Container temp = new Container();
         temp.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topLeft")));
         add(temp);
         add(onlineCount);
+
+        redraw();
     }
 
     /**
@@ -49,5 +54,11 @@ public class UserCountOverlay extends Stack {
         receivedCount = true;
 
         this.lblOnlineCount.setText(String.valueOf(count));
+    }
+
+    public void redraw() {
+        boolean wgth = PxlsGame.widthGTHeight();
+        lblOnlineCount.setFontScale(wgth ? 0.2f : 0.3f);
+        userIconCell.size(wgth ? 16 : 32, wgth ? 16 : 32);
     }
 }

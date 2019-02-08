@@ -12,22 +12,32 @@ import com.badlogic.gdx.utils.Align;
 import space.pxls.Pxls;
 
 import java.util.List;
+import java.util.Locale;
 
 public class PixelBar extends Stack {
-    private final Table table;
+    enum PopState {
+        UP,
+        DOWN,
+        TOGGLE
+    }
+
+    private final Table pixelListTable;
     private final Container<Label> cooldownContainer;
     private final Label cooldownLabel;
     private List<String> palette;
     private int currentColor = -1;
     private long cooldownExpiry;
+    public boolean havePopped = false;
+    private boolean[] isUp;
 
     public PixelBar(final List<String> palette) {
         super();
         this.palette = palette;
+        isUp = new boolean[palette.size()];
 
-        table = new Table();
-        table.pad(8);
-        table.setTouchable(Touchable.enabled);
+        pixelListTable = new Table();
+        pixelListTable.pad(8);
+        pixelListTable.setTouchable(Touchable.enabled);
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -36,9 +46,35 @@ public class PixelBar extends Stack {
             }
         });
 
+        redraw();
+
+        add(pixelListTable);
+
+        cooldownLabel = new Label("00:00", Pxls.skin);
+        cooldownLabel.setAlignment(Align.center);
+        cooldownLabel.setFontScale(Gdx.graphics.getWidth() < Gdx.graphics.getHeight() ? 0.5f : 0.25f);
+        cooldownContainer = new Container<Label>(cooldownLabel);
+        cooldownContainer.fillX().align(Align.center).background(Pxls.skin.getDrawable("background"));
+        add(cooldownContainer);
+
+        cooldownContainer.setTouchable(Touchable.enabled);
+        cooldownContainer.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+    }
+
+    public void redraw() {
+        if (pixelListTable == null) throw new IllegalStateException("pixelListTable has not been initialized!");
+
+        pixelListTable.clearChildren();
+
         boolean twoRows = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
         for (int i = 0; i < palette.size(); i++) {
             String s = palette.get(i);
+            isUp[i] = false;
 
             Color c = Color.valueOf(s);
             final Image img = new Image(Pxls.skin, "palette");
@@ -54,7 +90,7 @@ public class PixelBar extends Stack {
                 }
             });
 
-            final Cell<Image> cell = table.add(img).expandX().fillX().height(40);
+            final Cell<Image> cell = pixelListTable.add(img).expandX().fillX().height(40);
 
             int snapPoint = palette.size() / 2 - 1;
             int spacing = 4;
@@ -72,22 +108,13 @@ public class PixelBar extends Stack {
             cell.width(size).height(size).space(spacing);
         }
 
-        add(table);
+        if (cooldownLabel != null) {
+            cooldownLabel.setFontScale(Gdx.graphics.getWidth() < Gdx.graphics.getHeight() ? 0.5f : 0.25f);
+        }
 
-        cooldownLabel = new Label("00:00", Pxls.skin);
-        cooldownLabel.setAlignment(Align.center);
-        cooldownLabel.setFontScale(twoRows ? 0.5f : 0.25f);
-        cooldownContainer = new Container<Label>(cooldownLabel);
-        cooldownContainer.fillX().align(Align.center).background(Pxls.skin.getDrawable("background"));
-        add(cooldownContainer);
-
-        cooldownContainer.setTouchable(Touchable.enabled);
-        cooldownContainer.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
+        if (currentColor >= 0) {
+            updateSelected();
+        }
     }
 
     public void updateCooldown(float cooldown) {
@@ -105,7 +132,7 @@ public class PixelBar extends Stack {
 
         int minutes = (int) (timeLeft / 60);
         int seconds = (int) (timeLeft % 60);
-        this.cooldownLabel.setText(String.format("%02d:%02d", minutes, seconds));
+        this.cooldownLabel.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
     }
 
     public int getCurrentColor() {
@@ -117,28 +144,80 @@ public class PixelBar extends Stack {
             newColor = -1;
         }
         if (currentColor >= 0) {
-            MoveByAction mba = new MoveByAction();
-            mba.setAmountY(-8);
-            mba.setDuration(0.1f);
-            mba.setInterpolation(Interpolation.exp5);
-            table.getChildren().get(currentColor).addAction(mba);
+            pop(currentColor, PopState.DOWN);
         }
 
         int lastColor = currentColor;
         currentColor = newColor;
 
         if (currentColor >= 0 && lastColor != newColor) {
-            MoveByAction mba = new MoveByAction();
-            mba.setAmountY(8);
-            mba.setDuration(0.1f);
-            mba.setInterpolation(Interpolation.exp5);
-            table.getChildren().get(currentColor).addAction(mba);
+            pop(currentColor, PopState.UP);
         }
+    }
+
+    private void pop(int i) {
+        pop(i, PopState.TOGGLE);
+    }
+
+    private void pop(int i, PopState forceState) {
+        if (forceState == null) forceState = PopState.TOGGLE;
+        if (i < 0 || i > isUp.length-1) return;
+        switch(forceState) {
+            case UP:
+                if (isUp[i]) return;
+                popUp(i);
+                break;
+            case DOWN:
+                if (!isUp[i]) return;
+                popDown(i);
+                break;
+            case TOGGLE:
+                if (isUp[i]) {
+                    popDown(i);
+                } else {
+                    popUp(i);
+                }
+                break;
+        }
+    }
+
+    private void popUp(final int i) {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                MoveByAction mba = new MoveByAction();
+                mba.setAmountY(8);
+                mba.setDuration(0.1f);
+                mba.setInterpolation(Interpolation.exp5);
+                isUp[i] = true;
+
+                pixelListTable.getChildren().get(i).addAction(mba);
+            }
+        });
+    }
+
+    private void popDown(final int i) {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                MoveByAction mba = new MoveByAction();
+                mba.setAmountY(-8f);
+                mba.setDuration(0.1f);
+                mba.setInterpolation(Interpolation.exp5);
+                isUp[i] = false;
+
+                pixelListTable.getChildren().get(i).addAction(mba);
+            }
+        });
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
         updateCooldown();
+    }
+
+    public void updateSelected() {
+        pop(currentColor, PopState.UP);
     }
 }

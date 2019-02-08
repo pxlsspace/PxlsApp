@@ -14,6 +14,11 @@ import com.google.gson.Gson;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.renderers.Canvas;
+import space.pxls.renderers.GridOverlay;
+import space.pxls.renderers.Heatmap;
+import space.pxls.renderers.Renderer;
+import space.pxls.renderers.Template;
+import space.pxls.renderers.Virginmap;
 
 import java.util.List;
 

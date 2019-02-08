@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import space.pxls.Pxls;
 import space.pxls.ui.CanvasScreen;
 
-public class Virginmap {
+public class Virginmap implements Renderer {
     public final Color fillStyle = Color.valueOf("#00FF00");
     private CanvasScreen parent;
     private boolean loaded = false;
@@ -48,19 +48,16 @@ public class Virginmap {
         if (loaded && !reload) return;
         if (loading) return;
         loading = true;
-        System.out.println("Loading Virginmap");
         Net.HttpRequest virginmapReq = new Net.HttpRequest(Net.HttpMethods.GET);
         virginmapReq.setUrl(Pxls.domain + "/virginmap?r=" + ((int) Math.floor(Math.random() * 10000)));
         virginmapReq.setHeader("User-Agent", Pxls.getUA());
         Gdx.net.sendHttpRequest(virginmapReq, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                System.out.println("Got virginmap data. Storing and updating texture...");
                 mapData = httpResponse.getResult();
 
                 loading = false;
                 loaded = true;
-                System.out.println("Done. Calling updateTexture");
                 updateTexture();
             }
 
@@ -121,5 +118,15 @@ public class Virginmap {
         if (mapTexture== null) throw new IllegalStateException("mapTexture is null");
 
         parent.batch.draw(mapTexture, canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
+    }
+
+    @Override
+    public CanvasScreen getCanvasScreen() {
+        return parent;
+    }
+
+    @Override
+    public void setCanvasScreen(CanvasScreen screen) {
+        this.parent = screen;
     }
 }

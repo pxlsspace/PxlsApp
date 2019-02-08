@@ -29,6 +29,7 @@ public class PxlsGame extends Game {
     public LoginRunner loginRunner;
     public URI startupURI;
     public String VersionString = "0.0.0";
+    public OrientationHelper orientationHelper;
 
     public PxlsGame() {}
     public PxlsGame(String versionString) {
@@ -403,5 +404,9 @@ public class PxlsGame extends Game {
         } catch (Exception e) {/*ignored*/}
 
         return null;
+    }
+
+    public static boolean widthGTHeight() {
+        return Gdx.graphics.getWidth() > Gdx.graphics.getHeight();
     }
 }

@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import space.pxls.Pxls;
 import space.pxls.ui.CanvasScreen;
 
-public class GridOverlay {
+public class GridOverlay implements Renderer {
     private CanvasScreen parent;
     public Texture gridTexture;
 
@@ -30,10 +30,24 @@ public class GridOverlay {
         return this;
     }
 
+    public void pixel(int x, int y, int color) {
+
+    }
+
     public void render(float zoom, Vector2 screenCenter, Vector2 canvasSize, Vector2 canvasCorner) {
         if (parent == null) return;
         if (!Pxls.prefsHelper.getGridEnabled()) return;
         if (zoom < 5) return;
         parent.batch.draw(gridTexture, canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
+    }
+
+    @Override
+    public CanvasScreen getCanvasScreen() {
+        return parent;
+    }
+
+    @Override
+    public void setCanvasScreen(CanvasScreen screen) {
+        this.parent = screen;
     }
 }

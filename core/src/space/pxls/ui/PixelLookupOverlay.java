@@ -4,9 +4,11 @@ import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
 import com.badlogic.gdx.Gdx;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
 import com.badlogic.gdx.Net;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
@@ -18,6 +20,7 @@ import space.pxls.PxlsGame;
 import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class PixelLookupOverlay extends Table {
@@ -27,6 +30,11 @@ public class PixelLookupOverlay extends Table {
     private long time;
     private int pixels;
     private int pixelsAlltime;
+
+    private Label close;
+    private Label report;
+
+    private ArrayList<Label> labels = new ArrayList<Label>();
 
     public PixelLookupOverlay(final int x, final int y, String username, long time, int pixels, int pixelsAlltime, final int id, boolean loggedIn) {
         super(Pxls.skin);
@@ -38,27 +46,27 @@ public class PixelLookupOverlay extends Table {
         this.pixelsAlltime = pixelsAlltime;
 
         Label coordsLabel = new Label("Coords:", Pxls.skin);
-        coordsLabel.setFontScale(0.3f);
+        coordsLabel.setFontScale(0.25f);
         Label coords = new PxlsLabel("(" + x + ", " + y + ")");
 
         Label userLabel = new Label("Placed by:", Pxls.skin);
-        userLabel.setFontScale(0.3f);
+        userLabel.setFontScale(0.25f);
         Label user = new PxlsLabel(username);
 
         Label timeLabel = new Label("Placed at:", Pxls.skin);
-        timeLabel.setFontScale(0.3f);
+        timeLabel.setFontScale(0.25f);
         long current = System.currentTimeMillis();
         Label tme = new PxlsLabel(current - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time));
 
         Label pixelsLabel = new Label("Pixels by user:", Pxls.skin);
-        pixelsLabel.setFontScale(0.3f);
+        pixelsLabel.setFontScale(0.25f);
         Label pxls = new PxlsLabel(Integer.toString(pixels));
 
         Label pixelsAlltimeLabel = new Label("Alltime Pixels:", Pxls.skin);
-        pixelsAlltimeLabel.setFontScale(0.3f);
+        pixelsAlltimeLabel.setFontScale(0.25f);
         Label pxlsAlltime = new PxlsLabel(Integer.toString(pixelsAlltime));
 
-        Label close = new PxlsLabel("Close").setFontScaleChain(0.2f);
+        close = new PxlsLabel("Close").setFontScaleChain(0.3f);
         close.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -67,7 +75,7 @@ public class PixelLookupOverlay extends Table {
             }
         });
 
-        pad(12);
+        pad(6);
         add(coordsLabel).expandX().left();
         add(coords).expandX().right().row();
 
@@ -83,11 +91,22 @@ public class PixelLookupOverlay extends Table {
         add(pixelsAlltimeLabel).expandX().left();
         add(pxlsAlltime).expandX().right().row();
 
+        labels.add(coordsLabel);
+        labels.add(coords);
+        labels.add(userLabel);
+        labels.add(user);
+        labels.add(timeLabel);
+        labels.add(tme);
+        labels.add(pixelsLabel);
+        labels.add(pxls);
+        labels.add(pixelsAlltimeLabel);
+        labels.add(pxlsAlltime);
+
         add(new SolidContainer()).colspan(2).growX().height(2).row();
 
         if (loggedIn) {
-            Label report = new Label("Report", Pxls.skin);
-            report.setFontScale(0.2f);
+            report = new Label("Report", Pxls.skin);
+            report.setFontScale(0.3f);
             report.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float _x, float _y) {
@@ -100,6 +119,8 @@ public class PixelLookupOverlay extends Table {
         } else {
             add(close).colspan(2).expandX().right().row();
         }
+
+        redraw();
     }
     private void report(final int x, final int y, final int id) {
         GDXTextPrompt gdxTextPrompt = Pxls.dialogs.newDialog(GDXTextPrompt.class);
@@ -151,5 +172,16 @@ public class PixelLookupOverlay extends Table {
             }
         });
         gdxTextPrompt.build().show();
+    }
+
+    public void redraw() {
+        if (labels == null) return;
+        float scale = PxlsGame.widthGTHeight() ? 0.1f : 0.25f;
+        for (Label l : labels) {
+            l.setFontScale(scale);
+        }
+
+        close.setFontScale(PxlsGame.widthGTHeight() ? 0.15f : 0.3f);
+        report.setFontScale(PxlsGame.widthGTHeight() ? 0.15f : 0.3f);
     }
 }

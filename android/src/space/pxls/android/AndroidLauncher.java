@@ -1,6 +1,7 @@
 package space.pxls.android;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,7 +11,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import space.pxls.Pxls;
+
+import space.pxls.OrientationHelper;
 import space.pxls.PxlsGame;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,6 +37,66 @@ public class AndroidLauncher extends AndroidApplication {
         } catch (PackageManager.NameNotFoundException e) {/* ignored */}
 
         game = new PxlsGame(_v);
+        game.orientationHelper = new OrientationHelper() {
+            @Override
+            public void setOrientation(Orientation orientation) {
+                switch (orientation) {
+                    case BEHIND:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_BEHIND);
+                        break;
+                    case FULL_SENSOR:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+                        break;
+                    case FULL_USER:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+                        break;
+                    case LANDSCAPE:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                        break;
+                    case LOCKED:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+                        break;
+                    case NOSENSOR:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+                        break;
+                    case PORTRAIT:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        break;
+                    case REVERSE_LANDSCAPE:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                        break;
+                    case REVERSE_PORTRAIT:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                        break;
+                    case SENSOR:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                        break;
+                    case SENSOR_LANDSCAPE:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                        break;
+                    case SENSOR_PORTRAIT:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                        break;
+                    case UNSPECIFIED:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                        break;
+                    case USER:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
+                        break;
+                    case USER_LANDSCAPE:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+                        break;
+                    case USER_PORTRAIT:
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+                        break;
+                }
+            }
+
+            @Override
+            public Orientation getOrientation() {
+               return Orientation.values()[getRequestedOrientation()];
+            }
+        };
         Intent intent = getIntent();
         if (intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             

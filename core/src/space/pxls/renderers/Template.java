@@ -19,7 +19,7 @@ import space.pxls.PxlsGame;
 import space.pxls.structs.TemplateState;
 import space.pxls.ui.CanvasScreen;
 
-public class Template {
+public class Template implements Renderer {
     private String url;
     private float width;
     private float height;
@@ -43,7 +43,6 @@ public class Template {
     }
 
     public void load(int _x, int _y, final float _tw, float _opacity, String _url) {
-        System.out.printf("template#load(%s, %s, %s, %s, %s)%n", _x, _y, _tw, _opacity, _url);
         Pxls.gameState.getSafeTemplateState().offsetX = _x;
         Pxls.gameState.getSafeTemplateState().offsetY = _y;
         Pxls.gameState.getSafeTemplateState().totalWidth = _tw;
@@ -114,7 +113,7 @@ public class Template {
         });
     }
 
-    public void render(float zoom, Vector2 screenCenter) {
+    public void render(float zoom, Vector2 screenCenter, Vector2 canvasSize, Vector2 canvasCorner) {
         TemplateState ts = Pxls.gameState.getSafeTemplateState();
         if (!ts.enabled) {
             return;
@@ -136,5 +135,17 @@ public class Template {
     public String makePxlsURL() {
         TemplateState ts = Pxls.gameState.getSafeTemplateState();
         return String.format("%s/#template=%s&ox=%s&oy=%s&oo=%s&tw=%s", Pxls.domain, ts.URL, ts.offsetX, ts.offsetX, ts.opacity, ts.totalWidth);
+    }
+
+    public void pixel(int x, int y, int color) {}
+
+    @Override
+    public CanvasScreen getCanvasScreen() {
+        return parent;
+    }
+
+    @Override
+    public void setCanvasScreen(CanvasScreen screen) {
+        this.parent = screen;
     }
 }

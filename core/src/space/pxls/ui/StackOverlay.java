@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 import space.pxls.Pxls;
+import space.pxls.PxlsGame;
 
 public class StackOverlay extends Container<Container<Label>> {
     private int count;
@@ -29,6 +30,8 @@ public class StackOverlay extends Container<Container<Label>> {
 
         setClip(true);
         normal = true;
+
+        redraw();
     }
 
     // called on each stack update (gain, consume, etc.)
@@ -79,5 +82,9 @@ public class StackOverlay extends Container<Container<Label>> {
 
     public void empty() {
         this.countLabel.setText("");
+    }
+
+    public void redraw() {
+        countLabel.setFontScale(PxlsGame.widthGTHeight() ? 0.2f : 0.3f);
     }
 }

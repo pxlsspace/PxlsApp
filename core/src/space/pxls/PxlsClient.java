@@ -61,7 +61,7 @@ public class PxlsClient {
                     } else if (type.equals("userinfo")) {
                         UserInfoPacket userInfoPacket = Pxls.gson.fromJson(message, UserInfoPacket.class);
                         loggedIn = true;
-                        account = new Account(userInfoPacket.username, userInfoPacket.banned, userInfoPacket.role.equals("BANNED") ? 0 : userInfoPacket.banExpiry, userInfoPacket.ban_reason);
+                        account = new Account(userInfoPacket.username, userInfoPacket.banned, userInfoPacket.role.equals("BANNED") ? 0 : userInfoPacket.banExpiry, userInfoPacket.ban_reason, userInfoPacket.method);
                         updateCallback.updateAccount(account);
                     } else if (type.equals("cooldown")) {
                         CooldownPacket cooldownPacket = Pxls.gson.fromJson(message, CooldownPacket.class);
@@ -209,6 +209,7 @@ public class PxlsClient {
         String ban_reason;
         String role;
         long banExpiry;
+        String method;
     }
 
     static class CooldownPacket {

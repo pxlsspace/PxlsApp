@@ -14,13 +14,14 @@ import space.pxls.PxlsGame;
 
 public class LoginBar extends Table {
     private final Label.LabelStyle ls;
+    private Label title;
     public LoginPopup popup;
     public LoginBar() {
         popup = new LoginPopup();
         BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
         ls = new Label.LabelStyle(font, Color.BLACK);
 
-        Label title = new Label("Sign in with...", ls);
+        title = new Label("Sign in with...", ls);
         title.setFontScale(0.5f);
         title.addListener(new ClickListener() {
             @Override
@@ -29,5 +30,12 @@ public class LoginBar extends Table {
             }
         });
         add(title).colspan(5).row();
+
+        redraw();
+    }
+
+    public void redraw() {
+        title.setFontScale(PxlsGame.widthGTHeight() ? 0.25f : 0.5f);
+        popup.redraw();
     }
 }

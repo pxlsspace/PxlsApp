@@ -28,6 +28,7 @@ public class MenuScreen extends ScreenAdapter {
     private Stage stage;
     private Account account;
     private CanvasScreen canvasScreen;
+    public int w=0,h=0;
 
     public MenuScreen(CanvasScreen canvasScreen, Account loggedInAccount) {
         this.stage = new Stage();
@@ -82,13 +83,8 @@ public class MenuScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                System.out.printf("clipboard: %s%n", Gdx.app.getClipboard().getContents());
                 final Map<String, String> templateValues = PxlsGame.i.parseTemplateURL(Gdx.app.getClipboard().getContents());
                 if (templateValues != null) {
-                    System.out.println("Parsed:");
-                    for (Map.Entry<String, String> stringStringEntry : templateValues.entrySet()) {
-                        System.out.printf("    %s: %s%n", stringStringEntry.getKey(), stringStringEntry.getValue());
-                    }
                     PxlsGame.i.confirm("Are you sure you want to load a template from your clipboard?", new PxlsGame.ConfirmCallback() {
                         @Override
                         public void done(boolean confirmed) {
@@ -172,7 +168,7 @@ public class MenuScreen extends ScreenAdapter {
         });
 
         Table topBarTable = new Table().pad(12);
-        topBarTable.add(new PxlsLabel(this.account == null ? "Not Logged In" : "Logged in as " + this.account.getName()).setFontScaleChain(0.5f)).left();
+        topBarTable.add(new PxlsLabel(this.account == null ? "Not Logged In" : "Logged in as " + this.account.getSanitizedName()).setFontScaleChain(0.5f)).left();
         topBarTable.add(closeButton).size(80,80).expandX().right();
 
         table.add(new Stack(new SolidContainer(shadeColor), topBarTable)).growX().row();
@@ -203,6 +199,9 @@ public class MenuScreen extends ScreenAdapter {
             table.add(new Stack(new SolidContainer(shadeColor), tblLogout)).colspan(2).growX().right().row();
         }
 
+        for (Actor a : stage.getActors()) {
+            a.remove();
+        }
         stage.addActor(table);
     }
 
@@ -224,5 +223,16 @@ public class MenuScreen extends ScreenAdapter {
         Label toReturn = new Label(text, Pxls.skin);
         toReturn.setFontScale(0.3f);
         return toReturn;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        if (w != width || h != height) {
+            MenuScreen ms = new MenuScreen(canvasScreen, account);
+            ms.w = width;
+            ms.h = height;
+            PxlsGame.i.setScreen(ms);
+        }
     }
 }

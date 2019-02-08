@@ -23,6 +23,11 @@ public class PxlsLabel extends Label {
     }
 
     @Override
+    public void validate() {
+        super.validate();
+    }
+
+    @Override
     public float getMinWidth() {
         return 0f;
     }

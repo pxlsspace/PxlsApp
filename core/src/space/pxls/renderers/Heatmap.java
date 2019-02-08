@@ -16,7 +16,7 @@ import java.util.TimerTask;
 import space.pxls.Pxls;
 import space.pxls.ui.CanvasScreen;
 
-public class Heatmap {
+public class Heatmap implements Renderer {
     public final Color fillStyle = Color.valueOf("#CD5C5C");
     private boolean loadedHeatmap = false;
     private boolean loadingHeatmap = false;
@@ -73,7 +73,6 @@ public class Heatmap {
         if (loadedHeatmap && !reload) return;
         if (loadingHeatmap) return;
         loadingHeatmap = true;
-        System.out.println("Loading Heatmap");
 
         Net.HttpRequest heatmapReq = new Net.HttpRequest(Net.HttpMethods.GET);
         heatmapReq.setUrl(Pxls.domain + "/heatmap?r=" + ((int) Math.floor(Math.random() * 10000)));
@@ -81,12 +80,10 @@ public class Heatmap {
         Gdx.net.sendHttpRequest(heatmapReq, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                System.out.println("Got heatmap data. Storing and updating texture...");
                 heatmapData = httpResponse.getResult();
 
                 loadingHeatmap = false;
                 loadedHeatmap = true;
-                System.out.println("Done. Calling updateTexture");
                 updateTexture();
             }
 
@@ -170,5 +167,15 @@ public class Heatmap {
 
     public byte[] convertHeatmapResponse() {
         return new byte[] {};
+    }
+
+    @Override
+    public CanvasScreen getCanvasScreen() {
+        return parent;
+    }
+
+    @Override
+    public void setCanvasScreen(CanvasScreen screen) {
+        this.parent = screen;
     }
 }

@@ -16,13 +16,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.google.gson.JsonObject;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
 public class LoginPopup extends Container<Container<Table>> {
     private final Label.LabelStyle ls;
     private boolean up;
     private final Container<Table> container;
+    private final ArrayList<Label> labels = new ArrayList<Label>();
+
     public LoginPopup() {
         BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
         ls = new Label.LabelStyle(font, Color.BLACK);
@@ -46,6 +51,7 @@ public class LoginPopup extends Container<Container<Table>> {
                     launchLogin(url);
                 }
             });
+            labels.add(title);
             table.add(title).row();
         }
         
@@ -55,6 +61,8 @@ public class LoginPopup extends Container<Container<Table>> {
         container.pad(8);
         setActor(container);
         setClip(true);
+
+        redraw();
     }
 
     public void toggle() {
@@ -115,6 +123,13 @@ public class LoginPopup extends Container<Container<Table>> {
         super.act(delta);
         if (!up && !container.hasActions()) {
             container.setY(-container.getHeight());
+        }
+    }
+
+    public void redraw() {
+        float scale = PxlsGame.widthGTHeight() ? 0.2f : 0.4f;
+        for (Label l : labels) {
+            l.setFontScale(scale);
         }
     }
 }

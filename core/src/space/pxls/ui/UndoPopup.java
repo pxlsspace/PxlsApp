@@ -1,30 +1,26 @@
 package space.pxls.ui;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
-import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import javax.swing.GroupLayout;
-
 import space.pxls.Pxls;
+import space.pxls.PxlsGame;
 
 public class UndoPopup extends Container<Container<Label>> {
     private long popDownTime;
     private boolean up;
     private final Container<Label> container;
+    private Label label;
 
     public UndoPopup() {
 
-        Label label = new Label("Undo", Pxls.skin);
+        label = new Label("Undo", Pxls.skin);
         label.setFontScale(0.4f);
         label.setAlignment(Align.center);
         label.addListener(new ClickListener() {
@@ -46,6 +42,8 @@ public class UndoPopup extends Container<Container<Label>> {
 
         setClip(true);
         //fire(new UndoEvent());
+
+        redraw();
     }
 
     private float getYPos () {
@@ -91,4 +89,8 @@ public class UndoPopup extends Container<Container<Label>> {
     }
 
     public static class UndoEvent extends Event {}
+
+    public void redraw() {
+        label.setFontScale(PxlsGame.widthGTHeight() ? 0.2f : 0.4f);
+    }
 }

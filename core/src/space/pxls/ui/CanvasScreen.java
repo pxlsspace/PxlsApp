@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -29,6 +28,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
 
 import space.pxls.Account;
+import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsClient;
 import space.pxls.PxlsGame;
@@ -37,7 +37,6 @@ import space.pxls.renderers.GridOverlay;
 import space.pxls.renderers.Heatmap;
 import space.pxls.renderers.Template;
 import space.pxls.renderers.Virginmap;
-import space.pxls.structs.TemplateState;
 
 public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCallback {
     public final LoadScreen.BoardInfo boardInfo;
@@ -75,7 +74,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     public CanvasScreen(Canvas canvas) {
         Pxls.gameState = Pxls.prefsHelper.GetSavedGameState();
-        System.out.println("Initializing CanvasScreen with " + Pxls.gameState);
         boardInfo = canvas.info;
 
         batch = new SpriteBatch();
@@ -141,13 +139,13 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         centerPopup.add(undoPopup);
 
         table.add(stackOverlayContainer).bottom().left();
-        table.add(centerPopup).center().bottom().expandX();
-        table.add(userCountOverlay).bottom().right().growY();
+        table.add(centerPopup).center().bottom().expandX().expandY();
+        table.add(userCountOverlay).bottom().right();
         table.row();
 
         table.add(bottomContainer).fillX().expandX().colspan(3);
         table.setFillParent(true);
-        table.setDebug(true);
+//        table.setDebug(true);
         stage.addActor(table);
 
         client = new PxlsClient(this);
@@ -262,7 +260,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                     Pxls.gameState.getSafeTemplateState().setOffsetX((int)pos.x);
                     Pxls.gameState.getSafeTemplateState().setOffsetY((int)pos.y);
                     return true;
-                } else if (paletteBar.getCurrentColor() >= 0) {
+                } else if (paletteBar.getCurrentColor() >= 0 && !Pxls.gameState.getSafeTemplateState().moveMode) {
                     Vector2 pos = screenToBoardSpace(new Vector2(x, y));
                     placePixel((int) pos.x, (int) pos.y, Pxls.prefsHelper.getKeepColorSelected());
                     return true;
@@ -401,6 +399,15 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     public void resize(final int width, final int height) {
         super.resize(width, height);
         stage.getViewport().update(width, height, true);
+
+        if (paletteBar != null) paletteBar.redraw();
+        if (userBar != null) userBar.redraw();
+        if (login != null) login.redraw();
+        if (userCountOverlay != null) userCountOverlay.redraw();
+        if (stackOverlay != null) stackOverlay.redraw();
+        if (undoPopup != null) undoPopup.redraw();
+        if (lookupContainer != null && lookupContainer.getActor() != null) lookupContainer.getActor().redraw();
+        if (templateMoveModeHelper != null) templateMoveModeHelper.redraw();
     }
 
     private Vector2 screenToBoardSpace(Vector2 vec) {
@@ -429,7 +436,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             canvas.render(zoom, screenCenter, canvasSize, canvasCorner);
             heatmap.render(zoom, screenCenter, canvasSize, canvasCorner);
             virginmap.render(zoom, screenCenter, canvasSize, canvasCorner);
-            template.render(zoom, screenCenter);
+            template.render(zoom, screenCenter, canvasSize, canvasCorner);
             gridOverlay.render(zoom, screenCenter, canvasSize, canvasCorner);
             batch.end();
 
@@ -475,7 +482,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         if (account != null) {
             final CanvasScreen self = this;
-            userBar = new UserBar(account.getName());
+            userBar = new UserBar(account.getSanitizedName());
             userBar.addListener(new EventListener() {
                 @Override
                 public boolean handle(Event event) {
@@ -540,7 +547,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     }
 
     public void moveTo(int x, int y, int scale) {
-        System.out.printf("should jump to %s %s @%s%n", x, y, scale);
         center.x = x;
         center.y = y;
         zoom = scale;
@@ -579,11 +585,15 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         private boolean[] pointerDown = new boolean[] {false, false, false, false, false, false, false, false, false, false};
         private PxlsSlider sliderOpacity = new PxlsSlider().setPrepend("Opacity ");
         private float _lastOpacity = 0f;
+        private OrientationHelper.Orientation orientation = null;
+
+        Cell cellBtnUp, cellBtnDown, cellBtnLeft, cellBtnRight;
+        PxlsButton btnCancel, btnConfirm;
 
         public Table moveModeControls;
         public TemplateMoveModeHelper() {
-            PxlsButton btnCancel = new PxlsButton(" Cancel ").setFontScale(0.2f).red();
-            PxlsButton btnConfirm = new PxlsButton(" Confirm ").setFontScale(0.2f).blue();
+            btnCancel = new PxlsButton(" Cancel ").setFontScale(0.2f).red();
+            btnConfirm = new PxlsButton(" Confirm ").setFontScale(0.2f).blue();
 
             Image btnUp = new Image(Pxls.skin.getDrawable("arrow.gray.up"));
             Image btnDown = new Image(Pxls.skin.getDrawable("arrow.gray.down"));
@@ -666,15 +676,16 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             moveModeControls.add(sliderOpacity).colspan(3).growX().row();
 
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
-            moveModeControls.add(btnUp).size(48,48).pad(4, 4, 4, 4);
+            cellBtnUp = moveModeControls.add(btnUp).size(48,48).pad(4, 4, 4, 4);
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX().row();
 
-            moveModeControls.add(btnLeft).size(48,48).right().pad(4, 4, 4, 4);
+            cellBtnLeft = moveModeControls.add(btnLeft).size(48,48).right().pad(4, 4, 4, 4);
             moveModeControls.add(new Container()).pad(4, 4, 4, 4);
-            moveModeControls.add(btnRight).size(48,48).left().pad(4, 4, 4, 4).row();
+            cellBtnRight = moveModeControls.add(btnRight).size(48,48).left().pad(4, 4, 4, 4);
+            moveModeControls.row();
 
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX();
-            moveModeControls.add(btnDown).size(48,48).pad(4, 4, 4, 4);
+            cellBtnDown = moveModeControls.add(btnDown).size(48,48).pad(4, 4, 4, 4);
             moveModeControls.add(new Container()).pad(4, 4, 4, 4).fillX().row();
 
             sliderOpacity.setValue(Pxls.gameState.getSafeTemplateState().opacity);
@@ -684,15 +695,36 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                     Pxls.gameState.getSafeTemplateState().opacity = sliderOpacity.getValue();
                 }
             });
+
+            redraw();
         }
 
         void moveStart() {
+            if (PxlsGame.i.orientationHelper != null) {
+                orientation = PxlsGame.i.orientationHelper.getOrientation();
+                PxlsGame.i.orientationHelper.setOrientation(OrientationHelper.Orientation.PORTRAIT);
+            }
             _lastOpacity = Pxls.gameState.getSafeTemplateState().opacity;
             sliderOpacity.setValue(_lastOpacity);
         }
 
         void moveDone() {
+            if (orientation != null && PxlsGame.i.orientationHelper != null) {
+                PxlsGame.i.orientationHelper.setOrientation(OrientationHelper.Orientation.FULL_SENSOR);
+            }
             Pxls.gameState.getSafeTemplateState().opacity = _lastOpacity;
+        }
+
+        void redraw() {
+            boolean widthGTHeight = PxlsGame.widthGTHeight();
+            float squareSize = widthGTHeight ? 16 : 48;
+            cellBtnUp.size(squareSize, squareSize);
+            cellBtnDown.size(squareSize, squareSize);
+            cellBtnLeft.size(squareSize, squareSize);
+            cellBtnRight.size(squareSize, squareSize);
+            btnCancel.setFontScale(widthGTHeight ? 0.1f : 0.2f);
+            btnConfirm.setFontScale(widthGTHeight ? 0.1f : 0.2f);
+            sliderOpacity.getLabel().setFontScale(widthGTHeight ? 0.1f : 0.3f);
         }
     }
 }

@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import space.pxls.ui.CanvasScreen;
 import space.pxls.ui.LoadScreen;
 
-public class Canvas {
+public class Canvas implements Renderer {
     private CanvasScreen parent;
     public final LoadScreen.BoardInfo info;
     public FrameBuffer canvasBuffer;
@@ -20,8 +20,6 @@ public class Canvas {
 
         final Pixmap p = new Pixmap(info.width, info.height, Pixmap.Format.RGBA8888);
         p.getPixels().put(initialData).position(0);
-
-        System.out.println("constructing FrameBuffer with info" + info);
 
         canvasTexture = new Texture(info.width, info.height, Pixmap.Format.RGBA8888);
         canvasTexture.draw(p, 0, 0);
@@ -47,5 +45,15 @@ public class Canvas {
     public void render(float zoom, Vector2 screenCenter, Vector2 canvasSize, Vector2 canvasCorner) {
         if (parent == null) return;
         parent.batch.draw(canvasTexture, canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
+    }
+
+    @Override
+    public CanvasScreen getCanvasScreen() {
+        return parent;
+    }
+
+    @Override
+    public void setCanvasScreen(CanvasScreen screen) {
+        this.parent = screen;
     }
 }
