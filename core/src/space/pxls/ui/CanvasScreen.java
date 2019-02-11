@@ -158,6 +158,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (Pxls.prefsHelper.getVirginmapEnabled() && virginmap != null) {
             virginmap.updateTexture();
         }
+        if (userBar != null) {
+            userBar.setLockVisible(Pxls.gameState.getSafeCanvasState().locked);
+        }
 
         if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
         if (Pxls.gameState.getSafeTemplateState().moveMode) {
@@ -492,6 +495,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (account != null) {
             final CanvasScreen self = this;
             userBar = new UserBar(account.getSanitizedName());
+            userBar.setLockVisible(Pxls.gameState.getSafeCanvasState().locked);
             userBar.addListener(new EventListener() {
                 @Override
                 public boolean handle(Event event) {

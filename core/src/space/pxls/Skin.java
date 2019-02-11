@@ -25,6 +25,7 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         addDrawable("checked", "checked.png");
         addDrawable("unchecked", "unchecked.png");
         addDrawable("user", "user.png");
+        addDrawable("lock", "lock.png");
 
         addDrawable("arrow.gray.left", "arrows/left.up.png");
         addDrawable("arrow.gray.right", "arrows/right.up.png");
