@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.google.gson.JsonObject;
+
+import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 
@@ -127,7 +129,7 @@ public class LoginPopup extends Container<Container<Table>> {
     }
 
     public void redraw() {
-        float scale = PxlsGame.widthGTHeight() ? 0.2f : 0.4f;
+        float scale = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE ? 0.2f : 0.4f;
         for (Label l : labels) {
             l.setFontScale(scale);
         }

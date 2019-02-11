@@ -41,8 +41,8 @@ public class UserBar extends Table {
     }
 
     public void redraw() {
-        boolean widthGTHeight = PxlsGame.widthGTHeight();
-        label.setFontScale(widthGTHeight ? 0.1f : 0.25f);
-        menuButtonCell.width(widthGTHeight ? 32 : 48).height(widthGTHeight ? 16 : 32);
+        boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
+        label.setFontScale(isLandscape ? 0.1f : 0.25f);
+        menuButtonCell.width(isLandscape ? 32 : 48).height(isLandscape ? 16 : 32);
     }
 }

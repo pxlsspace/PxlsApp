@@ -4,9 +4,7 @@ public interface OrientationHelper {
     enum Orientation {
         BEHIND,
         FULL_SENSOR,
-        FULL_USER,
         LANDSCAPE,
-        LOCKED,
         NOSENSOR,
         PORTRAIT,
         REVERSE_LANDSCAPE,
@@ -15,10 +13,15 @@ public interface OrientationHelper {
         SENSOR_LANDSCAPE,
         SENSOR_PORTRAIT,
         UNSPECIFIED,
-        USER,
-        USER_LANDSCAPE,
-        USER_PORTRAIT
+        USER
+    }
+    enum SimpleOrientation {
+        LANDSCAPE,
+        PORTRAIT,
+        NA
     }
     void setOrientation(Orientation orientation);
+    void setOrientation(SimpleOrientation orientation);
     Orientation getOrientation();
+    SimpleOrientation getSimpleOrientation();
 }

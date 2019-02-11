@@ -15,6 +15,8 @@ import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 
 import com.badlogic.gdx.utils.Align;
 import com.github.kevinsawicki.timeago.TimeAgo;
+
+import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import java.net.URLEncoder;
@@ -176,12 +178,13 @@ public class PixelLookupOverlay extends Table {
 
     public void redraw() {
         if (labels == null) return;
-        float scale = PxlsGame.widthGTHeight() ? 0.1f : 0.25f;
+        boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
+        float scale = isLandscape ? 0.1f : 0.25f;
         for (Label l : labels) {
             l.setFontScale(scale);
         }
 
-        close.setFontScale(PxlsGame.widthGTHeight() ? 0.15f : 0.3f);
-        report.setFontScale(PxlsGame.widthGTHeight() ? 0.15f : 0.3f);
+        close.setFontScale(isLandscape ? 0.15f : 0.3f);
+        report.setFontScale(isLandscape ? 0.15f : 0.3f);
     }
 }

@@ -17,6 +17,8 @@ public class UserCountOverlay extends Stack {
     private Label lblOnlineCount;
     private Boolean receivedCount = false;
     private Cell userIconCell;
+    private Container bgContainer;
+    private Table onlineCount;
 
     public UserCountOverlay(int count) {
         this();
@@ -27,14 +29,14 @@ public class UserCountOverlay extends Stack {
 
         lblOnlineCount = new Label("", Pxls.skin);
         lblOnlineCount.setFontScale(0.3f);
-        Table onlineCount = new Table();
+        onlineCount = new Table();
         onlineCount.pad(8);
         userIconCell = onlineCount.add(new Image(Pxls.skin.getDrawable("user"))).growX().right().size(32, 32);
         onlineCount.add(lblOnlineCount).right().row();
 
-        Container temp = new Container();
-        temp.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topLeft")));
-        add(temp);
+        bgContainer = new Container();
+        bgContainer.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topLeft")));
+        add(bgContainer);
         add(onlineCount);
 
         redraw();
@@ -57,8 +59,15 @@ public class UserCountOverlay extends Stack {
     }
 
     public void redraw() {
-        boolean wgth = PxlsGame.widthGTHeight();
-        lblOnlineCount.setFontScale(wgth ? 0.2f : 0.3f);
-        userIconCell.size(wgth ? 16 : 32, wgth ? 16 : 32);
+        boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
+        lblOnlineCount.setFontScale(isLandscape ? 0.2f : 0.3f);
+        userIconCell.size(isLandscape ? 16 : 32, isLandscape ? 16 : 32);
+        if (isLandscape) {
+            bgContainer.setBackground(Pxls.skin.getDrawable("background"));
+            onlineCount.pad(0, 8, 0, 8);
+        } else {
+            bgContainer.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topLeft")));
+            onlineCount.pad(8);
+        }
     }
 }

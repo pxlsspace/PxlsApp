@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
+import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 
@@ -91,6 +92,6 @@ public class UndoPopup extends Container<Container<Label>> {
     public static class UndoEvent extends Event {}
 
     public void redraw() {
-        label.setFontScale(PxlsGame.widthGTHeight() ? 0.2f : 0.4f);
+        label.setFontScale(PxlsGame.i.orientationHelper.getSimpleOrientation() == OrientationHelper.SimpleOrientation.LANDSCAPE ? 0.2f : 0.4f);
     }
 }

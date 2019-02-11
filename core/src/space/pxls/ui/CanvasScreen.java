@@ -54,7 +54,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private Container<PixelLookupOverlay> lookupContainer;
     private Container<StackOverlay> stackOverlayContainer;
     private UndoPopup undoPopup;
-    private Cell centerPopupCell;
+    private Cell cellStackOverlay, cellUserCountOverlay, centerPopupCell;
     public StackOverlay stackOverlay;
 
     private PixelBar paletteBar;
@@ -138,9 +138,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         centerPopup.add(login.popup);
         centerPopup.add(undoPopup);
 
-        table.add(stackOverlayContainer).bottom().left();
+        cellStackOverlay = table.add(stackOverlayContainer).bottom().left();
         table.add(centerPopup).center().bottom().expandX().expandY();
-        table.add(userCountOverlay).bottom().right();
+        cellUserCountOverlay = table.add(userCountOverlay).bottom().right();
         table.row();
 
         table.add(bottomContainer).fillX().expandX().colspan(3);
@@ -408,6 +408,15 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (undoPopup != null) undoPopup.redraw();
         if (lookupContainer != null && lookupContainer.getActor() != null) lookupContainer.getActor().redraw();
         if (templateMoveModeHelper != null) templateMoveModeHelper.redraw();
+        if (cellStackOverlay != null && cellUserCountOverlay != null) {
+            if (PxlsGame.i.orientationHelper.getSimpleOrientation() == OrientationHelper.SimpleOrientation.LANDSCAPE) {
+                cellStackOverlay.padBottom(-1);
+                cellUserCountOverlay.padBottom(-1);
+            } else {
+                cellStackOverlay.padBottom(0);
+                cellUserCountOverlay.padBottom(0);
+            }
+        }
     }
 
     private Vector2 screenToBoardSpace(Vector2 vec) {
@@ -716,15 +725,15 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         }
 
         void redraw() {
-            boolean widthGTHeight = PxlsGame.widthGTHeight();
-            float squareSize = widthGTHeight ? 16 : 48;
+            boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
+            float squareSize = isLandscape ? 16 : 48;
             cellBtnUp.size(squareSize, squareSize);
             cellBtnDown.size(squareSize, squareSize);
             cellBtnLeft.size(squareSize, squareSize);
             cellBtnRight.size(squareSize, squareSize);
-            btnCancel.setFontScale(widthGTHeight ? 0.1f : 0.2f);
-            btnConfirm.setFontScale(widthGTHeight ? 0.1f : 0.2f);
-            sliderOpacity.getLabel().setFontScale(widthGTHeight ? 0.1f : 0.3f);
+            btnCancel.setFontScale(isLandscape ? 0.1f : 0.2f);
+            btnConfirm.setFontScale(isLandscape ? 0.1f : 0.2f);
+            sliderOpacity.getLabel().setFontScale(isLandscape ? 0.1f : 0.3f);
         }
     }
 }

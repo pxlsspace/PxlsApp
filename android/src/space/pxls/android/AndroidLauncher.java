@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -47,14 +48,8 @@ public class AndroidLauncher extends AndroidApplication {
                     case FULL_SENSOR:
                         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
                         break;
-                    case FULL_USER:
-                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
-                        break;
                     case LANDSCAPE:
                         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                        break;
-                    case LOCKED:
-                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
                         break;
                     case NOSENSOR:
                         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
@@ -83,11 +78,20 @@ public class AndroidLauncher extends AndroidApplication {
                     case USER:
                         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
                         break;
-                    case USER_LANDSCAPE:
-                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+                }
+            }
+
+            @Override
+            public void setOrientation(SimpleOrientation orientation) {
+                switch(orientation) {
+                    case LANDSCAPE:
+                        setOrientation(Orientation.SENSOR_LANDSCAPE);
                         break;
-                    case USER_PORTRAIT:
-                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+                    case PORTRAIT:
+                        setOrientation(Orientation.SENSOR_PORTRAIT);
+                        break;
+                    case NA:
+                        setOrientation(Orientation.FULL_SENSOR);
                         break;
                 }
             }
@@ -96,10 +100,25 @@ public class AndroidLauncher extends AndroidApplication {
             public Orientation getOrientation() {
                return Orientation.values()[getRequestedOrientation()];
             }
+
+            @Override
+            public SimpleOrientation getSimpleOrientation() {
+                if (getWindowManager() == null || getWindowManager().getDefaultDisplay() == null) return SimpleOrientation.NA;
+
+                switch (getWindowManager().getDefaultDisplay().getRotation()) {
+                    case Surface.ROTATION_0:
+                    case Surface.ROTATION_180:
+                        return SimpleOrientation.PORTRAIT;
+                    case Surface.ROTATION_270:
+                    case Surface.ROTATION_90:
+                        return SimpleOrientation.LANDSCAPE;
+                }
+
+                return SimpleOrientation.NA;
+            }
         };
         Intent intent = getIntent();
-        if (intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
-            
+        if (intent != null && intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
             try {
                 String url = intent.getDataString();
                 URI uri = new URI(url);

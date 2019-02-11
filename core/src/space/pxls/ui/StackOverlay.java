@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
+import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 
@@ -14,7 +15,6 @@ public class StackOverlay extends Container<Container<Label>> {
     private final Label countLabel;
     private boolean normal;
     private long cooldownExpiry;
-    private boolean isEmpty;
 
     public StackOverlay(final int count, final int maxCount) {
         super();
@@ -85,6 +85,11 @@ public class StackOverlay extends Container<Container<Label>> {
     }
 
     public void redraw() {
-        countLabel.setFontScale(PxlsGame.widthGTHeight() ? 0.2f : 0.3f);
+        countLabel.setFontScale(PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE ? 0.2f : 0.3f);
+        if (PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE) {
+            container.setBackground(Pxls.skin.getDrawable("background"));
+        } else {
+            container.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
+        }
     }
 }
