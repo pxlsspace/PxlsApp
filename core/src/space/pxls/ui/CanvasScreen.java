@@ -559,9 +559,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         });
     }
 
-    public void moveTo(int x, int y, int scale) {
+    public void moveTo(int x, int y, float scale) {
         center.x = x;
-        center.y = y;
+        center.y = boardInfo.height-y; //(0, 0) is bottom left corner. y needs to be translated relative to board height in this case.
         zoom = scale;
     }
 

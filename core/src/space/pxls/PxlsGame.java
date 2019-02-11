@@ -95,11 +95,11 @@ public class PxlsGame extends Game {
                 int posX = 0;
                 int posY = 0;
                 try {
-                    int scale = -1;
+                    float scale = 1f;
                     posX = Integer.parseInt(paramX);
                     posY = Integer.parseInt(paramY);
                     try {
-                        scale = Integer.parseInt(paramScale);
+                        scale = Float.parseFloat(paramScale);
                     } catch (Exception e) { /* ignored */ }
                     _screen.moveTo(posX, posY, scale);
                 } catch (Exception e) {
@@ -108,7 +108,8 @@ public class PxlsGame extends Game {
             }
         }
         if (url == null) {
-            _screen.template.load(0, 0, -1, 0.5f, "");
+//            _screen.template.load(0, 0, -1, 0.5f, "");
+            //TODO: why was this here? we don't want to clear template here... no reason to. people may be clicking a link to jump to a specific spot to fix a grief on their already loaded template.
             return; // nothing to do
         }
         String s_x = params.get("ox");
