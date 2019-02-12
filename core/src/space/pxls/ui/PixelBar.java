@@ -3,6 +3,7 @@ package space.pxls.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.Skin;
 
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +44,14 @@ public class PixelBar extends Stack {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                changeColor(-1);
+                if (Pxls.prefsHelper.getKeepColorSelected()) {
+                    Actor a = pixelListTable.hit(x, y, false);
+                    if (a instanceof PixelImage) {
+                        changeColor(((PixelImage) a).idx);
+                    }
+                } else {
+                    changeColor(-1);
+                }
                 return true;
             }
         });
@@ -78,10 +87,11 @@ public class PixelBar extends Stack {
             isUp[i] = false;
 
             Color c = Color.valueOf(s);
-            final Image img = new Image(Pxls.skin, "palette");
+            final PixelImage img = new PixelImage(Pxls.skin, "palette");
             img.setColor(c);
 
             final int finalI = i;
+            img.idx = i;
             img.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -91,7 +101,7 @@ public class PixelBar extends Stack {
                 }
             });
 
-            final Cell<Image> cell = pixelListTable.add(img).expandX().fillX().height(40);
+            final Cell<PixelImage> cell = pixelListTable.add(img).expandX().fillX().height(40);
 
             int snapPoint = palette.size() / 2 - 1;
             int spacing = 4;
@@ -238,5 +248,13 @@ public class PixelBar extends Stack {
 
     public void updateSelected() {
         pop(currentColor, PopState.UP);
+    }
+
+    class PixelImage extends Image {
+        public int idx = -1;
+
+        public PixelImage(Skin skin, String palette) {
+            super(skin, palette);
+        }
     }
 }
