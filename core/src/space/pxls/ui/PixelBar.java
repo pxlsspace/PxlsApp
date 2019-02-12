@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import space.pxls.Pxls;
+import space.pxls.PxlsGame;
 
 import java.util.List;
 import java.util.Locale;
@@ -117,14 +118,32 @@ public class PixelBar extends Stack {
         }
     }
 
+    private boolean[] vibeState = new boolean[] {true, true, true, true};
     public void updateCooldown(float cooldown) {
         cooldownExpiry = System.currentTimeMillis() + (long) (cooldown * 1000);
-        updateCooldown();
+        if (cooldown > 0) {
+            vibeState[0] = vibeState[1] = vibeState[2] = false;
+            updateCooldown();
+        }
     }
 
     private void updateCooldown() {
         long now = System.currentTimeMillis();
         float timeLeft = (cooldownExpiry - now) / 1000f;
+
+        if (Pxls.prefsHelper.getShouldVibrate() && timeLeft >= -1 && timeLeft <= 2 && PxlsGame.i.vibrationHelper != null) {
+            int stateI = ((int)Math.floor(timeLeft)) + 1;
+            if (!vibeState[stateI]) {
+                if (Pxls.prefsHelper.getShouldPrevibe()) {
+                    PxlsGame.i.vibrationHelper.vibrate(stateI > 0 ? 50 : 500);
+                } else {
+                    if (stateI == 0) {
+                        PxlsGame.i.vibrationHelper.vibrate(500);
+                    }
+                }
+                vibeState[stateI] = true; //still flag vibestate as true even if we didn't previbe so that we don't call the code 100 times
+            }
+        }
 
         this.cooldownContainer.setVisible(timeLeft > 0);
 

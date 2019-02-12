@@ -24,6 +24,9 @@ public class PrefsHelper {
 
     //misc
     private boolean hasSeenMoveModeTutorial = false;
+    private boolean cachedShouldVibrate = true;
+    private boolean cachedShouldPrevibe = true;
+    private boolean cachedShouldVibeOnStack = true;
 
     //Overlays
     private boolean cachedGridEnabled = false;
@@ -44,6 +47,9 @@ public class PrefsHelper {
         getHeatmapEnabled(true);
         getHasSeenMoveModeTutorial(true);
         getVirginmapEnabled(true);
+        getShouldVibrate(true);
+        getShouldPrevibe(true);
+        getShouldVibeOnStack(true);
         stateFlushTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -187,6 +193,48 @@ public class PrefsHelper {
         if (!reload) return this.cachedHideUserCount;
         this.cachedHideUserCount = this.preferences.getBoolean("hideUserCount", false);
         return this.cachedHideUserCount;
+    }
+
+    public void setShouldVibrate(boolean toSet) {
+        this.cachedShouldVibrate = toSet;
+        this.preferences.putBoolean("shouldVibrate", toSet);
+        this.preferences.flush();
+    }
+    public boolean getShouldVibrate(boolean reload) {
+        if (!reload) return this.cachedShouldVibrate;
+        this.cachedShouldVibrate = this.preferences.getBoolean("shouldVibrate", true);
+        return this.cachedShouldVibrate;
+    }
+    public boolean getShouldVibrate() {
+        return getShouldVibrate(false);
+    }
+
+    public void setShouldPrevibe(boolean toSet) {
+        this.cachedShouldPrevibe = toSet;
+        this.preferences.putBoolean("shouldPrevibe", toSet);
+        this.preferences.flush();
+    }
+    public boolean getShouldPrevibe(boolean reload) {
+        if (!reload) return this.cachedShouldPrevibe;
+        this.cachedShouldPrevibe = this.preferences.getBoolean("shouldPrevibe", true);
+        return this.cachedShouldPrevibe;
+    }
+    public boolean getShouldPrevibe() {
+        return getShouldPrevibe(false);
+    }
+
+    public void setShouldVibeOnStack(boolean toSet) {
+        this.cachedShouldVibeOnStack = toSet;
+        this.preferences.putBoolean("shouldVibeOnStack", toSet);
+        this.preferences.flush();
+    }
+    public boolean getShouldVibeOnStack(boolean reload) {
+        if (!reload) return this.cachedShouldVibeOnStack;
+        this.cachedShouldVibeOnStack = this.preferences.getBoolean("shouldVibeOnStack", true);
+        return this.cachedShouldVibeOnStack;
+    }
+    public boolean getShouldVibeOnStack() {
+        return getShouldVibeOnStack(false);
     }
 
     public PxlsGameState GetSavedGameState() {

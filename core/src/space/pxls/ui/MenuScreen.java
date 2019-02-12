@@ -55,6 +55,9 @@ public class MenuScreen extends ScreenAdapter {
         final PxlsCheckBox cbHideUserCount = new PxlsCheckBox("Hide UserCount", Pxls.prefsHelper.getHideUserCount());
         final PxlsCheckBox cbVirginmapEnabled = new PxlsCheckBox("Enable VirginMap", Pxls.prefsHelper.getVirginmapEnabled());
         final PxlsCheckBox cbCanvasLocked = new PxlsCheckBox("Lock Canvas", Pxls.gameState.getSafeCanvasState().locked);
+        final PxlsCheckBox cbShouldVibe = new PxlsCheckBox("Enable vibration", Pxls.prefsHelper.getShouldVibrate());
+        final PxlsCheckBox cbShouldVibeOnStack = new PxlsCheckBox("Vibrate on stack gain", Pxls.prefsHelper.getShouldVibeOnStack());
+        final PxlsCheckBox cbShouldPrevibe = new PxlsCheckBox("Enable \"previbe\" ticks", Pxls.prefsHelper.getShouldPrevibe());
 
         final PxlsButton btnGetTemplateURL = new PxlsButton("Get current template link");
 
@@ -130,6 +133,11 @@ public class MenuScreen extends ScreenAdapter {
         tcVirginmap.add(cbVirginmapEnabled).padTop(6).padLeft(5).colspan(2).expandX().left().row();
         tcVirginmap.add(sliderVirginmapOpacity).colspan(2).growX().fillY().row();
 
+        Table tcVibration = new TitledTableHelper("Vibration");
+        tcVibration.add(cbShouldVibe).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcVibration.add(cbShouldPrevibe).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tcVibration.add(cbShouldVibeOnStack).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+
         Button closeButton = new Button(Pxls.skin.getDrawable("times"));
         Table table = new Table();
         table.setFillParent(true);
@@ -148,6 +156,9 @@ public class MenuScreen extends ScreenAdapter {
                 Pxls.prefsHelper.setHideUerCount(cbHideUserCount.isChecked());
                 Pxls.prefsHelper.setHeatmapEnabled(cbHeatmap.isChecked());
                 Pxls.prefsHelper.setVirginmapEnabled(cbVirginmapEnabled.isChecked());
+                Pxls.prefsHelper.setShouldVibrate(cbShouldVibe.isChecked());
+                Pxls.prefsHelper.setShouldPrevibe(cbShouldPrevibe.isChecked());
+                Pxls.prefsHelper.setShouldVibeOnStack(cbShouldVibeOnStack.isChecked());
                 Pxls.gameState.getSafeCanvasState().locked = (cbCanvasLocked.isChecked());
                 Pxls.gameState.getSafeTemplateState().enabled = cbTemplate.isChecked();
                 Pxls.gameState.getSafeTemplateState().moveMode = cbMoveMode.isChecked();
@@ -175,6 +186,7 @@ public class MenuScreen extends ScreenAdapter {
 
         Table contentTable = new Table();
         contentTable.add(tcMisc).padTop(24).growX().row();
+        contentTable.add(tcVibration).padTop(48).growX().row();
         contentTable.add(tcHeatmap).padTop(48).growX().row();
         contentTable.add(tcVirginmap).padTop(48).growX().row();
         contentTable.add(tcTemplate).padTop(48).growX().row();

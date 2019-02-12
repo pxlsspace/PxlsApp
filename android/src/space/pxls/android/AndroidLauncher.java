@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import space.pxls.OrientationHelper;
 import space.pxls.PxlsGame;
+import space.pxls.VibrationHelper;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -115,6 +118,23 @@ public class AndroidLauncher extends AndroidApplication {
                 }
 
                 return SimpleOrientation.NA;
+            }
+        };
+        game.vibrationHelper = new VibrationHelper() {
+            private Vibrator vibrator;
+
+            @Override
+            public void vibrate(long milliseconds) {
+                Vibrator vib = getVibrator();
+                if (vib == null || !vib.hasVibrator()) return;
+                vib.vibrate(milliseconds);
+            }
+
+            Vibrator getVibrator() {
+                if (vibrator == null) {
+                    vibrator = (Vibrator)getContext().getSystemService(VIBRATOR_SERVICE);
+                }
+                return vibrator;
             }
         };
         Intent intent = getIntent();

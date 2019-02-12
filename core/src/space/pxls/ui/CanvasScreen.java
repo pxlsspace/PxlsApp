@@ -390,7 +390,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     }
 
     private void placePixel(int x, int y, boolean keepSelected) {
-        if (paletteBar.getCurrentColor() >= 0) {
+        if (!stackOverlay.onCooldown() && paletteBar.getCurrentColor() >= 0) {
             client.placePixel(x, y, paletteBar.getCurrentColor());
             if (!keepSelected) {
                 paletteBar.changeColor(-1);

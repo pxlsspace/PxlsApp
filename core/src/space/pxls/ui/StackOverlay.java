@@ -38,6 +38,11 @@ public class StackOverlay extends Container<Container<Label>> {
     public void updateStack(int count, String cause) {
         this.count = count;
         updateStack();
+        if (Pxls.prefsHelper.getShouldVibrate() && Pxls.prefsHelper.getShouldVibeOnStack() && cause.equals("stackGain")) {
+            if (PxlsGame.i.vibrationHelper != null) {
+                PxlsGame.i.vibrationHelper.vibrate(500);
+            }
+        }
     }
 
     public void updateStack() {
@@ -91,5 +96,9 @@ public class StackOverlay extends Container<Container<Label>> {
         } else {
             container.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
         }
+    }
+
+    public boolean onCooldown() {
+        return cooldownExpiry-System.currentTimeMillis() > 0;
     }
 }
