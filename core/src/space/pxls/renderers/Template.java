@@ -69,7 +69,7 @@ public class Template implements Renderer {
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                String contentType = httpResponse.getHeader("Content-Type");
+                final String contentType = httpResponse.getHeader("Content-Type");
                 if (!(contentType.equalsIgnoreCase("image/png") || contentType.equalsIgnoreCase("image/jpg") || contentType.equalsIgnoreCase("image/jpeg"))) {
                     PxlsGame.i.alert("The requested template image is not a supported format.");
                     Pxls.gameState.getSafeTemplateState().enabled = false;
@@ -80,12 +80,16 @@ public class Template implements Renderer {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
+                        Pixmap.Format format = Pixmap.Format.RGBA8888;
+                        if (contentType.equalsIgnoreCase("image/jpg") || contentType.equalsIgnoreCase("image/jpeg")) {
+                            format = Pixmap.Format.RGB888;
+                        }
                         if (_width != 0) {
                             buffer.dispose();
                         }
                         _width = p.getWidth();
                         _height = p.getHeight();
-                        buffer = new FrameBuffer(Pixmap.Format.RGBA8888, _width, _height, false);
+                        buffer = new FrameBuffer(format, _width, _height, false);
                         buffer.getColorBufferTexture().draw(p, 0, 0);
                         buffer.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
                         p.dispose();
