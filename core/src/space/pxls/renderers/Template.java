@@ -56,16 +56,19 @@ public class Template implements Renderer {
                 width = _width * scale;
                 height = _height * scale;
             }
+            Pxls.gameState.getSafeTemplateState().enabled = true;
             return;
         }
         // fetch the new temaplate image
         url = _url;
         if (url.isEmpty()) {
+            Pxls.gameState.getSafeTemplateState().enabled = false;
             return;
         }
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setUrl(url);
         req.setHeader("User-Agent", Pxls.getUA());
+        req.setHeader("Accept", "image/png, image/jpg, image/jpeg");
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -73,6 +76,7 @@ public class Template implements Renderer {
                 if (!(contentType.equalsIgnoreCase("image/png") || contentType.equalsIgnoreCase("image/jpg") || contentType.equalsIgnoreCase("image/jpeg"))) {
                     PxlsGame.i.alert("The requested template image is not a supported format.");
                     Pxls.gameState.getSafeTemplateState().enabled = false;
+                    Pxls.gameState.getSafeTemplateState().URL = "";
                     return;
                 }
                 byte[] data = httpResponse.getResult();
