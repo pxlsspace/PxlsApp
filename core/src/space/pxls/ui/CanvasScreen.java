@@ -7,7 +7,9 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -19,11 +21,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
 
@@ -71,6 +75,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     public Virginmap virginmap;
 
     private Table mainUITable;
+    private Table pixcountAndCooldownTable;
+    private Container<Label> secondaryCooldownContainer;
+    private Cell secondaryCooldownContainerCell;
 
     private TemplateMoveModeHelper templateMoveModeHelper;
 
@@ -101,6 +108,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             virginmap.loadMap();
         }
         gridOverlay = new GridOverlay(this);
+
+        secondaryCooldownContainer = new Container<Label>(new PxlsLabel("")).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 0.85f))))));
+        secondaryCooldownContainer.padLeft(4).padRight(16);
 
         templateMoveModeHelper = new TemplateMoveModeHelper();
 
@@ -140,7 +150,11 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         centerPopup.add(login.popup);
         centerPopup.add(undoPopup);
 
-        cellStackOverlay = mainUITable.add(stackOverlayContainer).bottom().left();
+        pixcountAndCooldownTable = new Table();
+        secondaryCooldownContainerCell = pixcountAndCooldownTable.add(secondaryCooldownContainer).fill().space(0);
+        pixcountAndCooldownTable.add(stackOverlayContainer);
+
+        cellStackOverlay = mainUITable.add(pixcountAndCooldownTable).bottom().left();
         mainUITable.add(centerPopup).center().bottom().expandX().expandY();
         cellUserCountOverlay = mainUITable.add(userCountOverlay).bottom().right();
         mainUITable.row();
@@ -180,6 +194,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         } else {
             topContainer.setActor(userBar);
         }
+
+        updateCooldownActors();
+        redraw();
     }
 
     @Override
@@ -404,8 +421,10 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     public void resize(final int width, final int height) {
         super.resize(width, height);
         stage.getViewport().update(width, height, true);
+        redraw();
+    }
 
-        if (paletteBar != null) paletteBar.redraw();
+    public void redraw() {
         if (userBar != null) userBar.redraw();
         if (login != null) login.redraw();
         if (userCountOverlay != null) userCountOverlay.redraw();
@@ -416,6 +435,23 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (cellStackOverlay != null && cellUserCountOverlay != null) {
             cellStackOverlay.padBottom(0);
             cellUserCountOverlay.padBottom(0);
+        }
+        paletteBar.redraw();
+        CooldownOverlay.getInstance().redraw();
+    }
+
+    public void updateCooldownActors() {
+        if (paletteBar != null && secondaryCooldownContainer != null && secondaryCooldownContainerCell != null) {
+            boolean keepSelected = Pxls.prefsHelper.getKeepColorSelected();
+            boolean isOnCD = CooldownOverlay.getInstance().getCooldownExpiry() - System.currentTimeMillis() > 0;
+
+            paletteBar.getCooldownContainer().setActor(keepSelected ? null : CooldownOverlay.getInstance().getCooldownLabel());
+            secondaryCooldownContainer.setActor(keepSelected ? CooldownOverlay.getInstance().getCooldownLabel() : null);
+            if (keepSelected) {
+                secondaryCooldownContainerCell.setActor(isOnCD ? secondaryCooldownContainer : null);
+            } else {
+                secondaryCooldownContainerCell.setActor(null);
+            }
         }
     }
 
@@ -519,10 +555,11 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     @Override
     public void cooldown(float seconds) {
-        paletteBar.updateCooldown(seconds);
+        CooldownOverlay.getInstance().updateCooldown(seconds);
         if (bottomContainer.getActor() != login) {
             stackOverlayContainer.setActor(stackOverlay);
             stackOverlay.updateCooldown(seconds);
+            updateCooldownActors();
         } else {
             stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
         }

@@ -1,11 +1,14 @@
 package space.pxls;
 
+import com.badlogic.gdx.Screen;
 import com.google.gson.JsonObject;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
 import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ServerHandshake;
+
+import space.pxls.ui.CanvasScreen;
 import space.pxls.ui.LoadScreen;
 
 import javax.net.ssl.SSLContext;
@@ -66,6 +69,7 @@ public class PxlsClient {
                     } else if (type.equals("cooldown")) {
                         CooldownPacket cooldownPacket = Pxls.gson.fromJson(message, CooldownPacket.class);
                         updateCallback.cooldown(cooldownPacket.wait);
+                        Screen s = PxlsGame.i.getScreen();
                     } else if (type.equals("captcha_required")) {
                         updateCallback.runCaptcha();
                     } else if (type.equals("captcha_status")) {

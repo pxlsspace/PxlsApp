@@ -2,6 +2,8 @@ package space.pxls.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
@@ -30,8 +34,10 @@ public class PixelBar extends Stack {
     private List<String> palette;
     private int currentColor = -1;
     private long cooldownExpiry;
-    public boolean havePopped = false;
     private boolean[] isUp;
+    private Drawable _drawableTransparent = new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 0f)))));
+    private Drawable _drawableSemiTransparent = new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 0.85f)))));
+    private Drawable _drawableOpaque = new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 1f)))));
 
     public PixelBar(final List<String> palette) {
         super();
@@ -60,11 +66,9 @@ public class PixelBar extends Stack {
 
         add(pixelListTable);
 
-        cooldownLabel = new Label("00:00", Pxls.skin);
-        cooldownLabel.setAlignment(Align.center);
-        cooldownLabel.setFontScale(Gdx.graphics.getWidth() < Gdx.graphics.getHeight() ? 0.5f : 0.25f);
+        cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
         cooldownContainer = new Container<Label>(cooldownLabel);
-        cooldownContainer.fillX().align(Align.center).background(Pxls.skin.getDrawable("background"));
+        cooldownContainer.fillX().align(Align.center).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(0f, 0f, 0f, 0f))))));
         add(cooldownContainer);
 
         cooldownContainer.setTouchable(Touchable.enabled);
@@ -74,6 +78,10 @@ public class PixelBar extends Stack {
                 return true;
             }
         });
+    }
+
+    public Container<Label> getCooldownContainer() {
+        return cooldownContainer;
     }
 
     public void redraw() {
@@ -119,51 +127,14 @@ public class PixelBar extends Stack {
             cell.width(size).height(size).space(spacing);
         }
 
-        if (cooldownLabel != null) {
-            cooldownLabel.setFontScale(Gdx.graphics.getWidth() < Gdx.graphics.getHeight() ? 0.5f : 0.25f);
-        }
-
         if (currentColor >= 0) {
             updateSelected();
         }
-    }
 
-    private boolean[] vibeState = new boolean[] {true, true, true, true};
-    public void updateCooldown(float cooldown) {
-        cooldownExpiry = System.currentTimeMillis() + (long) (cooldown * 1000);
-        if (cooldown > 0) {
-            vibeState[0] = vibeState[1] = vibeState[2] = false;
-            updateCooldown();
-        } else {
-            vibeState[0] = vibeState[1] = vibeState[2] = true;
-        }
-    }
-
-    private void updateCooldown() {
-        long now = System.currentTimeMillis();
-        float timeLeft = (cooldownExpiry - now) / 1000f;
-
-        if (Pxls.prefsHelper.getShouldVibrate() && timeLeft >= -1 && timeLeft <= 2 && PxlsGame.i.vibrationHelper != null) {
-            int stateI = ((int)Math.floor(timeLeft)) + 1;
-            if (!vibeState[stateI]) {
-                if (Pxls.prefsHelper.getShouldPrevibe()) {
-                    PxlsGame.i.vibrationHelper.vibrate(stateI > 0 ? 50 : 500);
-                } else {
-                    if (stateI == 0) {
-                        PxlsGame.i.vibrationHelper.vibrate(500);
-                    }
-                }
-                vibeState[stateI] = true; //still flag vibestate as true even if we didn't previbe so that we don't call the code 100 times
-            }
+        if (cooldownContainer != null) {
+            cooldownContainer.setBackground(Pxls.prefsHelper.getKeepColorSelected() ? _drawableTransparent : _drawableSemiTransparent);
         }
 
-        this.cooldownContainer.setVisible(timeLeft > 0);
-
-        timeLeft++; // better human-readability
-
-        int minutes = (int) (timeLeft / 60);
-        int seconds = (int) (timeLeft % 60);
-        this.cooldownLabel.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
     }
 
     public int getCurrentColor() {
@@ -245,7 +216,9 @@ public class PixelBar extends Stack {
     @Override
     public void act(float delta) {
         super.act(delta);
-        updateCooldown();
+        CooldownOverlay.getInstance().simulateAct();
+        boolean stillCooled = ((CooldownOverlay.getInstance().getCooldownExpiry() - System.currentTimeMillis()) / 1000f) > 0;
+        cooldownContainer.setVisible(!Pxls.prefsHelper.getKeepColorSelected() && stillCooled);
     }
 
     public void updateSelected() {
