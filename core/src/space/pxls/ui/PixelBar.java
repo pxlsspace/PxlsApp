@@ -187,6 +187,7 @@ public class PixelBar extends Stack {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
+                if (isUp[i]) return;
                 MoveByAction mba = new MoveByAction();
                 mba.setAmountY(8);
                 mba.setDuration(0.1f);
@@ -202,6 +203,7 @@ public class PixelBar extends Stack {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
+                if (!isUp[i]) return;
                 MoveByAction mba = new MoveByAction();
                 mba.setAmountY(-8f);
                 mba.setDuration(0.1f);
