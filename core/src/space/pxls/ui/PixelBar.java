@@ -134,6 +134,8 @@ public class PixelBar extends Stack {
         if (cooldown > 0) {
             vibeState[0] = vibeState[1] = vibeState[2] = false;
             updateCooldown();
+        } else {
+            vibeState[0] = vibeState[1] = vibeState[2] = true;
         }
     }
 
