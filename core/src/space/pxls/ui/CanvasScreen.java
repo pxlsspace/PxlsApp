@@ -70,6 +70,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private GridOverlay gridOverlay;
     public Virginmap virginmap;
 
+    private Table mainUITable;
+
     private TemplateMoveModeHelper templateMoveModeHelper;
 
     public CanvasScreen(Canvas canvas) {
@@ -131,22 +133,22 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         userCountOverlay = new UserCountOverlay();
 
-        Table table = new Table();
-        table.add(topContainer).fillX().expandX().colspan(3).row();
-        table.add(lookupContainer).fillX().expandX().colspan(3).row();
+        mainUITable = new Table();
+        mainUITable.add(topContainer).fillX().expandX().colspan(3).row();
+        mainUITable.add(lookupContainer).fillX().expandX().colspan(3).row();
         Stack centerPopup = new Stack();
         centerPopup.add(login.popup);
         centerPopup.add(undoPopup);
 
-        cellStackOverlay = table.add(stackOverlayContainer).bottom().left();
-        table.add(centerPopup).center().bottom().expandX().expandY();
-        cellUserCountOverlay = table.add(userCountOverlay).bottom().right();
-        table.row();
+        cellStackOverlay = mainUITable.add(stackOverlayContainer).bottom().left();
+        mainUITable.add(centerPopup).center().bottom().expandX().expandY();
+        cellUserCountOverlay = mainUITable.add(userCountOverlay).bottom().right();
+        mainUITable.row();
 
-        table.add(bottomContainer).fillX().expandX().colspan(3);
-        table.setFillParent(true);
-//        table.setDebug(true);
-        stage.addActor(table);
+        mainUITable.add(bottomContainer).fillX().expandX().colspan(3);
+        mainUITable.setFillParent(true);
+        mainUITable.setDebug(true);
+        stage.addActor(mainUITable);
 
         client = new PxlsClient(this);
     }
@@ -263,7 +265,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                     Pxls.gameState.getSafeTemplateState().setOffsetX((int)pos.x);
                     Pxls.gameState.getSafeTemplateState().setOffsetY((int)pos.y);
                     return true;
-                } else if (paletteBar.getCurrentColor() >= 0 && !Pxls.gameState.getSafeTemplateState().moveMode) {
+                } else if (paletteBar.getCurrentColor() >= 0 && !Pxls.gameState.getSafeTemplateState().moveMode && y > userBar.getHeight() * 2) {
                     Vector2 pos = screenToBoardSpace(new Vector2(x, y));
                     placePixel((int) pos.x, (int) pos.y, Pxls.prefsHelper.getKeepColorSelected());
                     return true;
@@ -412,13 +414,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (lookupContainer != null && lookupContainer.getActor() != null) lookupContainer.getActor().redraw();
         if (templateMoveModeHelper != null) templateMoveModeHelper.redraw();
         if (cellStackOverlay != null && cellUserCountOverlay != null) {
-            if (PxlsGame.i.orientationHelper.getSimpleOrientation() == OrientationHelper.SimpleOrientation.LANDSCAPE) {
-                cellStackOverlay.padBottom(-1);
-                cellUserCountOverlay.padBottom(-1);
-            } else {
-                cellStackOverlay.padBottom(0);
-                cellUserCountOverlay.padBottom(0);
-            }
+            cellStackOverlay.padBottom(0);
+            cellUserCountOverlay.padBottom(0);
         }
     }
 
