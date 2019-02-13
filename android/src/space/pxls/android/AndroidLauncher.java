@@ -28,6 +28,8 @@ public class AndroidLauncher extends AndroidApplication {
     private PxlsGame game;
     private PxlsGame.CaptchaCallback captchaCallback;
 
+    private boolean isResumed = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +127,7 @@ public class AndroidLauncher extends AndroidApplication {
 
             @Override
             public void vibrate(long milliseconds) {
+                if (!isResumed) return;
                 Vibrator vib = getVibrator();
                 if (vib == null || !vib.hasVibrator()) return;
                 vib.vibrate(milliseconds);
@@ -196,6 +199,18 @@ public class AndroidLauncher extends AndroidApplication {
             } catch (URISyntaxException e) {
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isResumed = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isResumed = true;
     }
 
     @Override
