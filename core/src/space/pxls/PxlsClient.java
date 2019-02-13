@@ -165,8 +165,10 @@ public class PxlsClient {
     }
 
     public void placePixel(int x, int y, int color) {
-        client.send(Pxls.gson.toJson(new PixelPacket(x, y, color)));
-        pendingPixel = new PendingPixel(x, y, color);
+        if (client.isOpen()) {
+            client.send(Pxls.gson.toJson(new PixelPacket(x, y, color)));
+            pendingPixel = new PendingPixel(x, y, color);
+        }
     }
 
     public void undo() {
