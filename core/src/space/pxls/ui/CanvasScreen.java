@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
@@ -109,7 +110,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         }
         gridOverlay = new GridOverlay(this);
 
-        secondaryCooldownContainer = new Container<Label>(new PxlsLabel("")).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 0.85f))))));
+        secondaryCooldownContainer = new Container<Label>(new PxlsLabel("")).background(Pxls.skin.getDrawable("background"));
         secondaryCooldownContainer.padLeft(4).padRight(16);
 
         templateMoveModeHelper = new TemplateMoveModeHelper();
@@ -151,7 +152,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         centerPopup.add(undoPopup);
 
         pixcountAndCooldownTable = new Table();
-        secondaryCooldownContainerCell = pixcountAndCooldownTable.add(secondaryCooldownContainer).fill().space(0);
+        secondaryCooldownContainerCell = pixcountAndCooldownTable.add(secondaryCooldownContainer).fill().space(0).pad(0);
         pixcountAndCooldownTable.add(stackOverlayContainer);
 
         cellStackOverlay = mainUITable.add(pixcountAndCooldownTable).bottom().left();
@@ -161,7 +162,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         mainUITable.add(bottomContainer).fillX().expandX().colspan(3);
         mainUITable.setFillParent(true);
-        mainUITable.setDebug(true);
+//        mainUITable.setDebug(true);
         stage.addActor(mainUITable);
 
         client = new PxlsClient(this);
@@ -181,7 +182,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
         if (Pxls.gameState.getSafeTemplateState().moveMode) {
             if (!Pxls.prefsHelper.getHasSeenMoveModeTutorial()) {
-                PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nUse the nudge buttons for precision after jumping as necessary", new PxlsGame.ButtonCallback() {
+                PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nThe nudge buttons (arrows) will move the template 1 pixel in the specified direction.", new PxlsGame.ButtonCallback() {
                     @Override
                     public void clicked() {
                         Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);
