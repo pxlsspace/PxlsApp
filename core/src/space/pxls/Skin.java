@@ -1,11 +1,13 @@
 package space.pxls;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -15,6 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
+    private FreeTypeFontGenerator ftfGen = null;
+    private BitmapFont _font = null;
+
     public Skin() {
         addDrawable("pixel", "pixel.png");
         addDrawable("palette", "palette.png");
@@ -67,5 +72,18 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
 
     private void addPatch(String name, String textureLoc, int left, int right, int top, int bottom) {
         add(name, new NinePatch(new Texture(textureLoc), left, right, top, bottom));
+    }
+
+    public BitmapFont getFont() {
+        if (_font != null) return _font;
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/DroidSerif.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        int size = (int) Math.ceil(16 * Gdx.graphics.getDensity());
+        generator.scaleForPixelHeight(size);
+        param.minFilter = Texture.TextureFilter.Linear;
+        param.magFilter = Texture.TextureFilter.Linear;
+        _font = generator.generateFont(param);
+        generator.dispose();
+        return _font;
     }
 }

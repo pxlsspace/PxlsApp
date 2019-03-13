@@ -23,7 +23,6 @@ public class UserBar extends Table {
 
         label = new Label("Logged in as " + username, Pxls.skin);
         label.setFontScale(0.25f);
-        add(label).expandX().left();
 
         Button button = new Button(Pxls.skin.getDrawable("menu"));
         lockIconCell = add(lockImage).width(48).height(48).padRight(3).right();
@@ -47,7 +46,8 @@ public class UserBar extends Table {
 
     public void redraw() {
         boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
-        label.setFontScale(isLandscape ? 0.1f : 0.25f);
+//        label.setFontScale(isLandscape ? 0.1f : 0.25f);
+//        label.setStyle(Pxls.skin.getRedrawLabelStyle());
         menuButtonCell.width(isLandscape ? 32 : 48).height(isLandscape ? 16 : 32);
         lockIconCell.width(isLandscape ? 24 : 48).height(isLandscape ? 24 : 48);
         if (isLandscape) {
