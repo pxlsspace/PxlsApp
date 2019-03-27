@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class UserCountOverlay extends Stack {
     private Label lblOnlineCount;
@@ -27,8 +28,7 @@ public class UserCountOverlay extends Stack {
     public UserCountOverlay() {
         setVisible(false);
 
-        lblOnlineCount = new Label("", Pxls.skin);
-        lblOnlineCount.setFontScale(0.3f);
+        lblOnlineCount = new TTFLabel("");
         onlineCount = new Table();
         onlineCount.pad(8);
         userIconCell = onlineCount.add(new Image(Pxls.skin.getDrawable("user"))).growX().right().size(32, 32);
@@ -38,8 +38,6 @@ public class UserCountOverlay extends Stack {
         bgContainer.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topLeft")));
         add(bgContainer);
         add(onlineCount);
-
-        redraw();
     }
 
     /**
@@ -56,18 +54,5 @@ public class UserCountOverlay extends Stack {
         receivedCount = true;
 
         this.lblOnlineCount.setText(String.valueOf(count));
-    }
-
-    public void redraw() {
-        boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
-        lblOnlineCount.setFontScale(isLandscape ? 0.2f : 0.3f);
-        userIconCell.size(isLandscape ? 16 : 32, isLandscape ? 16 : 32);
-        if (isLandscape) {
-            bgContainer.setBackground(Pxls.skin.getDrawable("background"));
-            onlineCount.pad(0, 8, 0, 8);
-        } else {
-            bgContainer.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topLeft")));
-            onlineCount.pad(8);
-        }
     }
 }

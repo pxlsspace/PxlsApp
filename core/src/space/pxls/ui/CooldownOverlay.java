@@ -10,18 +10,18 @@ import java.util.Locale;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.renderers.Canvas;
+import space.pxls.ui.Components.TTFLabel;
 
 public class CooldownOverlay {
     private static CooldownOverlay _instance;
-    private Label lblCooldown;
+    private TTFLabel lblCooldown;
     private long cooldownExpiry;
     private boolean[] vibeState = new boolean[] {true, true, true, true};
     private boolean alertedZero = false;
 
     public CooldownOverlay() {
-        lblCooldown = new Label("00:00", Pxls.skin);
+        lblCooldown = new TTFLabel("00:00");
         lblCooldown.setAlignment(Align.center);
-        lblCooldown.setFontScale(Gdx.graphics.getWidth() < Gdx.graphics.getHeight() ? 0.4f : 0.25f);
     }
 
     public static CooldownOverlay getInstance() {
@@ -76,11 +76,6 @@ public class CooldownOverlay {
 
     public Label getCooldownLabel() {
         return lblCooldown;
-    }
-
-    public void redraw() {
-        boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
-        lblCooldown.setFontScale(isLandscape ? 0.19f : 0.3f);
     }
 
     public long getCooldownExpiry() {

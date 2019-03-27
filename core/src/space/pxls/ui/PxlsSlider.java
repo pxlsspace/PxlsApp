@@ -6,16 +6,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import space.pxls.Pxls;
+import space.pxls.ui.Components.TTFLabel;
 
 public class PxlsSlider extends Table {
     private Slider slider;
-    private PxlsLabel label;
+    private TTFLabel label;
     private String prepend = "";
     private String append = "";
 
     public PxlsSlider() {
         slider = new Slider(0f, 1f, 0.1f, false, Pxls.skin);
-        label = new PxlsLabel("0%");
+        label = new TTFLabel("0%");
 
         slider.addListener(new ChangeListener() {
             @Override
@@ -41,7 +42,7 @@ public class PxlsSlider extends Table {
         return this;
     }
 
-    public PxlsLabel getLabel() {
+    public TTFLabel getLabel() {
         return label;
     }
 

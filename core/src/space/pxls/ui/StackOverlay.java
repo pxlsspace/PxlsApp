@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class StackOverlay extends Container<Container<Label>> {
     private int count;
@@ -21,8 +22,7 @@ public class StackOverlay extends Container<Container<Label>> {
         this.count = count; // 5, but adds up to 6 as updateStack is called
         this.maxCount = maxCount + 1; // 6
 
-        countLabel = new Label(this.count + "/" + this.maxCount, Pxls.skin); // 6/6
-        countLabel.setFontScale(0.3f);
+        countLabel = new TTFLabel(this.count + "/" + this.maxCount); // 6/6
         container = new Container<Label>(countLabel);
         container.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
         container.pad(8);
@@ -30,8 +30,6 @@ public class StackOverlay extends Container<Container<Label>> {
 
         setClip(true);
         normal = true;
-
-        redraw();
     }
 
     // called on each stack update (gain, consume, etc.)
@@ -87,15 +85,6 @@ public class StackOverlay extends Container<Container<Label>> {
 
     public void empty() {
         this.countLabel.setText("");
-    }
-
-    public void redraw() {
-        countLabel.setFontScale(PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE ? 0.2f : 0.3f);
-        if (PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE) {
-            container.setBackground(Pxls.skin.getDrawable("background"));
-        } else {
-            container.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
-        }
     }
 
     public boolean onCooldown() {

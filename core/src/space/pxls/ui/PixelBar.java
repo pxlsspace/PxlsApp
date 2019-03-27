@@ -10,16 +10,20 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import space.pxls.Pxls;
-import space.pxls.PxlsGame;
-import space.pxls.Skin;
 
 import java.util.List;
-import java.util.Locale;
+
+import space.pxls.Pxls;
+import space.pxls.Skin;
 
 public class PixelBar extends Stack {
     enum PopState {
@@ -61,31 +65,6 @@ public class PixelBar extends Stack {
                 return true;
             }
         });
-
-        redraw();
-
-        add(pixelListTable);
-
-        cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
-        cooldownContainer = new Container<Label>(cooldownLabel);
-        cooldownContainer.fillX().align(Align.center).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(0f, 0f, 0f, 0f))))));
-        add(cooldownContainer);
-
-        cooldownContainer.setTouchable(Touchable.enabled);
-        cooldownContainer.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
-    }
-
-    public Container<Label> getCooldownContainer() {
-        return cooldownContainer;
-    }
-
-    public void redraw() {
-        if (pixelListTable == null) throw new IllegalStateException("pixelListTable has not been initialized!");
 
         pixelListTable.clearChildren();
 
@@ -131,10 +110,24 @@ public class PixelBar extends Stack {
             updateSelected();
         }
 
-        if (cooldownContainer != null) {
-            cooldownContainer.setBackground(Pxls.prefsHelper.getKeepColorSelected() ? _drawableTransparent : _drawableSemiTransparent);
-        }
+        add(pixelListTable);
 
+        cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
+        cooldownContainer = new Container<Label>(cooldownLabel);
+        cooldownContainer.fillX().align(Align.center).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(0f, 0f, 0f, 0f))))));
+        add(cooldownContainer);
+
+        cooldownContainer.setTouchable(Touchable.enabled);
+        cooldownContainer.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+    }
+
+    public Container<Label> getCooldownContainer() {
+        return cooldownContainer;
     }
 
     public int getCurrentColor() {

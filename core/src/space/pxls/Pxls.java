@@ -15,7 +15,7 @@ public class Pxls {
         // 2 for sorunome setup
         // 3 for GlowingSocc setup
         int debug = 3;
-        switch (3) {
+        switch (debug) {
             case 1:
                 domain = "http://192.168.0.23.nip.io:4567";
                 wsPath = "ws://192.168.0.23.nip.io:4567/ws";

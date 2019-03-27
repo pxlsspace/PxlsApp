@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class UserBar extends Table {
     private Label label;
@@ -21,8 +22,7 @@ public class UserBar extends Table {
 
         lockImage = new Image(Pxls.skin.getDrawable("lock"));
 
-        label = new Label("Logged in as " + username, Pxls.skin);
-        label.setFontScale(0.25f);
+        label = new TTFLabel("Logged in as " + username);
 
         Button button = new Button(Pxls.skin.getDrawable("menu"));
         lockIconCell = add(lockImage).width(48).height(48).padRight(3).right();
@@ -34,27 +34,12 @@ public class UserBar extends Table {
                 fire(new MenuOpenRequestedEvent(event, x, y));
             }
         });
-
-        redraw();
     }
 
     public static class LogoutEvent extends Event {}
 
     public static class MenuOpenRequestedEvent extends Event {
         public MenuOpenRequestedEvent(InputEvent event, float x, float y) {}
-    }
-
-    public void redraw() {
-        boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
-//        label.setFontScale(isLandscape ? 0.1f : 0.25f);
-//        label.setStyle(Pxls.skin.getRedrawLabelStyle());
-        menuButtonCell.width(isLandscape ? 32 : 48).height(isLandscape ? 16 : 32);
-        lockIconCell.width(isLandscape ? 24 : 48).height(isLandscape ? 24 : 48);
-        if (isLandscape) {
-            pad(1, 4, 1, 4);
-        } else {
-            pad(8);
-        }
     }
 
     public void setLockVisible(boolean visible) {

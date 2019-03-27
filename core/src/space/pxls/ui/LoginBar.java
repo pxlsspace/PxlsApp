@@ -13,18 +13,16 @@ import com.google.gson.JsonObject;
 import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class LoginBar extends Table {
-    private final Label.LabelStyle ls;
-    private Label title;
+//    private final Label.LabelStyle ls;
+    private TTFLabel title;
     public LoginPopup popup;
     public LoginBar() {
         popup = new LoginPopup();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
-        ls = new Label.LabelStyle(font, Color.BLACK);
 
-        title = new Label("Sign in with...", ls);
-        title.setFontScale(0.5f);
+        title = new TTFLabel("Sign in with...");
         title.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -32,12 +30,5 @@ public class LoginBar extends Table {
             }
         });
         add(title).colspan(5).row();
-
-        redraw();
-    }
-
-    public void redraw() {
-        title.setFontScale(PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE ? 0.25f : 0.5f);
-        popup.redraw();
     }
 }

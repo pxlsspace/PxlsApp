@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Timer;
 import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class UndoPopup extends Container<Container<Label>> {
     private long popDownTime;
@@ -24,8 +25,7 @@ public class UndoPopup extends Container<Container<Label>> {
     private float time = 0f;
 
     public UndoPopup() {
-        label = new Label("Undo", Pxls.skin);
-        label.setFontScale(0.4f);
+        label = new TTFLabel("Undo");
         label.setAlignment(Align.center);
         label.addListener(new ClickListener() {
             @Override
@@ -44,8 +44,6 @@ public class UndoPopup extends Container<Container<Label>> {
         fillX();
         setActor(container);
         setClip(true);
-
-        redraw();
     }
 
     private float getYPos () {
@@ -89,14 +87,4 @@ public class UndoPopup extends Container<Container<Label>> {
     }
 
     public static class UndoEvent extends Event {}
-
-    public void redraw() {
-        if (up) {
-            _popMoveTo(getYPos(), 0);
-        } else {
-            _popMoveTo(getYPos(), -container.getHeight());
-        }
-
-        label.setFontScale(PxlsGame.i.orientationHelper.getSimpleOrientation() == OrientationHelper.SimpleOrientation.LANDSCAPE ? 0.2f : 0.4f);
-    }
 }

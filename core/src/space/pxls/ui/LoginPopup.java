@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -44,8 +45,7 @@ public class LoginPopup extends Container<Container<Table>> {
         
         for (final String url : services.keySet()) {
             String display = services.get(url);
-            Label title = new Label(display, ls);
-            title.setFontScale(0.4f);
+            TTFLabel title = new TTFLabel(display);
             title.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -63,8 +63,6 @@ public class LoginPopup extends Container<Container<Table>> {
         container.pad(8);
         setActor(container);
         setClip(true);
-
-        redraw();
     }
 
     public void toggle() {
@@ -125,13 +123,6 @@ public class LoginPopup extends Container<Container<Table>> {
         super.act(delta);
         if (!up && !container.hasActions()) {
             container.setY(-container.getHeight());
-        }
-    }
-
-    public void redraw() {
-        float scale = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE ? 0.2f : 0.4f;
-        for (Label l : labels) {
-            l.setFontScale(scale);
         }
     }
 }

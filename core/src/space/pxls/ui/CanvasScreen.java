@@ -38,6 +38,7 @@ import space.pxls.renderers.GridOverlay;
 import space.pxls.renderers.Heatmap;
 import space.pxls.renderers.Template;
 import space.pxls.renderers.Virginmap;
+import space.pxls.ui.Components.TTFLabel;
 import space.pxls.ui.events.MenuOpenRequested;
 
 public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCallback {
@@ -75,13 +76,15 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private Container<Label> secondaryCooldownContainer;
     private Cell secondaryCooldownContainerCell;
     private AuthedBar authedBar;
+    private UserBar userBar;
+    private Table menuTable;
 
     private Account account;
-    private MainUI mainUI;
 
     private TemplateMoveModeHelper templateMoveModeHelper;
 
     public CanvasScreen(Canvas canvas) {
+        final CanvasScreen self = this;
         Pxls.gameState = Pxls.prefsHelper.GetSavedGameState();
         boardInfo = canvas.info;
 
@@ -109,7 +112,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         }
         gridOverlay = new GridOverlay(this);
 
-        secondaryCooldownContainer = new Container<Label>(new PxlsLabel("")).background(Pxls.skin.getDrawable("background"));
+        secondaryCooldownContainer = new Container<Label>(new TTFLabel("")).background(Pxls.skin.getDrawable("background"));
         secondaryCooldownContainer.padLeft(4).padRight(16);
 
         templateMoveModeHelper = new TemplateMoveModeHelper();
@@ -142,6 +145,17 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         userCountOverlay = new UserCountOverlay();
 
         authedBar = new AuthedBar();
+        authedBar.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                System.out.printf("Got event %s%n", event.getClass().getSimpleName());
+                if (event instanceof MenuOpenRequested) {
+                    PxlsGame.i.setScreen(new MenuScreen(self, account));
+                    return true;
+                }
+                return false;
+            }
+        });
 
         mainUITable = new Table();
         mainUITable.add(authedBar).fillX().expandX().colspan(3).row();
@@ -197,7 +211,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         }
 
         updateCooldownActors();
-        redraw();
     }
 
     @Override
@@ -422,24 +435,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     public void resize(final int width, final int height) {
         super.resize(width, height);
         stage.getViewport().update(width, height, true);
-        redraw();
-    }
-
-    public void redraw() {
-//        if (userBar != null) userBar.redraw();
-        if (login != null) login.redraw();
-        if (userCountOverlay != null) userCountOverlay.redraw();
-        if (stackOverlay != null) stackOverlay.redraw();
-        if (undoPopup != null) undoPopup.redraw();
-        if (lookupContainer != null && lookupContainer.getActor() != null) lookupContainer.getActor().redraw();
-        if (templateMoveModeHelper != null) templateMoveModeHelper.redraw();
-        if (cellStackOverlay != null && cellUserCountOverlay != null) {
-            cellStackOverlay.padBottom(0);
-            cellUserCountOverlay.padBottom(0);
-        }
-        if (authedBar != null) authedBar.redraw();
-        paletteBar.redraw();
-        CooldownOverlay.getInstance().redraw();
     }
 
     public void updateCooldownActors() {
@@ -499,8 +494,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         client.disconnect();
         client = new PxlsClient(this);
         authedBar.setUsername(null);
-        Account a = null;
-        mainUI.getAuthedBar().setUsername(a);
 //        topContainer.setActor(null);
     }
 
@@ -534,18 +527,18 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         if (account != null) {
             final CanvasScreen self = this;
-            mainUI.getAuthedBar().setUsername(account);
             authedBar.setUsername(account.getSanitizedName());
-            authedBar.addListener(new EventListener() {
-                @Override
-                public boolean handle(Event event) {
-                    if (event instanceof MenuOpenRequested) {
-                        PxlsGame.i.setScreen(new MenuScreen(self, account));
-                        return true;
-                    }
-                    return false;
-                }
-            });
+//            authedBar.addListener(new EventListener() {
+//                @Override
+//                public boolean handle(Event event) {
+//                    System.out.printf("Got event %s%n", event.getClass().getSimpleName());
+//                    if (event instanceof MenuOpenRequested) {
+//                        PxlsGame.i.setScreen(new MenuScreen(self, account));
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
             if (account.isBanned()) {
                 bottomContainer.setActor(new BannedBar(account.getBanExpiry(), account.getBanReason()));
             }
@@ -629,6 +622,18 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         return template;
     }
 
+    public int panX() {
+        return (int) Math.floor(center.x);
+    }
+
+    public int panY() {
+        return (int) Math.floor(center.y);
+    }
+
+    public int panZoom() {
+        return (int) Math.floor(zoom);
+    }
+
     private class TemplateMoveModeHelper {
         private int numPointersDown = 0;
         private boolean[] pointerDown = new boolean[] {false, false, false, false, false, false, false, false, false, false};
@@ -641,8 +646,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         public Table moveModeControls;
         public TemplateMoveModeHelper() {
-            btnCancel = new PxlsButton(" Cancel ").setFontScale(0.2f).red();
-            btnConfirm = new PxlsButton(" Confirm ").setFontScale(0.2f).blue();
+            btnCancel = new PxlsButton(" Cancel ").red();
+            btnConfirm = new PxlsButton(" Confirm ").blue();
 
             Image btnUp = new Image(Pxls.skin.getDrawable("arrow.gray.up"));
             Image btnDown = new Image(Pxls.skin.getDrawable("arrow.gray.down"));
@@ -744,8 +749,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                     Pxls.gameState.getSafeTemplateState().opacity = sliderOpacity.getValue();
                 }
             });
-
-            redraw();
         }
 
         void moveStart() {
@@ -763,18 +766,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             }
             Pxls.gameState.getSafeTemplateState().opacity = _lastOpacity;
         }
-
-        void redraw() {
-            boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
-            float squareSize = isLandscape ? 16 : 48;
-            cellBtnUp.size(squareSize, squareSize);
-            cellBtnDown.size(squareSize, squareSize);
-            cellBtnLeft.size(squareSize, squareSize);
-            cellBtnRight.size(squareSize, squareSize);
-            btnCancel.setFontScale(isLandscape ? 0.1f : 0.2f);
-            btnConfirm.setFontScale(isLandscape ? 0.1f : 0.2f);
-            sliderOpacity.getLabel().setFontScale(isLandscape ? 0.1f : 0.3f);
-        }
     }
 
     private class AuthedBar extends Table {
@@ -787,7 +778,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             setBackground(Pxls.skin.getDrawable("background"));
             pad(3, 8, 3, 8);
 
-            lblUsername = new Label("Logged in as ...", new Label.LabelStyle(Pxls.skin.getFont(), new Color(0f, 0f, 0f, 1f)));
+            lblUsername = new TTFLabel("Not Logged In");
             imgMenuTrigger = new Image(Pxls.skin.getDrawable("menu"));
             lockImage = new Image(Pxls.skin.getDrawable("lock"));
             lockImage.setVisible(false);
@@ -807,20 +798,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             });
         }
 
-        public void redraw() {
-            boolean isLandscape = PxlsGame.i.orientationHelper.getSimpleOrientation() == space.pxls.OrientationHelper.SimpleOrientation.LANDSCAPE;
-            if (lblUsername != null) {
-                lblUsername.setStyle(new Label.LabelStyle(Pxls.skin.getFont(), new Color(0f, 0f, 0f, 1f)));
-            }
-            if (menuButtonCell != null && lockIconCell != null) {
-                menuButtonCell.width(isLandscape ? 32 : 48).height(isLandscape ? 16 : 32);
-                lockIconCell.width(isLandscape ? 24 : 48).height(isLandscape ? 24 : 48);
-            }
-        }
-
         public void setUsername(String username) {
             if (username == null) {
-                lblUsername.setText("Not logged in");
+                lblUsername.setText("Not Logged In");
             } else {
                 lblUsername.setText(String.format("Logged in as %s", username));
             }

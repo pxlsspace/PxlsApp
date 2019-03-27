@@ -5,14 +5,8 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
@@ -148,7 +142,7 @@ public class Template implements Renderer {
 
     public String makePxlsURL() {
         TemplateState ts = Pxls.gameState.getSafeTemplateState();
-        return String.format("%s/#template=%s&ox=%s&oy=%s&oo=%s&tw=%s", Pxls.domain, ts.URL, ts.offsetX, ts.offsetX, ts.opacity, ts.totalWidth);
+        return String.format("%s/#template=%s&ox=%s&oy=%s&oo=%s&tw=%s&x=%s&y=%s&scale=%s", Pxls.domain, ts.URL, ts.offsetX, ts.offsetX, ts.opacity, ts.totalWidth, parent.panX(), parent.panY(), parent.panZoom());
     }
 
     public void pixel(int x, int y, int color) {}

@@ -10,12 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import java.util.Map;
@@ -23,6 +20,7 @@ import java.util.Map;
 import space.pxls.Account;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class MenuScreen extends ScreenAdapter {
     private Stage stage;
@@ -179,7 +177,7 @@ public class MenuScreen extends ScreenAdapter {
         });
 
         Table topBarTable = new Table().pad(12);
-        topBarTable.add(new PxlsLabel(this.account == null ? "Not Logged In" : "Logged in as " + this.account.getSanitizedName()).setFontScaleChain(0.5f)).left();
+        topBarTable.add(new TTFLabel(this.account == null ? "Not Logged In" : "Logged in as " + this.account.getSanitizedName())).left();
         topBarTable.add(closeButton).size(80,80).expandX().right();
 
         table.add(new Stack(new SolidContainer(shadeColor), topBarTable)).growX().row();
@@ -198,7 +196,7 @@ public class MenuScreen extends ScreenAdapter {
         if (this.account != null) {
             Table tblLogout = new Table();
             tblLogout.add(logoutIcon).growX().right().size(96, 96);
-            tblLogout.add(new PxlsLabel("Logout").setFontScaleChain(.6f)).right().row();
+            tblLogout.add(new TTFLabel("Logout", 32)).right().row();
             tblLogout.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -231,10 +229,8 @@ public class MenuScreen extends ScreenAdapter {
         stage.draw();
     }
 
-    private Label makeLabel(String text) {
-        Label toReturn = new Label(text, Pxls.skin);
-        toReturn.setFontScale(0.3f);
-        return toReturn;
+    private TTFLabel makeLabel(String text) {
+        return new TTFLabel(text);
     }
 
     @Override

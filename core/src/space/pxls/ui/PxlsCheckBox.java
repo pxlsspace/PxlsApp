@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import space.pxls.Pxls;
+import space.pxls.ui.Components.TTFLabel;
 
 /**
  * A button with 2 states to represent checked/unchecked, and a label. Pretty simple.
@@ -23,7 +24,7 @@ public class PxlsCheckBox extends Table {
     private Drawable _uncheckedButton = null;
     private Image _drawnImage = null;
     private Cell buttonCell = null;
-    private PxlsLabel label;
+    private TTFLabel label;
 
     public PxlsCheckBox(String text) {
         this(text, false);
@@ -33,8 +34,8 @@ public class PxlsCheckBox extends Table {
         this._checkedButton = (Pxls.skin.getDrawable("checked"));
         this._uncheckedButton = (Pxls.skin.getDrawable("unchecked"));
         this._drawnImage = new Image(checked ? this._checkedButton : this._uncheckedButton);
-        this.buttonCell = add(this._drawnImage).left().size(64, 64).padRight(16);
-        this.label = new PxlsLabel(text).setFontScaleChain(0.5f);
+        this.buttonCell = add(this._drawnImage).left().size(32, 32).padRight(16);
+        this.label = new TTFLabel(text);
         add(label).expandX().row();
 
         final PxlsCheckBox self = this;
@@ -54,16 +55,11 @@ public class PxlsCheckBox extends Table {
         super.draw(batch, parentAlpha);
     }
 
-    public PxlsCheckBox setFontScale(float f) {
-        label.setFontScale(f);
-        return this;
-    }
-
     public Cell getButtonCell() {
         return buttonCell;
     }
 
-    public PxlsLabel getLabel() {
+    public TTFLabel getLabel() {
         return label;
     }
 

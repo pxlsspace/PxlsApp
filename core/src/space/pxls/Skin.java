@@ -1,7 +1,6 @@
 package space.pxls;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -16,9 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
     private FreeTypeFontGenerator ftfGen = null;
     private BitmapFont _font = null;
+    private float lastDensity = -1;
 
     public Skin() {
         addDrawable("pixel", "pixel.png");
@@ -74,16 +77,30 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         add(name, new NinePatch(new Texture(textureLoc), left, right, top, bottom));
     }
 
-    public BitmapFont getFont() {
-        if (_font != null) return _font;
+    private Map<Integer, BitmapFont> _fontCache = new HashMap<Integer, BitmapFont>();
+
+    public BitmapFont getFontForDP(int dp, boolean skipCache) {
+        BitmapFont toRet = _fontCache.get(dp);
+        if (!skipCache && toRet != null) return toRet;
+
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/DroidSerif.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        int size = (int) Math.ceil(16 * Gdx.graphics.getDensity());
+        int size = (int) Math.ceil(dp * Gdx.graphics.getDensity());
         generator.scaleForPixelHeight(size);
+        param.size = size;
         param.minFilter = Texture.TextureFilter.Linear;
         param.magFilter = Texture.TextureFilter.Linear;
-        _font = generator.generateFont(param);
+        toRet = generator.generateFont(param);
+        _fontCache.put(dp, toRet);
         generator.dispose();
-        return _font;
+        return toRet;
+    }
+
+    public BitmapFont getFontForDP(int dp) {
+        return getFontForDP(dp, false);
+    }
+
+    public BitmapFont getFont() {
+        return getFontForDP(16);
     }
 }

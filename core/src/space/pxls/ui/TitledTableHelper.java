@@ -1,16 +1,22 @@
 package space.pxls.ui;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Align;
 
 import space.pxls.Pxls;
+import space.pxls.ui.Components.TTFLabel;
 
 public class TitledTableHelper extends Table {
     public TitledTableHelper(String title) {
         setBackground(new NinePatchDrawable(Pxls.skin.getPatch("white-patch"))); //white-patch is a simple bordered 9patch with white background
-        add(new Stack(new SolidContainer(new Color(0, 0, 0, 0.1f)), new PxlsLabel(title).setFontScaleChain(0.6f))).colspan(2).fillX().center().row(); //actual title
+        Label label = new TTFLabel(title, 24);
+//        label.getStyle().fontColor = new Color(1f, 1f, 1f, 1f);
+        label.setAlignment(Align.center);
+        add(new Stack(new SolidContainer(new Color(0, 0, 0, 0.1f)), label)).colspan(2).fillX().center().row(); //actual title
         add(new SolidContainer()).height(6).colspan(2).padBottom(3).fillX().row(); //bottom "border"
     }
 }

@@ -170,6 +170,8 @@ public class PxlsGame extends Game {
 
             @Override
             public void failed(Throwable t) {
+                t.printStackTrace();
+                System.err.println("Failed to log in");
                 alert("Failed logging in");
             }
 
