@@ -8,8 +8,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ServerHandshake;
 
-import space.pxls.ui.CanvasScreen;
-import space.pxls.ui.LoadScreen;
+import space.pxls.ui.Screens.LoadScreen;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;

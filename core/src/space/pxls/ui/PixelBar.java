@@ -24,6 +24,8 @@ import java.util.List;
 
 import space.pxls.Pxls;
 import space.pxls.Skin;
+import space.pxls.ui.Components.SolidContainer;
+import space.pxls.ui.Overlays.CooldownOverlay;
 
 public class PixelBar extends Stack {
     enum PopState {

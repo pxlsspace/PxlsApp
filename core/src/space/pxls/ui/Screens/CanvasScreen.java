@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.ui.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -38,7 +38,18 @@ import space.pxls.renderers.GridOverlay;
 import space.pxls.renderers.Heatmap;
 import space.pxls.renderers.Template;
 import space.pxls.renderers.Virginmap;
+import space.pxls.ui.BannedBar;
+import space.pxls.ui.Components.PxlsButton;
+import space.pxls.ui.Components.PxlsSlider;
+import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Components.TTFLabel;
+import space.pxls.ui.LoginBar;
+import space.pxls.ui.Overlays.CooldownOverlay;
+import space.pxls.ui.Overlays.PixelLookupOverlay;
+import space.pxls.ui.Overlays.StackOverlay;
+import space.pxls.ui.Overlays.UserCountOverlay;
+import space.pxls.ui.PixelBar;
+import space.pxls.ui.UndoPopup;
 import space.pxls.ui.events.MenuOpenRequested;
 
 public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCallback {
@@ -76,7 +87,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private Container<Label> secondaryCooldownContainer;
     private Cell secondaryCooldownContainerCell;
     private AuthedBar authedBar;
-    private UserBar userBar;
     private Table menuTable;
 
     private Account account;

@@ -2,7 +2,7 @@ package space.pxls.renderers;
 
 import com.badlogic.gdx.math.Vector2;
 
-import space.pxls.ui.CanvasScreen;
+import space.pxls.ui.Screens.CanvasScreen;
 
 public interface Renderer {
     void pixel(final int x, final int y, final int color);

@@ -10,8 +10,8 @@ import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
 import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
-import space.pxls.ui.CanvasScreen;
-import space.pxls.ui.LoadScreen;
+import space.pxls.ui.Screens.CanvasScreen;
+import space.pxls.ui.Screens.LoadScreen;
 
 import java.net.URI;
 import java.net.URISyntaxException;

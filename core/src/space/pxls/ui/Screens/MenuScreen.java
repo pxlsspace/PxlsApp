@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.ui.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -20,7 +20,12 @@ import java.util.Map;
 import space.pxls.Account;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.PxlsButton;
+import space.pxls.ui.Components.PxlsCheckBox;
+import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Components.TTFLabel;
+import space.pxls.ui.Components.TitledTableHelper;
+import space.pxls.ui.Components.PxlsSlider;
 
 public class MenuScreen extends ScreenAdapter {
     private Stage stage;

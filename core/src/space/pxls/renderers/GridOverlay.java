@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import space.pxls.Pxls;
-import space.pxls.ui.CanvasScreen;
+import space.pxls.ui.Screens.CanvasScreen;
 
 public class GridOverlay implements Renderer {
     private CanvasScreen parent;

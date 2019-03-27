@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.ui.Components;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import space.pxls.Pxls;
-import space.pxls.ui.Components.TTFLabel;
 
 public class PxlsSlider extends Table {
     private Slider slider;

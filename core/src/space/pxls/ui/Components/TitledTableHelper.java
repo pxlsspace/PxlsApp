@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.ui.Components;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import space.pxls.Pxls;
-import space.pxls.ui.Components.TTFLabel;
 
 public class TitledTableHelper extends Table {
     public TitledTableHelper(String title) {

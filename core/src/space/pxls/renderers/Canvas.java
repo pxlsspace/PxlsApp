@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 
-import space.pxls.ui.CanvasScreen;
-import space.pxls.ui.LoadScreen;
+import space.pxls.ui.Screens.CanvasScreen;
+import space.pxls.ui.Screens.LoadScreen;
 
 public class Canvas implements Renderer {
     private CanvasScreen parent;

@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.ui.Components;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

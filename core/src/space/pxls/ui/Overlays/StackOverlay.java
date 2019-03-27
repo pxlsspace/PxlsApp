@@ -1,10 +1,9 @@
-package space.pxls.ui;
+package space.pxls.ui.Overlays;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
-import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.ui.Components.TTFLabel;

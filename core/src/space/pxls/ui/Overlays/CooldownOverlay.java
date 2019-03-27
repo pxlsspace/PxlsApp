@@ -1,7 +1,5 @@
-package space.pxls.ui;
+package space.pxls.ui.Overlays;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 
@@ -9,8 +7,8 @@ import java.util.Locale;
 
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
-import space.pxls.renderers.Canvas;
 import space.pxls.ui.Components.TTFLabel;
+import space.pxls.ui.Screens.CanvasScreen;
 
 public class CooldownOverlay {
     private static CooldownOverlay _instance;

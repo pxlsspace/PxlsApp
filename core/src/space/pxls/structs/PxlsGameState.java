@@ -3,11 +3,6 @@ package space.pxls.structs;
 import java.util.HashMap;
 import java.util.Map;
 
-import space.pxls.renderers.Canvas;
-import space.pxls.renderers.Template;
-import space.pxls.renderers.Virginmap;
-import space.pxls.ui.CanvasScreen;
-
 public class PxlsGameState {
     public CanvasState canvasState = new CanvasState();
     public TemplateState templateState = new TemplateState();

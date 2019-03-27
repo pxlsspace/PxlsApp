@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.ui.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -11,16 +11,11 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Align;
 import com.google.gson.Gson;
 
+import java.util.List;
+
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.renderers.Canvas;
-import space.pxls.renderers.GridOverlay;
-import space.pxls.renderers.Heatmap;
-import space.pxls.renderers.Renderer;
-import space.pxls.renderers.Template;
-import space.pxls.renderers.Virginmap;
-
-import java.util.List;
 
 public class LoadScreen extends ScreenAdapter {
     @Override

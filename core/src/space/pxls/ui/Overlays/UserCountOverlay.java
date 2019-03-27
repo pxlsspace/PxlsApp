@@ -1,6 +1,5 @@
-package space.pxls.ui;
+package space.pxls.ui.Overlays;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -9,9 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
-
 import space.pxls.Pxls;
-import space.pxls.PxlsGame;
 import space.pxls.ui.Components.TTFLabel;
 
 public class UserCountOverlay extends Stack {

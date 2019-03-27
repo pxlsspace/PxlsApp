@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.structs.TemplateState;
-import space.pxls.ui.CanvasScreen;
+import space.pxls.ui.Screens.CanvasScreen;
 
 public class Template implements Renderer {
     private String url;

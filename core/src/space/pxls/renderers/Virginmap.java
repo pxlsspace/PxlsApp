@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import space.pxls.Pxls;
-import space.pxls.ui.CanvasScreen;
+import space.pxls.ui.Screens.CanvasScreen;
 
 public class Virginmap implements Renderer {
     public final Color fillStyle = Color.valueOf("#00FF00");

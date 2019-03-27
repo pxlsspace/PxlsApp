@@ -1,4 +1,4 @@
-package space.pxls.ui;
+package space.pxls.ui.Overlays;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -15,6 +15,7 @@ import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
 import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Components.TTFLabel;
 
 public class PixelLookupOverlay extends Table {
