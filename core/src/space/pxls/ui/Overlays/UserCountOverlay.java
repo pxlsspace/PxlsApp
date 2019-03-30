@@ -28,7 +28,7 @@ public class UserCountOverlay extends Stack {
         lblOnlineCount = new TTFLabel("");
         onlineCount = new Table();
         onlineCount.pad(8);
-        userIconCell = onlineCount.add(new Image(Pxls.skin.getDrawable("user"))).growX().right().size(32, 32);
+        userIconCell = onlineCount.add(new Image(Pxls.skin.getDrawable("user"))).growX().right().size(32, 32).padRight(8);
         onlineCount.add(lblOnlineCount).right().row();
 
         bgContainer = new Container();
