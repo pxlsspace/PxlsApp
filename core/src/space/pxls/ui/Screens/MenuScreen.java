@@ -22,10 +22,10 @@ import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.ui.Components.PxlsButton;
 import space.pxls.ui.Components.PxlsCheckBox;
+import space.pxls.ui.Components.PxlsSlider;
 import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Components.TTFLabel;
 import space.pxls.ui.Components.TitledTableHelper;
-import space.pxls.ui.Components.PxlsSlider;
 
 public class MenuScreen extends ScreenAdapter {
     private Stage stage;
@@ -241,6 +241,7 @@ public class MenuScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+        stage.getViewport().update(width, height);
         if (w != width || h != height) {
             MenuScreen ms = new MenuScreen(canvasScreen, account);
             ms.w = width;

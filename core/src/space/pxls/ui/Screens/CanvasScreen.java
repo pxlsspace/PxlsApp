@@ -67,7 +67,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private Container<PixelLookupOverlay> lookupContainer;
     private Container<StackOverlay> stackOverlayContainer;
     private UndoPopup undoPopup;
-    private Cell cellStackOverlay, cellUserCountOverlay, centerPopupCell;
+    private Cell cellStackOverlay, cellUserCountOverlay, centerPopupCell, topCell;
     public StackOverlay stackOverlay;
 
     private PixelBar paletteBar;
@@ -168,7 +168,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         });
 
         mainUITable = new Table();
-        mainUITable.add(authedBar).fillX().expandX().colspan(3).row();
+        topCell = mainUITable.add(authedBar).fillX().expandX().colspan(3);
+        mainUITable.row();
+
         mainUITable.add(lookupContainer).fillX().expandX().colspan(3).row();
         Stack centerPopup = new Stack();
         centerPopup.add(login.popup);
@@ -215,9 +217,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             }
             templateMoveModeHelper.moveStart();
             Pxls.gameState.getSafeTemplateState().stageForMoving();
-//            topContainer.setActor(templateMoveModeHelper.moveModeControls);
+            topCell.setActor(templateMoveModeHelper.moveModeControls);
         } else {
-//            topContainer.setActor(authedBar);
+            topCell.setActor(authedBar);
         }
 
         updateCooldownActors();
@@ -657,7 +659,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         public Table moveModeControls;
         public TemplateMoveModeHelper() {
             btnCancel = new PxlsButton(" Cancel ").red();
+            btnCancel.getLabel().setFontScale(0.25f);
             btnConfirm = new PxlsButton(" Confirm ").blue();
+            btnConfirm.getLabel().setFontScale(0.25f);
 
             Image btnUp = new Image(Pxls.skin.getDrawable("arrow.gray.up"));
             Image btnDown = new Image(Pxls.skin.getDrawable("arrow.gray.down"));
@@ -705,7 +709,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                         public void done(boolean confirmed) {
                             if (confirmed) {
                                 Pxls.gameState.getSafeTemplateState().finalizeMove(true);
-//                                topContainer.setActor(userBar);
+                                topCell.setActor(authedBar);
                                 moveDone();
                             }
                         }
@@ -722,7 +726,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                         public void done(boolean confirmed) {
                             if (confirmed) {
                                 Pxls.gameState.getSafeTemplateState().finalizeMove(false);
-//                                topContainer.setActor(userBar);
+                                topCell.setActor(authedBar);
                                 Pxls.prefsHelper.SaveGameState(Pxls.gameState, true);
                                 moveDone();
                             }
@@ -759,6 +763,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                     Pxls.gameState.getSafeTemplateState().opacity = sliderOpacity.getValue();
                 }
             });
+
+            moveModeControls.setBackground(Pxls.skin.getDrawable("background"));
         }
 
         void moveStart() {
