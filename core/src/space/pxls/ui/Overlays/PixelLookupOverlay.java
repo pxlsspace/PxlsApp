@@ -49,19 +49,19 @@ public class PixelLookupOverlay extends Table {
         });
 
         pad(6);
-        add(new TTFLabel("Coords:").fontScale(0.85f)).expandX().left();
+        add(new TTFLabel("Coords:").fontScale(0.85f)).left();
         add(new TTFLabel("(" + x + ", " + y + ")").fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(new TTFLabel("Placed by:").fontScale(0.85f)).expandX().left();
+        add(new TTFLabel("Placed by:").fontScale(0.85f)).left();
         add(new TTFLabel(username).fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(new TTFLabel("Placed at:").fontScale(0.85f)).expandX().left();
+        add(new TTFLabel("Placed at:").fontScale(0.85f)).left();
         add(new TTFLabel(System.currentTimeMillis() - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time)).fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(new TTFLabel("Pixels by user:").fontScale(0.85f)).expandX().left();
+        add(new TTFLabel("Pixels by user:").fontScale(0.85f)).left();
         add(new TTFLabel(Integer.toString(pixels)).fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(new TTFLabel("Alltime Pixels:").fontScale(0.85f)).expandX().left();
+        add(new TTFLabel("Alltime Pixels:").fontScale(0.85f)).left();
         add(new TTFLabel(Integer.toString(pixelsAlltime)).fontScale(0.75f).wrap(true)).fillX().left().row();
 
         add(new SolidContainer()).colspan(2).growX().height(2).row();
