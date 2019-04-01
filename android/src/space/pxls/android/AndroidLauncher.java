@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -11,15 +13,19 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.graphics.Pixmap;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import space.pxls.ImageHelper;
 import space.pxls.OrientationHelper;
 import space.pxls.PxlsGame;
 import space.pxls.VibrationHelper;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class AndroidLauncher extends AndroidApplication {
     public static final int CAPTCHA_REQUEST = 1;
@@ -138,6 +144,32 @@ public class AndroidLauncher extends AndroidApplication {
                     vibrator = (Vibrator)getContext().getSystemService(VIBRATOR_SERVICE);
                 }
                 return vibrator;
+            }
+        };
+        game.imageHelper = new ImageHelper() {
+            @Override
+            public Pixmap getPixmapForIS(InputStream inputStream) {
+                Bitmap b = BitmapFactory.decodeStream(inputStream);
+
+                int[] pixels = new int[b.getWidth() * b.getHeight()];
+                byte[] toRender = new byte[b.getWidth() * b.getHeight() * 4];
+                b.getPixels(pixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
+
+                for (int i = 0; i < pixels.length; i++) {
+                    int alpha = ((pixels[i] >> 24) & 0x000000FF);
+                    int red = ((pixels[i] >> 16) & 0x000000FF);
+                    int green = ((pixels[i] >> 8) & 0x000000FF);
+                    int blue = ((pixels[i]) & 0x000000FF);
+                    toRender[i * 4] = (byte) red;
+                    toRender[i * 4 + 1] = (byte) green;
+                    toRender[i * 4 + 2] = (byte) blue;
+                    toRender[i * 4 + 3] = (byte) alpha;
+                }
+
+                Pixmap templatePixmap = new Pixmap(b.getWidth(), b.getHeight(), b.hasAlpha() ? Pixmap.Format.RGBA8888 : Pixmap.Format.RGB888);
+                templatePixmap.getPixels().put(toRender).position(0);
+
+                return templatePixmap;
             }
         };
         Intent intent = getIntent();

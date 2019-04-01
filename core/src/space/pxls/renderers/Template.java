@@ -73,8 +73,7 @@ public class Template implements Renderer {
                     Pxls.gameState.getSafeTemplateState().URL = "";
                     return;
                 }
-                byte[] data = httpResponse.getResult();
-                final Pixmap p = new Pixmap(data, 0, data.length);
+                final Pixmap p = PxlsGame.i.imageHelper.getPixmapForIS(httpResponse.getResultAsStream());
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
@@ -105,14 +104,14 @@ public class Template implements Renderer {
                     }
                 });
             }
-            
+
             @Override
             public void failed(Throwable t) {
                 t.printStackTrace();
                 System.err.println("Failed to fetch Template image");
                 Pxls.gameState.getSafeTemplateState().enabled = false;
             }
-            
+
             @Override
             public void cancelled() {
                 System.out.println("template fetch webreq was cancelled");

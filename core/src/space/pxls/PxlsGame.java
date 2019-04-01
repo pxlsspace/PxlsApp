@@ -6,22 +6,22 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.google.gson.JsonObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
 import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.ui.Screens.CanvasScreen;
 import space.pxls.ui.Screens.LoadScreen;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.io.UnsupportedEncodingException;
 
 public class PxlsGame extends Game {
     public static PxlsGame i;
@@ -31,6 +31,7 @@ public class PxlsGame extends Game {
     public String VersionString = "0.0.0";
     public OrientationHelper orientationHelper;
     public VibrationHelper vibrationHelper;
+    public ImageHelper imageHelper;
 
     public PxlsGame() {}
     public PxlsGame(String versionString) {
