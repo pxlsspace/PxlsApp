@@ -208,7 +208,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (userCountOverlay != null && userCountOverlay.hasReceivedCount()) userCountOverlay.setVisible(!Pxls.prefsHelper.getHideUserCount());
         if (Pxls.gameState.getSafeTemplateState().moveMode) {
             if (!Pxls.prefsHelper.getHasSeenMoveModeTutorial()) {
-                PxlsGame.i.alert("Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nThe nudge buttons (arrows) will move the template 1 pixel in the specified direction.", new PxlsGame.ButtonCallback() {
+                PxlsGame.i.alert(Pxls.moveModeTutorial, new PxlsGame.ButtonCallback() {
                     @Override
                     public void clicked() {
                         Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);

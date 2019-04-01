@@ -63,6 +63,20 @@ public class MenuScreen extends ScreenAdapter {
         final PxlsCheckBox cbShouldPrevibe = new PxlsCheckBox("Enable \"previbe\" ticks", Pxls.prefsHelper.getShouldPrevibe());
 
         final PxlsButton btnGetTemplateURL = new PxlsButton("Get current template link");
+        final PxlsButton btnShowMoveModeTutorial = new PxlsButton("Show MoveMode tutorial");
+
+        btnShowMoveModeTutorial.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                PxlsGame.i.alert(Pxls.moveModeTutorial, new PxlsGame.ButtonCallback() {
+                    @Override
+                    public void clicked() {
+                        Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);
+                    }
+                });
+            }
+        });
 
         btnGetTemplateURL.addListener(new ClickListener() {
             @Override
@@ -131,6 +145,7 @@ public class MenuScreen extends ScreenAdapter {
         tcTemplate.add(sliderTemplateOpacity).colspan(2).growX().fillY().row();
         tcTemplate.add(btnLoadTemplateFromClipboard).pad(8).colspan(2).growX().center().row();
         tcTemplate.add(btnGetTemplateURL).pad(8).colspan(2).growX().center().row();
+        tcTemplate.add(btnShowMoveModeTutorial).pad(8).colspan(2).growX().center().row();
 
         Table tcVirginmap = new TitledTableHelper("Virginmap");
         tcVirginmap.add(cbVirginmapEnabled).padTop(6).padLeft(5).colspan(2).expandX().left().row();

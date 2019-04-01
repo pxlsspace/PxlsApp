@@ -42,6 +42,7 @@ public class Pxls {
     public static Skin skin;
     public static SpriteBatch batch;
     public static PxlsGameState gameState;
+    public static String moveModeTutorial = "Pan/zoom/etc as you normally would.\n\nIf you double tap a pixel, the top left corner of the template will move to where you tapped.\n\nThe nudge buttons (arrows) will move the template 1 pixel in the specified direction.";
     public static String getUA() {
         String _v = "0.0.0";
         if (PxlsGame.i != null) {

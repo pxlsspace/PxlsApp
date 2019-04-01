@@ -58,6 +58,15 @@ public class PrefsHelper {
         }, 100, 1000);
     }
 
+    /**
+     * DESTRUCTIVE - Clears all preferences and flushes.
+     * @see Preferences#clear()
+     */
+    public void clear() {
+        preferences.clear();
+        preferences.flush();
+    }
+
     public String getToken() {
         return this.preferences.getString("token", null);
     }
@@ -288,5 +297,9 @@ public class PrefsHelper {
             this.preferences.remove(key);
         }
         this.preferences.flush();
+    }
+
+    public Preferences getPreferences() {
+        return preferences;
     }
 }
