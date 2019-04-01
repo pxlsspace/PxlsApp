@@ -638,8 +638,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         return (int) Math.floor(center.x);
     }
 
-    public int panY() {
-        return (int) Math.floor(center.y);
+    public int panY(boolean fix) {
+        return fix ? (int) Math.floor(boardInfo.height - center.y) : (int) Math.floor(center.y);
     }
 
     public int panZoom() {
