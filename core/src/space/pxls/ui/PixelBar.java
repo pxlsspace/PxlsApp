@@ -10,13 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
@@ -34,30 +32,26 @@ public class PixelBar extends Stack {
         TOGGLE
     }
 
-    private final Table pixelListTable;
+    private final HorizontalGroup pixelRow;
     private final Container<Label> cooldownContainer;
     private final Label cooldownLabel;
     private List<String> palette;
     private int currentColor = -1;
-    private long cooldownExpiry;
     private boolean[] isUp;
-    private Drawable _drawableTransparent = new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 0f)))));
-    private Drawable _drawableSemiTransparent = new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 0.85f)))));
-    private Drawable _drawableOpaque = new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, 1f)))));
 
     public PixelBar(final List<String> palette) {
         super();
         this.palette = palette;
         isUp = new boolean[palette.size()];
 
-        pixelListTable = new Table();
-        pixelListTable.pad(8);
-        pixelListTable.setTouchable(Touchable.enabled);
+        pixelRow = new HorizontalGroup();
+        pixelRow.pad(8).wrap(true).space(4).wrapSpace(4).setTouchable(Touchable.enabled);
+
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (Pxls.prefsHelper.getKeepColorSelected()) {
-                    Actor a = pixelListTable.hit(x, y, false);
+                    Actor a = pixelRow.hit(x, y, false);
                     if (a instanceof PixelImage) {
                         changeColor(((PixelImage) a).idx);
                     }
@@ -68,7 +62,7 @@ public class PixelBar extends Stack {
             }
         });
 
-        pixelListTable.clearChildren();
+        pixelRow.clearChildren();
 
         boolean twoRows = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
         for (int i = 0; i < palette.size(); i++) {
@@ -90,29 +84,14 @@ public class PixelBar extends Stack {
                 }
             });
 
-            final Cell<PixelImage> cell = pixelListTable.add(img).expandX().fillX().height(40);
-
-            int snapPoint = palette.size() / 2 - 1;
-            int spacing = 4;
-
-            int count = palette.size();
-            if (twoRows) {
-                if (i == snapPoint) {
-                    cell.row();
-                }
-                count /= 2;
-                spacing = 8;
-            }
-
-            int size = (640 - 16 - (count + 1) * spacing) / count;
-            cell.width(size).height(size).space(spacing);
+            pixelRow.addActor(img);
         }
 
         if (currentColor >= 0) {
             updateSelected();
         }
 
-        add(pixelListTable);
+        add(pixelRow);
 
         cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
         cooldownContainer = new Container<Label>(cooldownLabel);
@@ -189,7 +168,7 @@ public class PixelBar extends Stack {
                 mba.setInterpolation(Interpolation.exp5);
                 isUp[i] = true;
 
-                pixelListTable.getChildren().get(i).addAction(mba);
+                pixelRow.getChildren().get(i).addAction(mba);
             }
         });
     }
@@ -205,7 +184,7 @@ public class PixelBar extends Stack {
                 mba.setInterpolation(Interpolation.exp5);
                 isUp[i] = false;
 
-                pixelListTable.getChildren().get(i).addAction(mba);
+                pixelRow.getChildren().get(i).addAction(mba);
             }
         });
     }
@@ -227,6 +206,16 @@ public class PixelBar extends Stack {
 
         public PixelImage(Skin skin, String palette) {
             super(skin, palette);
+        }
+
+        @Override
+        public float getPrefHeight() {
+            return 48;
+        }
+
+        @Override
+        public float getPrefWidth() {
+            return 48;
         }
     }
 }

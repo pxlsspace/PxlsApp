@@ -14,7 +14,7 @@ public class Pxls {
         // 1 for ske setup
         // 2 for sorunome setup
         // 3 for GlowingSocc setup
-        int debug = 3;
+        int debug = 0;
         switch (debug) {
             case 1:
                 domain = "http://192.168.0.23.nip.io:4567";
