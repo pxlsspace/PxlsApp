@@ -116,7 +116,7 @@ public class PixelBar extends Stack {
 
         cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
         cooldownContainer = new Container<Label>(cooldownLabel);
-        cooldownContainer.fillX().align(Align.center).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(0f, 0f, 0f, 0f))))));
+        cooldownContainer.fillX().align(Align.center).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, .9f))))));
         add(cooldownContainer);
 
         cooldownContainer.setTouchable(Touchable.enabled);
