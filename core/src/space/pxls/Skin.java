@@ -42,8 +42,8 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
 
         addPatch("light-patch", "light.9.png", 13, 14, 14, 14);
         addPatch("white-patch", "white.9.png", 5, 5, 5, 5);
-        addPatch("rounded.topLeft", "rounded.topLeft.9.png", 5,5,5,5);
-        addPatch("rounded.topRight", "rounded.topRight.9.png", 5,5,5,5);
+        addPatch("rounded.topLeft", "rounded.topLeft.9.png", 16,5,16,5);
+        addPatch("rounded.topRight", "rounded.topRight.9.png", 5,16,16,5);
 
         add("default-horizontal", new Slider.SliderStyle(new TextureRegionDrawable(new TextureRegion(new Texture("slider.png"))), new TextureRegionDrawable(new TextureRegion(new Texture("slider-knob.png")))));
 

@@ -25,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
 
@@ -122,7 +123,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         }
         gridOverlay = new GridOverlay(this);
 
-        secondaryCooldownContainer = new Container<Label>(new TTFLabel("")).background(Pxls.skin.getDrawable("background"));
+        secondaryCooldownContainer = new Container<Label>(new TTFLabel(""));
         secondaryCooldownContainer.padLeft(4).padRight(16);
 
         templateMoveModeHelper = new TemplateMoveModeHelper();
@@ -177,6 +178,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         centerPopup.add(undoPopup);
 
         pixcountAndCooldownTable = new Table();
+        pixcountAndCooldownTable.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
         secondaryCooldownContainerCell = pixcountAndCooldownTable.add(secondaryCooldownContainer).fill().space(0).pad(0);
         pixcountAndCooldownTable.add(stackOverlayContainer);
 

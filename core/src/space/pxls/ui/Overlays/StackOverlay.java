@@ -2,7 +2,6 @@ package space.pxls.ui.Overlays;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
@@ -23,8 +22,6 @@ public class StackOverlay extends Container<Container<Label>> {
 
         countLabel = new TTFLabel(this.count + "/" + this.maxCount); // 6/6
         container = new Container<Label>(countLabel);
-        container.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
-        container.pad(8);
         setActor(container);
 
         setClip(true);
