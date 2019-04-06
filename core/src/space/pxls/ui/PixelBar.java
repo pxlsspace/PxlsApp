@@ -45,7 +45,7 @@ public class PixelBar extends Stack {
         isUp = new boolean[palette.size()];
 
         pixelRow = new HorizontalGroup();
-        pixelRow.pad(8).wrap(true).space(4).wrapSpace(4).setTouchable(Touchable.enabled);
+        pixelRow.pad(16,8,16,8).wrap(true).space(12).wrapSpace(12).setTouchable(Touchable.enabled);
 
         addListener(new InputListener() {
             @Override
@@ -210,12 +210,12 @@ public class PixelBar extends Stack {
 
         @Override
         public float getPrefHeight() {
-            return 48;
+            return 80;
         }
 
         @Override
         public float getPrefWidth() {
-            return 48;
+            return 80;
         }
     }
 }

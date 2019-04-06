@@ -19,6 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
+    public static final int DP_DEFAULT=20;
+    public static final int DP_TITLE=30;
+    public static final int DP_SUBTITLE=25;
+
     private FreeTypeFontGenerator ftfGen = null;
     private BitmapFont _font = null;
     private float lastDensity = -1;
@@ -101,6 +105,6 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
     }
 
     public BitmapFont getFont() {
-        return getFontForDP(16);
+        return getFontForDP(Skin.DP_DEFAULT);
     }
 }
