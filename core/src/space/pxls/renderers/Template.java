@@ -141,7 +141,7 @@ public class Template implements Renderer {
 
     public String makePxlsURL() {
         TemplateState ts = Pxls.gameState.getSafeTemplateState();
-        return String.format("%s/#template=%s&ox=%s&oy=%s&oo=%s&tw=%s&x=%s&y=%s&scale=%s", Pxls.domain, ts.URL, ts.offsetX, ts.offsetX, ts.opacity, ts.totalWidth, parent.panX(), parent.panY(true), parent.panZoom());
+        return String.format("%s/#template=%s&ox=%s&oy=%s&oo=%s&tw=%s&x=%s&y=%s&scale=%s", Pxls.domain, ts.URL, ts.offsetX, ts.offsetY, ts.opacity, ts.totalWidth, parent.panX(), parent.panY(true), parent.panZoom());
     }
 
     public void pixel(int x, int y, int color) {}
