@@ -18,13 +18,17 @@ public class CooldownOverlay {
     private boolean alertedZero = false;
 
     public CooldownOverlay() {
-        lblCooldown = new TTFLabel("00:00");
-        lblCooldown.setAlignment(Align.center);
+        resetLabel();
     }
 
     public static CooldownOverlay getInstance() {
         if (_instance == null) _instance = new CooldownOverlay();
         return _instance;
+    }
+
+    public void resetLabel() {
+        lblCooldown = new TTFLabel("00:00");
+        lblCooldown.setAlignment(Align.center);
     }
 
     public void updateCooldown(float cooldown) {
@@ -64,7 +68,8 @@ public class CooldownOverlay {
         int seconds = (int) (timeLeft % 60);
         this.lblCooldown.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
         this.lblCooldown.setVisible(hasTimeLeft);
-        this.lblCooldown.getParent().setVisible(hasTimeLeft);
+        if (this.lblCooldown.getParent() != null)
+            this.lblCooldown.getParent().setVisible(hasTimeLeft);
         if (alertedZero) return;
         if (!hasTimeLeft && PxlsGame.i.getScreen() instanceof CanvasScreen) {
             alertedZero = true;
@@ -73,6 +78,8 @@ public class CooldownOverlay {
     }
 
     public Label getCooldownLabel() {
+        if (lblCooldown == null) resetLabel();
+        updateCooldown();
         return lblCooldown;
     }
 

@@ -94,6 +94,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private TemplateMoveModeHelper templateMoveModeHelper;
 
     public CanvasScreen(Canvas canvas) {
+        CooldownOverlay.getInstance().resetLabel();
         final CanvasScreen self = this;
         Pxls.gameState = Pxls.prefsHelper.GetSavedGameState();
         boardInfo = canvas.info;
@@ -452,11 +453,12 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     public void updateCooldownActors() {
         if (paletteBar != null && secondaryCooldownContainer != null && secondaryCooldownContainerCell != null) {
+            Label cdLabel = CooldownOverlay.getInstance().getCooldownLabel();
             boolean keepSelected = Pxls.prefsHelper.getKeepColorSelected();
             boolean isOnCD = CooldownOverlay.getInstance().getCooldownExpiry() - System.currentTimeMillis() > 0;
 
-            paletteBar.getCooldownContainer().setActor(keepSelected ? null : CooldownOverlay.getInstance().getCooldownLabel());
-            secondaryCooldownContainer.setActor(keepSelected ? CooldownOverlay.getInstance().getCooldownLabel() : null);
+            paletteBar.getCooldownContainer().setActor(keepSelected ? null : cdLabel);
+            secondaryCooldownContainer.setActor(keepSelected ? cdLabel : null);
             if (keepSelected) {
                 secondaryCooldownContainerCell.setActor(isOnCD ? secondaryCooldownContainer : null);
             } else {
