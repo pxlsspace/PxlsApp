@@ -45,7 +45,7 @@ public class PixelBar extends Stack {
         isUp = new boolean[palette.size()];
 
         pixelRow = new HorizontalGroup();
-        pixelRow.pad(16,8,16,8).wrap(true).space(12).wrapSpace(12).setTouchable(Touchable.enabled);
+        pixelRow.pad(12, 4, 12, 0).wrap(true).space(8).wrapSpace(8).setTouchable(Touchable.enabled);
 
         addListener(new InputListener() {
             @Override
@@ -63,14 +63,14 @@ public class PixelBar extends Stack {
         });
 
         pixelRow.clearChildren();
+        int _size = (int) ((Gdx.graphics.getWidth() / 12) - (pixelRow.getSpace()));
 
-        boolean twoRows = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
         for (int i = 0; i < palette.size(); i++) {
             String s = palette.get(i);
             isUp[i] = false;
 
             Color c = Color.valueOf(s);
-            final PixelImage img = new PixelImage(Pxls.skin, "palette");
+            final PixelImage img = new PixelImage(Pxls.skin, "palette", _size, _size);
             img.setColor(c);
 
             final int finalI = i;
@@ -203,19 +203,22 @@ public class PixelBar extends Stack {
 
     class PixelImage extends Image {
         public int idx = -1;
+        private int w,h;
 
-        public PixelImage(Skin skin, String palette) {
+        public PixelImage(Skin skin, String palette, int width, int height) {
             super(skin, palette);
+            w = width;
+            h = height;
         }
 
         @Override
         public float getPrefHeight() {
-            return 80;
+            return h;
         }
 
         @Override
         public float getPrefWidth() {
-            return 80;
+            return w;
         }
     }
 }
