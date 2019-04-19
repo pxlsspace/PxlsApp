@@ -38,7 +38,6 @@ public class MenuScreen extends ScreenAdapter {
         this.canvasScreen = canvasScreen;
         this.account = loggedInAccount;
         build();
-        stage.setDebugAll(true);
     }
 
     private void build() {
