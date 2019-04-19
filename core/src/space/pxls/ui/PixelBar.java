@@ -10,11 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
@@ -32,7 +34,7 @@ public class PixelBar extends Stack {
         TOGGLE
     }
 
-    private final HorizontalGroup pixelRow;
+    private final Table pixelListTable;
     private final Container<Label> cooldownContainer;
     private final Label cooldownLabel;
     private List<String> palette;
@@ -44,14 +46,14 @@ public class PixelBar extends Stack {
         this.palette = palette;
         isUp = new boolean[palette.size()];
 
-        pixelRow = new HorizontalGroup();
-        pixelRow.pad(16,8,16,8).wrap(true).space(12).wrapSpace(12).setTouchable(Touchable.enabled);
-
+        pixelListTable = new Table();
+        pixelListTable.pad(8);
+        pixelListTable.setTouchable(Touchable.enabled);
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (Pxls.prefsHelper.getKeepColorSelected()) {
-                    Actor a = pixelRow.hit(x, y, false);
+                    Actor a = pixelListTable.hit(x, y, false);
                     if (a instanceof PixelImage) {
                         changeColor(((PixelImage) a).idx);
                     }
@@ -62,8 +64,7 @@ public class PixelBar extends Stack {
             }
         });
 
-        pixelRow.clearChildren();
-        int _size = (int) ((Gdx.graphics.getWidth() / 12) - (pixelRow.getSpace()));
+        pixelListTable.clearChildren();
 
         boolean twoRows = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
         for (int i = 0; i < palette.size(); i++) {
@@ -85,14 +86,29 @@ public class PixelBar extends Stack {
                 }
             });
 
-            pixelRow.addActor(img);
+            final Cell<PixelImage> cell = pixelListTable.add(img).expandX().fillX().height(40);
+
+            int snapPoint = palette.size() / 2 - 1;
+            int spacing = 4;
+
+            int count = palette.size();
+            if (twoRows) {
+                if (i == snapPoint) {
+                    cell.row();
+                }
+                count /= 2;
+                spacing = 8;
+            }
+
+            int size = (640 - 16 - (count + 1) * spacing) / count;
+            cell.width(size).height(size).space(spacing);
         }
 
         if (currentColor >= 0) {
             updateSelected();
         }
 
-        add(pixelRow);
+        add(pixelListTable);
 
         cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
         cooldownContainer = new Container<Label>(cooldownLabel);
@@ -169,7 +185,7 @@ public class PixelBar extends Stack {
                 mba.setInterpolation(Interpolation.exp5);
                 isUp[i] = true;
 
-                pixelRow.getChildren().get(i).addAction(mba);
+                pixelListTable.getChildren().get(i).addAction(mba);
             }
         });
     }
@@ -185,7 +201,7 @@ public class PixelBar extends Stack {
                 mba.setInterpolation(Interpolation.exp5);
                 isUp[i] = false;
 
-                pixelRow.getChildren().get(i).addAction(mba);
+                pixelListTable.getChildren().get(i).addAction(mba);
             }
         });
     }
@@ -211,12 +227,12 @@ public class PixelBar extends Stack {
 
         @Override
         public float getPrefHeight() {
-            return 80;
+            return 48;
         }
 
         @Override
         public float getPrefWidth() {
-            return 80;
+            return 48;
         }
     }
 }
