@@ -9,29 +9,23 @@ import de.tomgrill.gdxdialogs.core.GDXDialogsSystem;
 import space.pxls.structs.PxlsGameState;
 
 public class Pxls {
-    public static void init() {
-        // 0 for no debug
-        // 1 for ske setup
-        // 2 for sorunome setup
-        // 3 for GlowingSocc setup
-        int debug = 0;
-        switch (debug) {
-            case 1:
-                domain = "http://192.168.0.23.nip.io:4567";
-                wsPath = "ws://192.168.0.23.nip.io:4567/ws";
-                break;
-            case 2:
-                domain = "http://192.168.1.13:4567";
-                wsPath = "ws://192.168.1.13:4567/ws";
-                break;
-            case 3:
-                domain = "http://192.168.86.100:4567";
-                wsPath = "ws://192.168.86.100:4567/ws";
-                break;
-            default:
-                domain = "https://pxls.space";
-                wsPath = "wss://pxls.space/ws";
+    private enum DevEnvironments {
+        PRODUCTION("https://pxls.space", "wss://pxls.space/ws"),
+        SKE("http://192.168.0.23.nip.io:4567", "ws://192.168.0.23.nip.io:4567/ws"),
+        SORUNOME("http://192.168.1.13:4567", "ws://192.168.1.13:4567/ws"),
+        SOCC("http://192.168.86.100:4567", "ws://192.168.86.100:4567/ws");
+
+        private String DOMAIN, WS_PATH;
+
+        DevEnvironments(String DOMAIN, String WS_PATH) {
+            this.DOMAIN = DOMAIN;
+            this.WS_PATH = WS_PATH;
         }
+    }
+
+    public static void init() {
+        domain = DevEnvironments.SOCC.DOMAIN;
+        wsPath = DevEnvironments.SOCC.WS_PATH;
     }
     public static String domain;
     public static String wsPath;
