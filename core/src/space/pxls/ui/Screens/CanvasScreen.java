@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
 
 import space.pxls.Account;
@@ -61,7 +62,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private Vector2 focalPoint;
     private float initialZoom;
 
-    private Stage stage = new Stage();
+    private Stage stage = new Stage(new ExtendViewport(640, 0));
 
     private Container<WidgetGroup> bottomContainer;
     private Container<PixelLookupOverlay> lookupContainer;
@@ -179,7 +180,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         pixcountAndCooldownTable = new Table();
         pixcountAndCooldownTable.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
-        secondaryCooldownContainerCell = pixcountAndCooldownTable.add(secondaryCooldownContainer).fill().space(0).pad(0, 0, 0, 16);
+        secondaryCooldownContainerCell = pixcountAndCooldownTable.add(secondaryCooldownContainer).fill().space(0).pad(0);
         pixcountAndCooldownTable.add(stackOverlayContainer);
 
         cellStackOverlay = mainUITable.add(pixcountAndCooldownTable).bottom().left();
@@ -662,9 +663,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         public Table moveModeControls;
         public TemplateMoveModeHelper() {
             btnCancel = new PxlsButton(" Cancel ").red();
-            btnCancel.getLabel().setFontScale(0.5f);
+            btnCancel.getLabel().setFontScale(0.25f);
             btnConfirm = new PxlsButton(" Confirm ").blue();
-            btnConfirm.getLabel().setFontScale(0.5f);
+            btnConfirm.getLabel().setFontScale(0.25f);
 
             Image btnUp = new Image(Pxls.skin.getDrawable("arrow.gray.up"));
             Image btnDown = new Image(Pxls.skin.getDrawable("arrow.gray.down"));
@@ -795,7 +796,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         public AuthedBar() {
             setBackground(Pxls.skin.getDrawable("background"));
-            pad(12);
+            pad(3, 8, 3, 8);
 
             lblUsername = new TTFLabel("Not Logged In");
             imgMenuTrigger = new Image(Pxls.skin.getDrawable("menu"));
@@ -803,8 +804,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             lockImage.setVisible(false);
 
             add(lblUsername).left().growX();
-            lockIconCell = add(lockImage).size(80, 80).padRight(3).right();
-            menuButtonCell = add(imgMenuTrigger).size(80, 64).right();
+            lockIconCell = add(lockImage).size(48, 48).padRight(3).right();
+            menuButtonCell = add(imgMenuTrigger).size(48, 32).right();
 
             row();
 

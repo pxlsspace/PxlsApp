@@ -45,7 +45,7 @@ public class PixelBar extends Stack {
         isUp = new boolean[palette.size()];
 
         pixelRow = new HorizontalGroup();
-        pixelRow.pad(12, 4, 12, 0).wrap(true).space(8).wrapSpace(8).setTouchable(Touchable.enabled);
+        pixelRow.pad(8).wrap(true).space(4).wrapSpace(4).setTouchable(Touchable.enabled);
 
         addListener(new InputListener() {
             @Override
@@ -65,6 +65,7 @@ public class PixelBar extends Stack {
         pixelRow.clearChildren();
         int _size = (int) ((Gdx.graphics.getWidth() / 12) - (pixelRow.getSpace()));
 
+        boolean twoRows = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
         for (int i = 0; i < palette.size(); i++) {
             String s = palette.get(i);
             isUp[i] = false;
