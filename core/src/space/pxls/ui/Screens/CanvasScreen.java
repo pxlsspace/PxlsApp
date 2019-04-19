@@ -798,7 +798,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             setBackground(Pxls.skin.getDrawable("background"));
             pad(3, 8, 3, 8);
 
-            lblUsername = new TTFLabel("Not Logged In");
+            lblUsername = new TTFLabel("Not Logged In").wrap(true);
             imgMenuTrigger = new Image(Pxls.skin.getDrawable("menu"));
             lockImage = new Image(Pxls.skin.getDrawable("lock"));
             lockImage.setVisible(false);
