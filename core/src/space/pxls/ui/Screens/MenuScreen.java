@@ -31,7 +31,7 @@ public class MenuScreen extends ScreenAdapter {
     private Stage stage;
     private Account account;
     private CanvasScreen canvasScreen;
-    public int w=0, h=0;
+    public int w=0,h=0;
 
     public MenuScreen(CanvasScreen canvasScreen, Account loggedInAccount) {
         this.stage = new Stage();
@@ -198,7 +198,7 @@ public class MenuScreen extends ScreenAdapter {
 
         Table topBarTable = new Table().pad(12);
         topBarTable.add(new TTFLabel(this.account == null ? "Not Logged In" : "Logged in as " + this.account.getSanitizedName())).left();
-        topBarTable.add(closeButton).size(30 * Gdx.graphics.getDensity(), 30 * Gdx.graphics.getDensity()).expandX().right();
+        topBarTable.add(closeButton).size(80,80).expandX().right();
 
         table.add(new Stack(new SolidContainer(shadeColor), topBarTable)).growX().row();
 
@@ -215,7 +215,7 @@ public class MenuScreen extends ScreenAdapter {
         table.add(new Container()).padBottom(24).colspan(2).growY().row(); //Adds a cell that fills the remaining height between the last cell and the next one. Used as a spacer to stick our logout to the bottom and to ensure everything displays properly
         if (this.account != null) {
             Table tblLogout = new Table();
-            tblLogout.add(logoutIcon).growX().right().size(35 * Gdx.graphics.getDensity(), 35 * Gdx.graphics.getDensity());
+            tblLogout.add(logoutIcon).growX().right().size(96, 96);
             tblLogout.add(new TTFLabel("Logout", 32)).right().row();
             tblLogout.addListener(new ClickListener() {
                 @Override

@@ -803,8 +803,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             lockImage.setVisible(false);
 
             add(lblUsername).left().growX();
-            lockIconCell = add(lockImage).size(25 * Gdx.graphics.getDensity(), 20 * Gdx.graphics.getDensity()).padRight(3).right();
-            menuButtonCell = add(imgMenuTrigger).size(30 * Gdx.graphics.getDensity(), 20 * Gdx.graphics.getDensity()).right();
+            lockIconCell = add(lockImage).size(80, 80).padRight(3).right();
+            menuButtonCell = add(imgMenuTrigger).size(80, 64).right();
 
             row();
 
