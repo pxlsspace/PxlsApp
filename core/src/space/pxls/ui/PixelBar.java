@@ -16,13 +16,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
 
 import space.pxls.Pxls;
+import space.pxls.PxlsGame;
 import space.pxls.Skin;
 import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Overlays.CooldownOverlay;
@@ -66,7 +66,7 @@ public class PixelBar extends Stack {
 
         pixelListTable.clearChildren();
 
-        boolean twoRows = Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
+        boolean twoRows = PxlsGame.i.isMultiWindow || Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
         for (int i = 0; i < palette.size(); i++) {
             String s = palette.get(i);
             isUp[i] = false;

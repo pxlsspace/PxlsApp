@@ -32,6 +32,8 @@ public class PxlsGame extends Game {
     public OrientationHelper orientationHelper;
     public VibrationHelper vibrationHelper;
     public ImageHelper imageHelper;
+    public boolean isPIP = false;
+    public boolean isMultiWindow = false;
 
     public PxlsGame() {}
     public PxlsGame(String versionString) {

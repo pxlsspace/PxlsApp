@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.Surface;
@@ -207,6 +209,10 @@ public class AndroidLauncher extends AndroidApplication {
                 }
             }
         };
+        if (Build.VERSION.SDK_INT >= 24) {
+            game.isMultiWindow = isInMultiWindowMode();
+            game.isPIP = isInPictureInPictureMode();
+        }
 
         View view = initializeForView(game, config);
         LinearLayout layout = new LinearLayout(this);
@@ -240,9 +246,18 @@ public class AndroidLauncher extends AndroidApplication {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         isResumed = true;
+        if (Build.VERSION.SDK_INT >= 24 && PxlsGame.i != null) {
+            PxlsGame.i.isMultiWindow = isInMultiWindowMode();
+            PxlsGame.i.isPIP = isInPictureInPictureMode();
+        }
     }
 
     @Override
