@@ -149,6 +149,7 @@ public class PxlsGame extends Game {
             alert("Authentification failed");
             return;
         }
+        req.setUrl(req.getUrl().replace("|", "%7C"));
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
