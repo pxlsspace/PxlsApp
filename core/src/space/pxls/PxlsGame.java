@@ -5,7 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -139,14 +142,22 @@ public class PxlsGame extends Game {
         _screen.template.load(x, y, tw, oo, url);
     }
 
-    public void handleAuthenticationCallback(String url) {
+    public void handleAuthenticationCallback(final String url) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setHeader("User-Agent", Pxls.getUA());
         try {
             URI uri = new URI(url);
             req.setUrl(new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString() + "?"+uri.getQuery()+"&json=1");
         } catch (URISyntaxException e) {
-            alert("Authentification failed");
+            System.err.printf("[pa] Auth failed. Attempted to create an invalid URI from the URL %s", url);
+//            alert("Authentification failed");
+            input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", getStackTraceAsString(new Error("Auth Failed: Bad Login URI ( " + url + " )", e)), new InputCallback() {
+                @Override
+                public void cancelled() {}
+
+                @Override
+                public void input(String response) {}
+            });
             return;
         }
         req.setUrl(req.getUrl().replace("|", "%7C"));
@@ -155,35 +166,74 @@ public class PxlsGame extends Game {
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
                 String res = httpResponse.getResultAsString();
                 if (res.startsWith("You are doing that too much")) {
+                    System.err.println("[pa] Auth failed. Caught 'you are doing that too much'");
                     alert(res);
                     return;
                 }
 
-                JsonObject jo = Pxls.gson.fromJson(res, JsonObject.class);
-                if (jo.has("error")) {
-                    alert(jo.get("message").getAsString());
-                    return;
+                JsonObject jo = null;
+                try {
+                    jo = Pxls.gson.fromJson(res, JsonObject.class);
+                } catch (JsonSyntaxException jse) {
+                    input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", getStackTraceAsString(new Error(String.format("Failed to parse the response from url '%s' into valid JSON. Response: '%s'", res, url), jse)), new InputCallback() {
+                        @Override
+                        public void cancelled() {}
+
+                        @Override
+                        public void input(String response) {}
+                    });
                 }
 
-                if (!jo.get("signup").getAsBoolean()) {
-                    applyToken(jo.get("token").getAsString());
+                if (jo != null) {
+                    if (jo.has("error")) {
+                        System.err.println("[pa] Auth failed. The `error` object exists on the parsed JSON. Displaying to user");
+                        //                    alert(jo.get("message").getAsString());
+                        input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", String.format("Got rejection `%s` for URL `%s`", jo.get("message").getAsString(), url), new InputCallback() {
+                            @Override
+                            public void cancelled() {}
+
+                            @Override
+                            public void input(String response) {}
+                        });
+                        return;
+                    }
+
+                    if (!jo.get("signup").getAsBoolean()) {
+                        System.err.println("[pa] Auth success");
+                        applyToken(jo.get("token").getAsString());
+                    } else {
+                        doSignupPrompt(jo.get("token").getAsString());
+                    }
                 } else {
-                    doSignupPrompt(jo.get("token").getAsString());
+                    alert("Failed to authenticate (`jo` was null), cannot continue.");
                 }
             }
 
             @Override
             public void failed(Throwable t) {
                 t.printStackTrace();
-                System.err.println("Failed to log in");
-                alert("Failed logging in");
+                System.err.println("[pa] Auth failed, the WebRequest threw an error. See above");
+                input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", getStackTraceAsString(new Error("Auth Failed: WebReq Died", t)), new InputCallback() {
+                    @Override
+                    public void cancelled() {}
+
+                    @Override
+                    public void input(String response) {}
+                });
             }
 
             @Override
             public void cancelled() {
-
+                System.err.println("[pa] Auth WebRequest cancelled");
             }
         });
+    }
+
+    private String getStackTraceAsString(Error e) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        e.printStackTrace(printWriter);
+        return stringWriter.toString().replaceAll("\r\n", "\\n");
     }
 
     public void alert(String message) {

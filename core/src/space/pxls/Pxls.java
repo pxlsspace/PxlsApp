@@ -24,8 +24,8 @@ public class Pxls {
     }
 
     public static void init() {
-        domain = DevEnvironments.SOCC.DOMAIN;
-        wsPath = DevEnvironments.SOCC.WS_PATH;
+        domain = DevEnvironments.PRODUCTION.DOMAIN;
+        wsPath = DevEnvironments.PRODUCTION.WS_PATH;
     }
     public static String domain;
     public static String wsPath;
