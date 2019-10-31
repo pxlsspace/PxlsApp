@@ -56,6 +56,9 @@ public class AndroidLauncher extends AndroidApplication {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(intent);
                 } else {
+                    if (method.equals("reddit")) {
+                        url = url.replace("v1/authorize?", "v1/authorize.compact?");
+                    }
                     Intent intent = new Intent(AndroidLauncher.this, LoginActivity.class);
                     intent.putExtra("method", method);
                     intent.putExtra("url", url);
