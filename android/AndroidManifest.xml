@@ -32,7 +32,6 @@
                 <data android:scheme="https" android:host="pxls.space" />
                 <data android:pathPattern="/auth/.*"/>
                 <data android:path="/"/>
-                <data android:path=""/>
             </intent-filter>
         </activity>
         <activity android:label="@string/app_name" android:name=".CaptchaActivity"/>

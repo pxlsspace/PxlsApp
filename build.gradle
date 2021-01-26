@@ -34,6 +34,7 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "http://clojars.org/repo" }
         maven { url "https://maven.google.com" }
+        jcenter()
     }
 }
 
