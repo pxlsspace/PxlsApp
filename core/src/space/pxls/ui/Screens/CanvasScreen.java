@@ -603,6 +603,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
     private void doLogout() {
         PxlsGame.i.logOut();
         stackOverlayContainer.removeActor(stackOverlayContainer.getActor());
+        pixcountAndCooldownTable.setVisible(false);
         bottomContainer.setActor(login);
     }
 
