@@ -545,7 +545,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         if (account != null) {
             final CanvasScreen self = this;
-            authedBar.setUsername(account.getSanitizedName());
+            authedBar.setUsername(account.getSanitizedUsername());
 //            authedBar.addListener(new EventListener() {
 //                @Override
 //                public boolean handle(Event event) {

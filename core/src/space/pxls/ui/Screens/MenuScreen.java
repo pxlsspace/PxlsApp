@@ -197,7 +197,7 @@ public class MenuScreen extends ScreenAdapter {
         });
 
         Table topBarTable = new Table().pad(12);
-        topBarTable.add(new TTFLabel(this.account == null ? "Not Logged In" : "Logged in as " + this.account.getSanitizedName()).wrap(true)).growX().left();
+        topBarTable.add(new TTFLabel(this.account == null ? "Not Logged In" : "Logged in as " + this.account.getSanitizedUsername()).wrap(true)).growX().left();
         topBarTable.add(closeButton).size(80,80).expandX().right();
 
         table.add(new Stack(new SolidContainer(shadeColor), topBarTable)).growX().row();

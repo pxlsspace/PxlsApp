@@ -1,34 +1,55 @@
 package space.pxls;
 
+import java.util.List;
+
 public class Account {
-    private String name;
+    String username;
+    String login;
+    List<Role> roles;
+    int pixelCount;
+    int pixelCountAllTime;
+    Boolean banned;
+    Long banExpiry;
+    String banReason;
+    String method;
+    Object placementOverrides;
+    Boolean chatBanned;
+    String chatbanReason;
+    Boolean chatbanIsPerma;
+    Long chatbanExpiry;
+    Boolean renameRequested;
+    String discordName;
+    Number chatNameColor;
 
-    private boolean banned;
-    private long banExpiry;
-    private String banReason;
-    private String method;
-
-    public Account(String name, boolean banned, long banExpiry, String banReason, String method) {
-        this.name = name;
-        this.banned = banned;
-        this.banExpiry = banExpiry;
-        this.banReason = banReason;
-        this.method = method;
+    public String getUsername() {
+        return username;
     }
 
-    public String getSanitizedName() {
-        return this.method.equals("ip") ? "-snip-" : this.name;
+    public String getSanitizedUsername() {
+        return method.equals("ip") ? "-snip-" : username;
     }
 
-    public String getName() {
-        return name;
+    public String getLogin() {
+        return login;
     }
 
-    public boolean isBanned() {
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public int getPixelCount() {
+        return pixelCount;
+    }
+
+    public int getPixelCountAllTime() {
+        return pixelCountAllTime;
+    }
+
+    public Boolean isBanned() {
         return banned;
     }
 
-    public long getBanExpiry() {
+    public Long getBanExpiry() {
         return banExpiry;
     }
 
@@ -40,8 +61,40 @@ public class Account {
         return method;
     }
 
+    public Object getPlacementOverrides() {
+        return placementOverrides;
+    }
+
+    public Boolean isChatBanned() {
+        return chatBanned;
+    }
+
+    public String getChatbanReason() {
+        return chatbanReason;
+    }
+
+    public Boolean isChatbanPerma() {
+        return chatbanIsPerma;
+    }
+
+    public Long getChatbanExpiry() {
+        return chatbanExpiry;
+    }
+
+    public Boolean isRenameRequested() {
+        return renameRequested;
+    }
+
+    public String getDiscordName() {
+        return discordName;
+    }
+
+    public Number getChatNameColor() {
+        return chatNameColor;
+    }
+
     @Override
     public String toString() {
-        return String.format("Name: %s, Banned: %s, banExpiry: %s, banReason: %s, method: %s", name, banned, banExpiry, banReason, method);
+        return String.format("Name: %s; Banned: %s; Ban Expiry: %s; Ban Reason: %s; Login Method: %s", username, banned, banExpiry, banReason, method);
     }
 }

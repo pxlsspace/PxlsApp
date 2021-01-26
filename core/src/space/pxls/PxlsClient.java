@@ -21,6 +21,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class PxlsClient {
                 public void onMessage(String message) {
                     JsonObject obj = Pxls.gson.fromJson(message, JsonObject.class);
                     String type = obj.get("type").getAsString();
+                    System.out.println("RECEIVED PACKET TYPE " + type + " WITH DATA " + message);
                     if (type.equals("pixel")) {
                         PixelsPacket pixelsPacket = Pxls.gson.fromJson(message, PixelsPacket.class);
                         for (PixelsPacket.Pixel pixel : pixelsPacket.pixels) {
@@ -61,9 +63,10 @@ public class PxlsClient {
                         UsersPacket usersPacket = Pxls.gson.fromJson(message, UsersPacket.class);
                         updateCallback.users(usersPacket.count);
                     } else if (type.equals("userinfo")) {
-                        UserInfoPacket userInfoPacket = Pxls.gson.fromJson(message, UserInfoPacket.class);
                         loggedIn = true;
-                        account = new Account(userInfoPacket.username, userInfoPacket.banned, userInfoPacket.role.equals("BANNED") ? 0 : userInfoPacket.banExpiry, userInfoPacket.ban_reason, userInfoPacket.method);
+                        System.out.println("Logged in");
+                        account = Pxls.gson.fromJson(message, Account.class);
+                        System.out.println("Account instantiated - " + account.toString());
                         updateCallback.updateAccount(account);
                     } else if (type.equals("cooldown")) {
                         CooldownPacket cooldownPacket = Pxls.gson.fromJson(message, CooldownPacket.class);
@@ -206,15 +209,6 @@ public class PxlsClient {
 
     static class UsersPacket {
         int count;
-    }
-
-    static class UserInfoPacket {
-        String username;
-        boolean banned;
-        String ban_reason;
-        String role;
-        long banExpiry;
-        String method;
     }
 
     static class CooldownPacket {
