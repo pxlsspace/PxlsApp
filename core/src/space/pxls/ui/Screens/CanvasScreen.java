@@ -5,7 +5,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
@@ -192,10 +191,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
         mainUITable.add(bottomContainer).fillX().expandX().colspan(3);
         mainUITable.setFillParent(true);
-//        mainUITable.setDebug(true);
         stage.addActor(mainUITable);
-//        mainUI = new MainUI(this);
-//        stage.addActor(mainUI);
         client = new PxlsClient(this);
     }
 
@@ -279,7 +275,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
                 System.out.println("amountY: " + amountY);
                 if (Pxls.gameState.getSafeCanvasState().locked) return true;
 
-                Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2);
+                Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2f, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2f);
                 int max = 75;
 
                 float oldZoom = zoom;
@@ -514,7 +510,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         client.disconnect();
         client = new PxlsClient(this);
         authedBar.setUsername(null);
-//        topContainer.setActor(null);
     }
 
     @Override
@@ -522,8 +517,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                String colorString = boardInfo.palette.get(color).value;
-                Color c = Color.valueOf(colorString);
                 canvas.pixel(x, y, color);
                 heatmap.pixel(x, y, color);
                 virginmap.pixel(x, y, color);
@@ -546,26 +539,13 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         this.account = account;
 
         if (account != null) {
-            final CanvasScreen self = this;
             authedBar.setUsername(account.getSanitizedUsername());
             pixcountAndCooldownTable.setVisible(true);
-//            authedBar.addListener(new EventListener() {
-//                @Override
-//                public boolean handle(Event event) {
-//                    System.out.printf("Got event %s%n", event.getClass().getSimpleName());
-//                    if (event instanceof MenuOpenRequested) {
-//                        PxlsGame.i.setScreen(new MenuScreen(self, account));
-//                        return true;
-//                    }
-//                    return false;
-//                }
-//            });
             if (account.isBanned()) {
                 bottomContainer.setActor(new BannedBar(account.getBanExpiry(), account.getBanReason()));
             }
         } else {
             authedBar.setUsername(null);
-//            topContainer.setActor(null);
         }
     }
 
@@ -611,21 +591,16 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
     public void moveTo(int x, int y, float scale) {
         center.x = x;
-        center.y = boardInfo.height-y; //(0, 0) is bottom left corner. y needs to be translated relative to board height in this case.
+        center.y = boardInfo.height - y; //(0, 0) is bottom left corner. y needs to be translated relative to board height in this case.
         zoom = scale;
     }
 
-    public void logout() {
-        logout(true);
-    }
     public void logout(boolean skipConfirm) {
         if (!skipConfirm) {
             PxlsGame.i.confirm("Are you sure you want to log out?", new PxlsGame.ConfirmCallback() {
                 @Override
                 public void done(boolean confirmed) {
-                    if (confirmed) {
-                        doLogout();
-                    }
+                    if (confirmed) doLogout();
                 }
             });
         } else {

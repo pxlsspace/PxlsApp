@@ -26,7 +26,6 @@ import space.pxls.PxlsGame;
 import space.pxls.Skin;
 import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Overlays.CooldownOverlay;
-import space.pxls.ui.Screens.LoadScreen;
 import space.pxls.ui.Screens.LoadScreen.PaletteEntry;
 
 public class PixelBar extends Stack {

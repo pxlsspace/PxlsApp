@@ -3,7 +3,6 @@ package space.pxls.ui;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.github.kevinsawicki.timeago.TimeAgo;
-import space.pxls.Pxls;
 import space.pxls.ui.Components.TTFLabel;
 
 public class BannedBar extends Table {
