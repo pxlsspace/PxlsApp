@@ -18,7 +18,7 @@ android {
     }
     defaultConfig {
         applicationId "space.pxls.android"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 30
     }
     buildTypes {

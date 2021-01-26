@@ -36,7 +36,7 @@ public class Canvas implements Renderer {
         if (parent == null) return;
 
         Pixmap temp = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        temp.setColor(Color.valueOf(info.palette.get(color)));
+        temp.setColor(Color.valueOf(info.palette.get(color).value));
         temp.drawPixel(0,0);
         canvasTexture.draw(temp, x, y);
         temp.dispose();

@@ -57,7 +57,6 @@ project(":android") {
     dependencies {
         implementation project(":core")
         implementation "de.tomgrill.gdxdialogs:gdx-dialogs-android:1.2.1"
-        implementation 'com.google.android.gms:play-services-ads:19.7.0'
         implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"

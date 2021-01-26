@@ -39,11 +39,11 @@ public class LoadScreen extends ScreenAdapter {
 
                 System.out.println("Initializing fancy color map (s = " + info.palette.size() + ")");
                 final int[] fancyColors = new int[info.palette.size()];
-                List<String> palette = info.palette;
+                List<PaletteEntry> palette = info.palette;
 
                 System.out.println("Looping...");
                 for (int i = 0; i < palette.size(); i++) {
-                    String s = palette.get(i);
+                    String s = palette.get(i).value;
                     System.out.println("i = " + i + ", s = " + s);
                     Color color = Color.valueOf(s);
                     System.out.println(color);
@@ -161,8 +161,13 @@ public class LoadScreen extends ScreenAdapter {
     public static class BoardInfo {
         public int width;
         public int height;
-        public List<String> palette;
+        public List<PaletteEntry> palette;
         public String captchaKey;
         public int maxStacked;
+    }
+
+    public static class PaletteEntry {
+        public String name;
+        public String value;
     }
 }

@@ -273,6 +273,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
             @Override
             public boolean scrolled(float amountX, float amountY) {
+                System.out.println("amountX: " + amountX);
+                System.out.println("amountY: " + amountY);
                 if (Pxls.gameState.getSafeCanvasState().locked) return true;
 
                 Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2);
@@ -518,7 +520,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                String colorString = boardInfo.palette.get(color);
+                String colorString = boardInfo.palette.get(color).value;
                 Color c = Color.valueOf(colorString);
                 canvas.pixel(x, y, color);
                 heatmap.pixel(x, y, color);

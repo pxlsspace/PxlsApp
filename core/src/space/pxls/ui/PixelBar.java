@@ -26,6 +26,8 @@ import space.pxls.PxlsGame;
 import space.pxls.Skin;
 import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Overlays.CooldownOverlay;
+import space.pxls.ui.Screens.LoadScreen;
+import space.pxls.ui.Screens.LoadScreen.PaletteEntry;
 
 public class PixelBar extends Stack {
     enum PopState {
@@ -37,11 +39,11 @@ public class PixelBar extends Stack {
     private final Table pixelListTable;
     private final Container<Label> cooldownContainer;
     private final Label cooldownLabel;
-    private List<String> palette;
+    private List<PaletteEntry> palette;
     private int currentColor = -1;
     private boolean[] isUp;
 
-    public PixelBar(final List<String> palette) {
+    public PixelBar(final List<PaletteEntry> palette) {
         super();
         this.palette = palette;
         isUp = new boolean[palette.size()];
@@ -68,7 +70,7 @@ public class PixelBar extends Stack {
 
         boolean twoRows = PxlsGame.i.isMultiWindow || Gdx.graphics.getWidth() < Gdx.graphics.getHeight();
         for (int i = 0; i < palette.size(); i++) {
-            String s = palette.get(i);
+            String s = palette.get(i).value;
             isUp[i] = false;
 
             Color c = Color.valueOf(s);
