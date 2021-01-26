@@ -26,4 +26,4 @@ jobs:
     - name: Upload debug APK artifact
       uses: actions/upload-artifact@v2.2.2
       with:
-        path: android/build/outputs/apk/debug/android-debug.apk
+        path: android/build/outputs/apk/debug/*.apk
