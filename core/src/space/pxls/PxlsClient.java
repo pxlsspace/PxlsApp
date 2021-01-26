@@ -1,12 +1,14 @@
 package space.pxls;
 
+import com.badlogic.gdx.Screen;
 import com.google.gson.JsonObject;
 import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
 import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ServerHandshake;
-import space.pxls.ui.LoadScreen;
+
+import space.pxls.ui.Screens.LoadScreen;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -37,9 +39,10 @@ public class PxlsClient {
             String wsPath = Pxls.wsPath;
 
             Map<String, String> headers = new HashMap<String, String>();
-            if (Pxls.getAuthToken() != null) {
-                headers.put("Cookie", "pxls-token=" + Pxls.getAuthToken());
+            if (Pxls.prefsHelper.getToken() != null) {
+                headers.put("Cookie", "pxls-token=" + Pxls.prefsHelper.getToken());
             }
+            headers.put("User-Agent", Pxls.getUA());
             client = new WebSocketClient(new URI(wsPath), new Draft_17(), headers, 30) {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
@@ -56,15 +59,16 @@ public class PxlsClient {
                         }
                     } else if (type.equals("users")) {
                         UsersPacket usersPacket = Pxls.gson.fromJson(message, UsersPacket.class);
-                        updateCallback.users(usersPacket.users);
+                        updateCallback.users(usersPacket.count);
                     } else if (type.equals("userinfo")) {
                         UserInfoPacket userInfoPacket = Pxls.gson.fromJson(message, UserInfoPacket.class);
                         loggedIn = true;
-                        account = new Account(userInfoPacket.username, userInfoPacket.banned, userInfoPacket.role.equals("BANNED") ? 0 : userInfoPacket.banExpiry, userInfoPacket.ban_reason);
+                        account = new Account(userInfoPacket.username, userInfoPacket.banned, userInfoPacket.role.equals("BANNED") ? 0 : userInfoPacket.banExpiry, userInfoPacket.ban_reason, userInfoPacket.method);
                         updateCallback.updateAccount(account);
                     } else if (type.equals("cooldown")) {
                         CooldownPacket cooldownPacket = Pxls.gson.fromJson(message, CooldownPacket.class);
                         updateCallback.cooldown(cooldownPacket.wait);
+                        Screen s = PxlsGame.i.getScreen();
                     } else if (type.equals("captcha_required")) {
                         updateCallback.runCaptcha();
                     } else if (type.equals("captcha_status")) {
@@ -164,8 +168,10 @@ public class PxlsClient {
     }
 
     public void placePixel(int x, int y, int color) {
-        client.send(Pxls.gson.toJson(new PixelPacket(x, y, color)));
-        pendingPixel = new PendingPixel(x, y, color);
+        if (client.isOpen()) {
+            client.send(Pxls.gson.toJson(new PixelPacket(x, y, color)));
+            pendingPixel = new PendingPixel(x, y, color);
+        }
     }
 
     public void undo() {
@@ -199,7 +205,7 @@ public class PxlsClient {
     }
 
     static class UsersPacket {
-        int users;
+        int count;
     }
 
     static class UserInfoPacket {
@@ -208,6 +214,7 @@ public class PxlsClient {
         String ban_reason;
         String role;
         long banExpiry;
+        String method;
     }
 
     static class CooldownPacket {

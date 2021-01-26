@@ -1,22 +1,22 @@
-package space.pxls.ui;
+package space.pxls.ui.Overlays;
 
-import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
 import com.badlogic.gdx.Gdx;
-import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import com.github.kevinsawicki.timeago.TimeAgo;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
+import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
-import java.net.URLEncoder;
-import java.io.UnsupportedEncodingException;
-
-import java.util.Date;
+import space.pxls.ui.Components.SolidContainer;
+import space.pxls.ui.Components.TTFLabel;
 
 public class PixelLookupOverlay extends Table {
     private int x;
@@ -25,6 +25,10 @@ public class PixelLookupOverlay extends Table {
     private long time;
     private int pixels;
     private int pixelsAlltime;
+
+    private TTFLabel close;
+    private TTFLabel report;
+
 
     public PixelLookupOverlay(final int x, final int y, String username, long time, int pixels, int pixelsAlltime, final int id, boolean loggedIn) {
         super(Pxls.skin);
@@ -35,34 +39,7 @@ public class PixelLookupOverlay extends Table {
         this.pixels = pixels;
         this.pixelsAlltime = pixelsAlltime;
 
-        Label coordsLabel = new Label("Coords:", Pxls.skin);
-        coordsLabel.setFontScale(0.3f);
-        Label coords = new Label("(" + x + ", " + y + ")", Pxls.skin);
-        coords.setFontScale(0.3f);
-
-        Label userLabel = new Label("Placed by:", Pxls.skin);
-        userLabel.setFontScale(0.3f);
-        Label user = new Label(username, Pxls.skin);
-        user.setFontScale(0.3f);
-
-        Label timeLabel = new Label("Placed at:", Pxls.skin);
-        timeLabel.setFontScale(0.3f);
-        long current = System.currentTimeMillis();
-        Label tme = new Label(current - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time), Pxls.skin);
-        tme.setFontScale(0.3f);
-
-        Label pixelsLabel = new Label("Pixels by user:", Pxls.skin);
-        pixelsLabel.setFontScale(0.3f);
-        Label pxls = new Label(Integer.toString(pixels), Pxls.skin);
-        pxls.setFontScale(0.3f);
-
-        Label pixelsAlltimeLabel = new Label("Alltime Pixels:", Pxls.skin);
-        pixelsAlltimeLabel.setFontScale(0.3f);
-        Label pxlsAlltime = new Label(Integer.toString(pixelsAlltime), Pxls.skin);
-        pxlsAlltime.setFontScale(0.3f);
-
-        Label close = new Label("Close", Pxls.skin);
-        close.setFontScale(0.2f);
+        close = new TTFLabel("Close");
         close.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -71,25 +48,26 @@ public class PixelLookupOverlay extends Table {
             }
         });
 
-        pad(12);
-        add(coordsLabel).expandX().left();
-        add(coords).expandX().right().row();
+        pad(6);
+        add(new TTFLabel("Coords:").fontScale(0.85f)).left();
+        add(new TTFLabel("(" + x + ", " + y + ")").fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(userLabel).expandX().left();
-        add(user).expandX().right().row();
+        add(new TTFLabel("Placed by:").fontScale(0.85f)).left();
+        add(new TTFLabel(username).fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(timeLabel).expandX().left();
-        add(tme).expandX().right().row();
+        add(new TTFLabel("Placed at:").fontScale(0.85f)).left();
+        add(new TTFLabel(System.currentTimeMillis() - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time)).fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(pixelsLabel).expandX().left();
-        add(pxls).expandX().right().row();
+        add(new TTFLabel("Pixels by user:").fontScale(0.85f)).left();
+        add(new TTFLabel(Integer.toString(pixels)).fontScale(0.75f).wrap(true)).fillX().left().row();
 
-        add(pixelsAlltimeLabel).expandX().left();
-        add(pxlsAlltime).expandX().right().row();
+        add(new TTFLabel("Alltime Pixels:").fontScale(0.85f)).left();
+        add(new TTFLabel(Integer.toString(pixelsAlltime)).fontScale(0.75f).wrap(true)).fillX().left().row();
+
+        add(new SolidContainer()).colspan(2).growX().height(2).row();
 
         if (loggedIn) {
-            Label report = new Label("Report", Pxls.skin);
-            report.setFontScale(0.2f);
+            report = new TTFLabel("Report");
             report.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float _x, float _y) {
@@ -124,12 +102,13 @@ public class PixelLookupOverlay extends Table {
                 }
                 Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.POST);
                 req.setUrl(Pxls.domain + "/report");
+                req.setHeader("User-Agent", Pxls.getUA());
                 try {
                     req.setContent("id=" + Integer.toString(id) + "&x=" + Integer.toString(x) + "&y=" + Integer.toString(y) + "&message=" + URLEncoder.encode(text, "utf-8"));
                 } catch (UnsupportedEncodingException e) {
                     System.out.println("uho");
                 }
-                req.setHeader("Cookie", "pxls-token=" + Pxls.getAuthToken());
+                req.setHeader("Cookie", "pxls-token=" + Pxls.prefsHelper.getToken());
                 Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
                     @Override
                     public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -152,5 +131,37 @@ public class PixelLookupOverlay extends Table {
             }
         });
         gdxTextPrompt.build().show();
+    }
+
+    public TTFLabel getClose() {
+        return close;
+    }
+
+    public TTFLabel getReport() {
+        return report;
+    }
+
+    public int getPixelsAlltime() {
+        return pixelsAlltime;
+    }
+
+    public int getPixels() {
+        return pixels;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public int getReportY() {
+        return y;
+    }
+
+    public int getReportX() {
+        return x;
     }
 }

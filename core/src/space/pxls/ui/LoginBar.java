@@ -9,19 +9,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.google.gson.JsonObject;
+
+import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class LoginBar extends Table {
-    private final Label.LabelStyle ls;
+//    private final Label.LabelStyle ls;
+    private TTFLabel title;
     public LoginPopup popup;
     public LoginBar() {
         popup = new LoginPopup();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
-        ls = new Label.LabelStyle(font, Color.BLACK);
 
-        Label title = new Label("Sign in with...", ls);
-        title.setFontScale(0.5f);
+        title = new TTFLabel("Sign in with...");
         title.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
