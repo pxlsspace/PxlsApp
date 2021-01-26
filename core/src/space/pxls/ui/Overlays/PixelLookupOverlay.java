@@ -13,31 +13,24 @@ import java.net.URLEncoder;
 
 import de.tomgrill.gdxdialogs.core.dialogs.GDXTextPrompt;
 import de.tomgrill.gdxdialogs.core.listener.TextPromptListener;
+import space.pxls.Lookup;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.ui.Components.SolidContainer;
 import space.pxls.ui.Components.TTFLabel;
 
 public class PixelLookupOverlay extends Table {
-    private int x;
-    private int y;
-    private String username;
-    private long time;
-    private int pixels;
-    private int pixelsAlltime;
+    private Lookup lookup;
+    private Boolean isLoggedIn;
 
     private TTFLabel close;
     private TTFLabel report;
 
 
-    public PixelLookupOverlay(final int x, final int y, String username, long time, int pixels, int pixelsAlltime, final int id, boolean loggedIn) {
+    public PixelLookupOverlay(final Lookup lookup, Boolean isLoggedIn) {
         super(Pxls.skin);
-        this.x = x;
-        this.y = y;
-        this.username = username;
-        this.time = time;
-        this.pixels = pixels;
-        this.pixelsAlltime = pixelsAlltime;
+        this.lookup = lookup;
+        this.isLoggedIn = isLoggedIn;
 
         close = new TTFLabel("Close");
         close.addListener(new ClickListener() {
@@ -50,29 +43,39 @@ public class PixelLookupOverlay extends Table {
 
         pad(6);
         add(new TTFLabel("Coords:").fontScale(0.85f)).left();
-        add(new TTFLabel("(" + x + ", " + y + ")").fontScale(0.75f).wrap(true)).fillX().left().row();
+        add(new TTFLabel("(" + lookup.getX() + ", " + lookup.getY() + ")").fontScale(0.75f).wrap(true)).fillX().left().row();
 
         add(new TTFLabel("Placed by:").fontScale(0.85f)).left();
-        add(new TTFLabel(username).fontScale(0.75f).wrap(true)).fillX().left().row();
+        add(new TTFLabel(lookup.getUsername()).fontScale(0.75f).wrap(true)).fillX().left().row();
 
         add(new TTFLabel("Placed at:").fontScale(0.85f)).left();
-        add(new TTFLabel(System.currentTimeMillis() - time <= 1000*60 ? "just now" : new TimeAgo().timeAgo(time)).fontScale(0.75f).wrap(true)).fillX().left().row();
+        add(new TTFLabel(System.currentTimeMillis() - lookup.getTime() <= 1000*60 ? "just now" : new TimeAgo().timeAgo(lookup.getTime())).fontScale(0.75f).wrap(true)).fillX().left().row();
 
         add(new TTFLabel("Pixels by user:").fontScale(0.85f)).left();
-        add(new TTFLabel(Integer.toString(pixels)).fontScale(0.75f).wrap(true)).fillX().left().row();
+        add(new TTFLabel(Integer.toString(lookup.getPixelCount())).fontScale(0.75f).wrap(true)).fillX().left().row();
 
         add(new TTFLabel("Alltime Pixels:").fontScale(0.85f)).left();
-        add(new TTFLabel(Integer.toString(pixelsAlltime)).fontScale(0.75f).wrap(true)).fillX().left().row();
+        add(new TTFLabel(Integer.toString(lookup.getPixelCountAlltime())).fontScale(0.75f).wrap(true)).fillX().left().row();
+
+        if (lookup.getFaction() != null) {
+            add(new TTFLabel("Faction:").fontScale(0.85f)).left();
+            add(new TTFLabel(lookup.getFaction()).fontScale(0.75f).wrap(true)).fillX().left().row();
+        }
+
+        if (lookup.getDiscordName() != null) {
+            add(new TTFLabel("Discord Tag:").fontScale(0.85f)).left();
+            add(new TTFLabel(lookup.getDiscordName()).fontScale(0.75f).wrap(true)).fillX().left().row();
+        }
 
         add(new SolidContainer()).colspan(2).growX().height(2).row();
 
-        if (loggedIn) {
+        if (isLoggedIn) {
             report = new TTFLabel("Report");
             report.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float _x, float _y) {
                     super.clicked(event, _x, _y);
-                    report(x, y, id);
+                    report(lookup.getX(), lookup.getY(), lookup.getId());
                 }
             });
             add(report).expandX().left();
@@ -104,7 +107,7 @@ public class PixelLookupOverlay extends Table {
                 req.setUrl(Pxls.domain + "/report");
                 req.setHeader("User-Agent", Pxls.getUA());
                 try {
-                    req.setContent("id=" + Integer.toString(id) + "&x=" + Integer.toString(x) + "&y=" + Integer.toString(y) + "&message=" + URLEncoder.encode(text, "utf-8"));
+                    req.setContent("id=" + id + "&x=" + x + "&y=" + y + "&message=" + URLEncoder.encode(text, "utf-8"));
                 } catch (UnsupportedEncodingException e) {
                     System.out.println("uho");
                 }
@@ -131,37 +134,5 @@ public class PixelLookupOverlay extends Table {
             }
         });
         gdxTextPrompt.build().show();
-    }
-
-    public TTFLabel getClose() {
-        return close;
-    }
-
-    public TTFLabel getReport() {
-        return report;
-    }
-
-    public int getPixelsAlltime() {
-        return pixelsAlltime;
-    }
-
-    public int getPixels() {
-        return pixels;
-    }
-
-    public long getTime() {
-        return time;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public int getReportY() {
-        return y;
-    }
-
-    public int getReportX() {
-        return x;
     }
 }

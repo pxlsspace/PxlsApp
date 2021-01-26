@@ -29,6 +29,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.JsonObject;
 
 import space.pxls.Account;
+import space.pxls.Lookup;
 import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsClient;
@@ -322,6 +323,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             @Override
             public boolean longPress(float x, float y) {
                 Vector2 pos = screenToBoardSpace(new Vector2(x, y));
+                System.out.println("Long press at (" + (int) pos.x + ", " + (int) pos.y + ")");
                 showLookup((int) pos.x, (int) pos.y);
                 return true;
             }
@@ -410,18 +412,9 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
                 String resp = httpResponse.getResultAsString();
                 
-                JsonObject data = Pxls.gson.fromJson(resp, JsonObject.class);
+                Lookup lookup = Pxls.gson.fromJson(resp, Lookup.class);
 
-                PixelLookupOverlay plo = new PixelLookupOverlay(
-                    data.get("x").getAsInt(),
-                    data.get("y").getAsInt(),
-                    data.get("username").getAsString(),
-                    data.get("time").getAsLong(),
-                    data.get("pixel_count").getAsInt(),
-                    data.get("pixel_count_alltime").getAsInt(),
-                    data.get("id").getAsInt(),
-                    client.loggedIn
-                );
+                PixelLookupOverlay plo = new PixelLookupOverlay(lookup, client.loggedIn);
                 lookupContainer.setActor(plo);
             }
 
@@ -432,7 +425,6 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
 
             @Override
             public void cancelled() {
-
             }
         });
     }
