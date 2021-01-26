@@ -272,14 +272,14 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             }
 
             @Override
-            public boolean scrolled(int amount) {
+            public boolean scrolled(float amountX, float amountY) {
                 if (Pxls.gameState.getSafeCanvasState().locked) return true;
 
                 Vector2 delta = new Vector2(Gdx.input.getX() - Gdx.graphics.getWidth() / 2, (Gdx.graphics.getHeight() - Gdx.input.getY()) - Gdx.graphics.getHeight() / 2);
                 int max = 75;
 
                 float oldZoom = zoom;
-                if (amount > 0) {
+                if (amountX > 0 && amountY > 0) {
                     zoom /= 1.2f;
                 } else {
                     zoom *= 1.2f;
