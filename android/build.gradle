@@ -46,6 +46,11 @@ android {
     aaptOptions {
         noCompress "ttf"
     }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "PxlsApp-${variant.versionName}.apk"
+        }
+    }
 }
 
 
