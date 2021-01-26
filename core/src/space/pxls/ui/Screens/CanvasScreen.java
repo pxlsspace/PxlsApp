@@ -182,6 +182,8 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         pixcountAndCooldownTable.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topRight")));
         secondaryCooldownContainerCell = pixcountAndCooldownTable.add(secondaryCooldownContainer).fill().space(0).pad(0);
         pixcountAndCooldownTable.add(stackOverlayContainer);
+        // Hide stack and cooldown by default, set visible when logged in
+        pixcountAndCooldownTable.setVisible(false);
 
         cellStackOverlay = mainUITable.add(pixcountAndCooldownTable).bottom().left();
         mainUITable.add(centerPopup).center().bottom().expandX().expandY();
@@ -546,6 +548,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
         if (account != null) {
             final CanvasScreen self = this;
             authedBar.setUsername(account.getSanitizedUsername());
+            pixcountAndCooldownTable.setVisible(true);
 //            authedBar.addListener(new EventListener() {
 //                @Override
 //                public boolean handle(Event event) {
@@ -824,7 +827,7 @@ public class CanvasScreen extends ScreenAdapter implements PxlsClient.UpdateCall
             if (username == null) {
                 lblUsername.setText("Not Logged In");
             } else {
-                lblUsername.setText(String.format("Logged in as %s", username));
+                lblUsername.setText(username);
             }
         }
 
