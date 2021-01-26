@@ -14,15 +14,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.google.gson.JsonObject;
+
+import space.pxls.OrientationHelper;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
+
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
 public class LoginPopup extends Container<Container<Table>> {
     private final Label.LabelStyle ls;
     private boolean up;
     private final Container<Table> container;
+    private final ArrayList<Label> labels = new ArrayList<Label>();
+
     public LoginPopup() {
         BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"));
         ls = new Label.LabelStyle(font, Color.BLACK);
@@ -37,8 +45,7 @@ public class LoginPopup extends Container<Container<Table>> {
         
         for (final String url : services.keySet()) {
             String display = services.get(url);
-            Label title = new Label(display, ls);
-            title.setFontScale(0.4f);
+            TTFLabel title = new TTFLabel(display);
             title.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -46,6 +53,7 @@ public class LoginPopup extends Container<Container<Table>> {
                     launchLogin(url);
                 }
             });
+            labels.add(title);
             table.add(title).row();
         }
         
@@ -90,6 +98,7 @@ public class LoginPopup extends Container<Container<Table>> {
     private void launchLogin(final String id) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setUrl(Pxls.domain + "/signin/" + id);
+        req.setHeader("User-Agent", Pxls.getUA());
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {

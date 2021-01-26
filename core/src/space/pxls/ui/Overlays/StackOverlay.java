@@ -1,9 +1,11 @@
-package space.pxls.ui;
+package space.pxls.ui.Overlays;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 import space.pxls.Pxls;
+import space.pxls.PxlsGame;
+import space.pxls.ui.Components.TTFLabel;
 
 public class StackOverlay extends Container<Container<Label>> {
     private int count;
@@ -12,18 +14,14 @@ public class StackOverlay extends Container<Container<Label>> {
     private final Label countLabel;
     private boolean normal;
     private long cooldownExpiry;
-    private boolean isEmpty;
 
     public StackOverlay(final int count, final int maxCount) {
         super();
         this.count = count; // 5, but adds up to 6 as updateStack is called
         this.maxCount = maxCount + 1; // 6
 
-        countLabel = new Label(this.count + "/" + this.maxCount, Pxls.skin); // 6/6
-        countLabel.setFontScale(0.3f);
+        countLabel = new TTFLabel(this.count + "/" + this.maxCount); // 6/6
         container = new Container<Label>(countLabel);
-        container.setBackground(Pxls.skin.getDrawable("background"));
-        container.pad(8);
         setActor(container);
 
         setClip(true);
@@ -34,6 +32,11 @@ public class StackOverlay extends Container<Container<Label>> {
     public void updateStack(int count, String cause) {
         this.count = count;
         updateStack();
+        if (Pxls.prefsHelper.getShouldVibrate() && Pxls.prefsHelper.getShouldVibeOnStack() && cause.equals("stackGain")) {
+            if (PxlsGame.i.vibrationHelper != null) {
+                PxlsGame.i.vibrationHelper.vibrate(500);
+            }
+        }
     }
 
     public void updateStack() {
@@ -78,5 +81,9 @@ public class StackOverlay extends Container<Container<Label>> {
 
     public void empty() {
         this.countLabel.setText("");
+    }
+
+    public boolean onCooldown() {
+        return cooldownExpiry-System.currentTimeMillis() > 0;
     }
 }
