@@ -130,24 +130,24 @@ public class AndroidLauncher extends AndroidApplication {
                 return SimpleOrientation.NA;
             }
         };
-        game.vibrationHelper = new VibrationHelper() {
-            private Vibrator vibrator;
-
-            @Override
-            public void vibrate(long milliseconds) {
-                if (!isResumed) return;
-                Vibrator vib = getVibrator();
-                if (vib == null || !vib.hasVibrator()) return;
-                vib.vibrate(milliseconds);
-            }
-
-            Vibrator getVibrator() {
-                if (vibrator == null) {
-                    vibrator = (Vibrator)getContext().getSystemService(VIBRATOR_SERVICE);
-                }
-                return vibrator;
-            }
-        };
+//        game.vibrationHelper = new VibrationHelper() {
+//            private Vibrator vibrator;
+//
+//            @Override
+//            public void vibrate(long milliseconds) {
+//                if (!isResumed) return;
+//                Vibrator vib = getVibrator();
+//                if (vib == null || !vib.hasVibrator()) return;
+//                vib.vibrate(milliseconds);
+//            }
+//
+//            Vibrator getVibrator() {
+//                if (vibrator == null) {
+//                    vibrator = (Vibrator)getContext().getSystemService(VIBRATOR_SERVICE);
+//                }
+//                return vibrator;
+//            }
+//        };
         game.imageHelper = new ImageHelper() {
             @Override
             public Pixmap getPixmapForIS(InputStream inputStream) {

@@ -33,7 +33,7 @@ public class PxlsGame extends Game {
     public URI startupURI;
     public String VersionString = "0.0.0";
     public OrientationHelper orientationHelper;
-    public VibrationHelper vibrationHelper;
+//    public VibrationHelper vibrationHelper;
     public ImageHelper imageHelper;
     public boolean isPIP = false;
     public boolean isMultiWindow = false;
