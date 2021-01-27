@@ -19,10 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
-    private FreeTypeFontGenerator ftfGen = null;
-    private BitmapFont _font = null;
-    private float lastDensity = -1;
-
     public Skin() {
         addDrawable("pixel", "pixel.png");
         addDrawable("palette", "palette.png");
@@ -66,9 +62,6 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         add("background", newDrawable("pixel", 1, 1, 1, 0.85f), Drawable.class);
     }
 
-    private void addDrawable(String name, Drawable drawable) {
-        add(name, drawable, Drawable.class);
-    }
     private void addDrawable(String name, String textureLoc) {
         add(name, new TextureRegionDrawable(new TextureRegion(new Texture(textureLoc))), Drawable.class);
     }
@@ -77,13 +70,13 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         add(name, new NinePatch(new Texture(textureLoc), left, right, top, bottom));
     }
 
-    private Map<Integer, BitmapFont> _fontCache = new HashMap<Integer, BitmapFont>();
+    private final Map<Integer, BitmapFont> _fontCache = new HashMap<Integer, BitmapFont>();
 
     public BitmapFont getFontForDP(int dp, boolean skipCache) {
         BitmapFont toRet = _fontCache.get(dp);
         if (!skipCache && toRet != null) return toRet;
 
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/DroidSerif.ttf"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
         int size = (int) Math.ceil(dp * Gdx.graphics.getDensity());
         generator.scaleForPixelHeight(size);
