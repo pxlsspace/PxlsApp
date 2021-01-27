@@ -49,18 +49,18 @@ public class CooldownOverlay {
         final boolean hasTimeLeft = timeLeft > 0;
 
         int stateI = ((int)Math.floor(timeLeft)) + 1;
-        if (Pxls.prefsHelper.getShouldVibrate() && timeLeft >= -1 && timeLeft <= 2 && PxlsGame.i.vibrationHelper != null) {
-            if (!vibeState[stateI]) {
-                if (Pxls.prefsHelper.getShouldPrevibe()) {
-                    PxlsGame.i.vibrationHelper.vibrate(stateI > 0 ? 50 : 500);
-                } else {
-                    if (stateI == 0) {
-                        PxlsGame.i.vibrationHelper.vibrate(500);
-                    }
-                }
-                vibeState[stateI] = true; //still flag vibestate as true even if we didn't previbe so that we don't call the code 100 times
-            }
-        }
+//        if (Pxls.prefsHelper.getShouldVibrate() && timeLeft >= -1 && timeLeft <= 2 && PxlsGame.i.vibrationHelper != null) {
+//            if (!vibeState[stateI]) {
+//                if (Pxls.prefsHelper.getShouldPrevibe()) {
+//                    PxlsGame.i.vibrationHelper.vibrate(stateI > 0 ? 50 : 500);
+//                } else {
+//                    if (stateI == 0) {
+//                        PxlsGame.i.vibrationHelper.vibrate(500);
+//                    }
+//                }
+//                vibeState[stateI] = true; //still flag vibestate as true even if we didn't previbe so that we don't call the code 100 times
+//            }
+//        }
 
         timeLeft++; // better human-readability
 
