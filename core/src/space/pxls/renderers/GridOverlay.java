@@ -36,7 +36,7 @@ public class GridOverlay implements Renderer {
 
     public void render(float zoom, Vector2 screenCenter, Vector2 canvasSize, Vector2 canvasCorner) {
         if (parent == null) return;
-        if (!Pxls.prefsHelper.getGridEnabled()) return;
+        if (!Pxls.getPrefsHelper().getGridEnabled()) return;
         if (zoom < 5) return;
         parent.batch.draw(gridTexture, canvasCorner.x, canvasCorner.y, canvasSize.x, canvasSize.y);
     }

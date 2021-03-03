@@ -73,8 +73,8 @@ public class Heatmap implements Renderer {
         loadingHeatmap = true;
 
         Net.HttpRequest heatmapReq = new Net.HttpRequest(Net.HttpMethods.GET);
-        heatmapReq.setUrl(Pxls.domain + "/heatmap?r=" + ((int) Math.floor(Math.random() * 10000)));
-        heatmapReq.setHeader("User-Agent", Pxls.getUA());
+        heatmapReq.setUrl(Pxls.getDomain() + "/heatmap?r=" + ((int) Math.floor(Math.random() * 10000)));
+        heatmapReq.setHeader("User-Agent", Pxls.getUserAgent());
         Gdx.net.sendHttpRequest(heatmapReq, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -101,7 +101,7 @@ public class Heatmap implements Renderer {
     }
 
     public void render(float zoom, Vector2 screenCenter, Vector2 canvasSize, Vector2 canvasCorner) {
-        if (!Pxls.prefsHelper.getHeatmapEnabled()) return;
+        if (!Pxls.getPrefsHelper().getHeatmapEnabled()) return;
         if (loadingHeatmap) {return;}
         if (!loadedHeatmap) {
             loadHeatmap();
@@ -123,7 +123,7 @@ public class Heatmap implements Renderer {
 
         byte[] toRender = new byte[parent.boardInfo.width * parent.boardInfo.height * 4];
         byte[] backdropPixels = new byte[parent.boardInfo.width * parent.boardInfo.height * 4];
-        byte backdropOpacity = (byte)(Pxls.gameState.getSafeHeatmapState().opacity * 0xFF);
+        byte backdropOpacity = (byte)(Pxls.getGameState().getSafeHeatmapState().opacity * 0xFF);
         int color = Color.rgb888(fillStyle);
         for (int i = 0; i < heatmapData.length; i++) {
             if (heatmapData[i] != 0) {

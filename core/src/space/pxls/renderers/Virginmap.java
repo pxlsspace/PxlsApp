@@ -49,8 +49,8 @@ public class Virginmap implements Renderer {
         if (loading) return;
         loading = true;
         Net.HttpRequest virginmapReq = new Net.HttpRequest(Net.HttpMethods.GET);
-        virginmapReq.setUrl(Pxls.domain + "/virginmap?r=" + ((int) Math.floor(Math.random() * 10000)));
-        virginmapReq.setHeader("User-Agent", Pxls.getUA());
+        virginmapReq.setUrl(Pxls.getDomain() + "/virginmap?r=" + ((int) Math.floor(Math.random() * 10000)));
+        virginmapReq.setHeader("User-Agent", Pxls.getUserAgent());
         Gdx.net.sendHttpRequest(virginmapReq, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -82,7 +82,7 @@ public class Virginmap implements Renderer {
         updating = true;
 
         byte[] toRender = new byte[parent.boardInfo.width * parent.boardInfo.height * 4];
-        byte opacity = (byte)(Pxls.gameState.getSafeVirginmapState().opacity * 0xFF);
+        byte opacity = (byte)(Pxls.getGameState().getSafeVirginmapState().opacity * 0xFF);
 
         for (int i = 0; i < mapData.length; i++) {
             toRender[i * 4] = (byte) 0x00;
@@ -107,7 +107,7 @@ public class Virginmap implements Renderer {
     }
 
     public void render(float zoom, Vector2 screenCenter, Vector2 canvasSize, Vector2 canvasCorner) {
-        if (!Pxls.prefsHelper.getVirginmapEnabled()) return;
+        if (!Pxls.getPrefsHelper().getVirginmapEnabled()) return;
         if (loading) {return;}
         if (!loaded) {
             loadMap();

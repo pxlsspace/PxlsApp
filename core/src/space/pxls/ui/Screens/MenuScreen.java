@@ -17,7 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import java.util.Map;
 
-import space.pxls.Account;
+import space.pxls.PrefsHelper;
+import space.pxls.structs.CanvasState;
+import space.pxls.structs.TemplateState;
+import space.pxls.data.User;
 import space.pxls.Pxls;
 import space.pxls.PxlsGame;
 import space.pxls.ui.Components.PxlsButton;
@@ -28,15 +31,15 @@ import space.pxls.ui.Components.TTFLabel;
 import space.pxls.ui.Components.TitledTableHelper;
 
 public class MenuScreen extends ScreenAdapter {
-    private Stage stage;
-    private Account account;
-    private CanvasScreen canvasScreen;
+    private final Stage stage;
+    private final User user;
+    private final CanvasScreen canvasScreen;
     public int w=0,h=0;
 
-    public MenuScreen(CanvasScreen canvasScreen, Account loggedInAccount) {
+    public MenuScreen(CanvasScreen canvasScreen, User loggedInUser) {
         this.stage = new Stage();
         this.canvasScreen = canvasScreen;
-        this.account = loggedInAccount;
+        this.user = loggedInUser;
         build();
     }
 
@@ -44,23 +47,27 @@ public class MenuScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(stage);
         Color shadeColor = new Color(0,0,0,0.05f);
         final MenuScreen self = this;
-        final Image logoutIcon = new Image(Pxls.skin.getDrawable("logout"));
+        final Image logoutIcon = new Image(Pxls.getSkin().getDrawable("logout"));
+
+        PrefsHelper prefsHelper = Pxls.getPrefsHelper();
+        TemplateState templateState = Pxls.getGameState().getSafeTemplateState();
+        CanvasState canvasState = Pxls.getGameState().getSafeCanvasState();
 
         //settings checkboxes
-        final PxlsCheckBox cbKeepSelected = new PxlsCheckBox("Keep color selected", Pxls.prefsHelper.getKeepColorSelected());
-        final PxlsCheckBox cbGreaterZoom = new PxlsCheckBox("Allow greater zoom", Pxls.prefsHelper.getAllowGreaterZoom());
-        final PxlsCheckBox cbRememberState = new PxlsCheckBox("Save last scroll/zoom", Pxls.prefsHelper.getRememberCanvasState());
-        final PxlsCheckBox cbRememberTemplate = new PxlsCheckBox("Save last template", Pxls.prefsHelper.getRememberTemplate());
-        final PxlsCheckBox cbHeatmap = new PxlsCheckBox("Enable Heatmap", Pxls.prefsHelper.getHeatmapEnabled());
-        final PxlsCheckBox cbTemplate = new PxlsCheckBox("Enable Template", Pxls.gameState.getSafeTemplateState().enabled);
-        final PxlsCheckBox cbMoveMode = new PxlsCheckBox("Move Mode", Pxls.gameState.getSafeTemplateState().moveMode);
-        final PxlsCheckBox cbGrid = new PxlsCheckBox("Enable Grid", Pxls.prefsHelper.getGridEnabled());
-        final PxlsCheckBox cbHideUserCount = new PxlsCheckBox("Hide UserCount", Pxls.prefsHelper.getHideUserCount());
-        final PxlsCheckBox cbVirginmapEnabled = new PxlsCheckBox("Enable VirginMap", Pxls.prefsHelper.getVirginmapEnabled());
-        final PxlsCheckBox cbCanvasLocked = new PxlsCheckBox("Lock Canvas", Pxls.gameState.getSafeCanvasState().locked);
-//        final PxlsCheckBox cbShouldVibe = new PxlsCheckBox("Enable vibration", Pxls.prefsHelper.getShouldVibrate());
-//        final PxlsCheckBox cbShouldVibeOnStack = new PxlsCheckBox("Vibrate on stack gain", Pxls.prefsHelper.getShouldVibeOnStack());
-//        final PxlsCheckBox cbShouldPrevibe = new PxlsCheckBox("Enable \"previbe\" ticks", Pxls.prefsHelper.getShouldPrevibe());
+        final PxlsCheckBox cbKeepSelected = new PxlsCheckBox("Keep color selected", prefsHelper.getKeepColorSelected());
+        final PxlsCheckBox cbGreaterZoom = new PxlsCheckBox("Allow greater zoom", prefsHelper.getAllowGreaterZoom());
+        final PxlsCheckBox cbRememberState = new PxlsCheckBox("Save last scroll/zoom", prefsHelper.getRememberCanvasState());
+        final PxlsCheckBox cbRememberTemplate = new PxlsCheckBox("Save last template", prefsHelper.getRememberTemplate());
+        final PxlsCheckBox cbHeatmap = new PxlsCheckBox("Enable Heatmap", prefsHelper.getHeatmapEnabled());
+        final PxlsCheckBox cbTemplate = new PxlsCheckBox("Enable Template", templateState.enabled);
+        final PxlsCheckBox cbMoveMode = new PxlsCheckBox("Move Mode", templateState.moveMode);
+        final PxlsCheckBox cbGrid = new PxlsCheckBox("Enable Grid", prefsHelper.getGridEnabled());
+        final PxlsCheckBox cbHideUserCount = new PxlsCheckBox("Hide UserCount", prefsHelper.getHideUserCount());
+        final PxlsCheckBox cbVirginmapEnabled = new PxlsCheckBox("Enable VirginMap", prefsHelper.getVirginmapEnabled());
+        final PxlsCheckBox cbCanvasLocked = new PxlsCheckBox("Lock Canvas", canvasState.locked);
+//        final PxlsCheckBox cbShouldVibe = new PxlsCheckBox("Enable vibration", prefsHelper.getShouldVibrate());
+//        final PxlsCheckBox cbShouldVibeOnStack = new PxlsCheckBox("Vibrate on stack gain", prefsHelper.getShouldVibeOnStack());
+//        final PxlsCheckBox cbShouldPrevibe = new PxlsCheckBox("Enable \"previbe\" ticks", prefsHelper.getShouldPrevibe());
 
         final PxlsButton btnGetTemplateURL = new PxlsButton("Get current template link");
         final PxlsButton btnShowMoveModeTutorial = new PxlsButton("Show MoveMode tutorial");
@@ -69,12 +76,7 @@ public class MenuScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                PxlsGame.i.alert(Pxls.moveModeTutorial, new PxlsGame.ButtonCallback() {
-                    @Override
-                    public void clicked() {
-                        Pxls.prefsHelper.setHasSeenMoveModeTutorial(true);
-                    }
-                });
+                PxlsGame.i.alert(Pxls.getMoveModeTutorial(), () -> prefsHelper.setHasSeenMoveModeTutorial(true));
             }
         });
 
@@ -92,11 +94,14 @@ public class MenuScreen extends ScreenAdapter {
             }
         });
 
-        final PxlsSlider sliderHeatmapOpacity = new PxlsSlider().setPrepend("Opacity: ");
-        sliderHeatmapOpacity.setValue(Pxls.gameState.getSafeHeatmapState().opacity);
+        final PxlsSlider sliderHeatmapOpacity = new PxlsSlider();
+        sliderHeatmapOpacity.setValue(Pxls.getGameState().getSafeHeatmapState().opacity);
 
-        final PxlsSlider sliderTemplateOpacity = new PxlsSlider().setPrepend("Opacity: ");
-        sliderTemplateOpacity.setValue(Pxls.gameState.getSafeTemplateState().opacity);
+        final PxlsSlider sliderVirginmapOpacity = new PxlsSlider();
+        sliderVirginmapOpacity.setValue(Pxls.getGameState().getSafeVirginmapState().opacity);
+
+        final PxlsSlider sliderTemplateOpacity = new PxlsSlider();
+        sliderTemplateOpacity.setValue(Pxls.getGameState().getSafeTemplateState().opacity);
 
         final PxlsButton btnLoadTemplateFromClipboard = new PxlsButton("Load From Clipboard");
         btnLoadTemplateFromClipboard.addListener(new ClickListener() {
@@ -105,14 +110,11 @@ public class MenuScreen extends ScreenAdapter {
                 super.clicked(event, x, y);
                 final Map<String, String> templateValues = PxlsGame.i.parseTemplateURL(Gdx.app.getClipboard().getContents());
                 if (templateValues != null) {
-                    PxlsGame.i.confirm("Are you sure you want to load a template from your clipboard?", new PxlsGame.ConfirmCallback() {
-                        @Override
-                        public void done(boolean confirmed) {
-                            if (confirmed) {
-                                canvasScreen.template.load(Integer.parseInt(templateValues.get("ox")), Integer.parseInt(templateValues.get("oy")), Float.valueOf(templateValues.get("tw")), Float.valueOf(templateValues.get("oo")), templateValues.get("template"));
-                                sliderTemplateOpacity.setValue(Float.valueOf(templateValues.get("oo")));
-                                cbTemplate.setChecked(true);
-                            }
+                    PxlsGame.i.confirm("Are you sure you want to load a template from your clipboard?", confirmed -> {
+                        if (confirmed) {
+                            canvasScreen.template.load(Integer.parseInt(templateValues.get("ox")), Integer.parseInt(templateValues.get("oy")), Float.parseFloat(templateValues.get("tw")), Float.valueOf(templateValues.get("oo")), templateValues.get("template"));
+                            sliderTemplateOpacity.setValue(Float.parseFloat(templateValues.get("oo")));
+                            cbTemplate.setChecked(true);
                         }
                     });
                 } else {
@@ -121,42 +123,39 @@ public class MenuScreen extends ScreenAdapter {
             }
         });
 
-        final PxlsSlider sliderVirginmapOpacity = new PxlsSlider().setPrepend("Opacity: ");
-        sliderVirginmapOpacity.setValue(Pxls.gameState.getSafeVirginmapState().opacity);
+        Table tableMisc = new TitledTableHelper("Misc");
+        tableMisc.add(cbKeepSelected).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableMisc.add(cbGreaterZoom).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableMisc.add(cbRememberState).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableMisc.add(cbHideUserCount).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableMisc.add(cbCanvasLocked).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 
-        Table tcMisc = new TitledTableHelper("Misc");
-        tcMisc.add(cbKeepSelected).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcMisc.add(cbGreaterZoom).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcMisc.add(cbRememberState).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcMisc.add(cbHideUserCount).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcMisc.add(cbCanvasLocked).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        Table tableHeatmap = new TitledTableHelper("Heatmap");
+        tableHeatmap.add(cbHeatmap).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableHeatmap.add(sliderHeatmapOpacity).colspan(2).growX().fillY().row();
 
-        Table tcHeatmap = new TitledTableHelper("Heatmap");
-        tcHeatmap.add(cbHeatmap).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcHeatmap.add(sliderHeatmapOpacity).colspan(2).growX().fillY().row();
+        Table tableVirginmap = new TitledTableHelper("Virginmap");
+        tableVirginmap.add(cbVirginmapEnabled).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableVirginmap.add(sliderVirginmapOpacity).colspan(2).growX().fillY().row();
 
-        Table tcGrid = new TitledTableHelper("Grid");
-        tcGrid.add(cbGrid).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        Table tableGrid = new TitledTableHelper("Grid");
+        tableGrid.add(cbGrid).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 
-        Table tcTemplate = new TitledTableHelper("Template");
-        tcTemplate.add(cbTemplate).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcTemplate.add(cbRememberTemplate).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcTemplate.add(cbMoveMode).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcTemplate.add(sliderTemplateOpacity).colspan(2).growX().fillY().row();
-        tcTemplate.add(btnLoadTemplateFromClipboard).pad(8).colspan(2).growX().center().row();
-        tcTemplate.add(btnGetTemplateURL).pad(8).colspan(2).growX().center().row();
-        tcTemplate.add(btnShowMoveModeTutorial).pad(8).colspan(2).growX().center().row();
-
-        Table tcVirginmap = new TitledTableHelper("Virginmap");
-        tcVirginmap.add(cbVirginmapEnabled).padTop(6).padLeft(5).colspan(2).expandX().left().row();
-        tcVirginmap.add(sliderVirginmapOpacity).colspan(2).growX().fillY().row();
+        Table tableTemplate = new TitledTableHelper("Template");
+        tableTemplate.add(cbTemplate).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableTemplate.add(cbRememberTemplate).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableTemplate.add(cbMoveMode).padTop(6).padLeft(5).colspan(2).expandX().left().row();
+        tableTemplate.add(sliderTemplateOpacity).colspan(2).growX().fillY().row();
+        tableTemplate.add(btnLoadTemplateFromClipboard).pad(8).colspan(2).growX().center().row();
+        tableTemplate.add(btnGetTemplateURL).pad(8).colspan(2).growX().center().row();
+        tableTemplate.add(btnShowMoveModeTutorial).pad(8).colspan(2).growX().center().row();
 
 //        Table tcVibration = new TitledTableHelper("Vibration");
 //        tcVibration.add(cbShouldVibe).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 //        tcVibration.add(cbShouldPrevibe).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 //        tcVibration.add(cbShouldVibeOnStack).padTop(6).padLeft(5).colspan(2).expandX().left().row();
 
-        Button closeButton = new Button(Pxls.skin.getDrawable("times"));
+        Button closeButton = new Button(Pxls.getSkin().getDrawable("times"));
         Table table = new Table();
         table.setFillParent(true);
 
@@ -165,28 +164,28 @@ public class MenuScreen extends ScreenAdapter {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 //Toggle states
-                Pxls.prefsHelper.setKeepColorSelected(cbKeepSelected.isChecked());
-                Pxls.prefsHelper.setAllowGreaterZoom(cbGreaterZoom.isChecked());
-                Pxls.prefsHelper.setRememberCanvasState(cbRememberState.isChecked());
-                Pxls.prefsHelper.setRememberTemplate(cbRememberTemplate.isChecked());
-                Pxls.prefsHelper.setGridEnabled(cbGrid.isChecked());
-                Pxls.prefsHelper.setHeatmapEnabled(cbGrid.isChecked());
-                Pxls.prefsHelper.setHideUerCount(cbHideUserCount.isChecked());
-                Pxls.prefsHelper.setHeatmapEnabled(cbHeatmap.isChecked());
-                Pxls.prefsHelper.setVirginmapEnabled(cbVirginmapEnabled.isChecked());
-//                Pxls.prefsHelper.setShouldVibrate(cbShouldVibe.isChecked());
-//                Pxls.prefsHelper.setShouldPrevibe(cbShouldPrevibe.isChecked());
-//                Pxls.prefsHelper.setShouldVibeOnStack(cbShouldVibeOnStack.isChecked());
-                Pxls.gameState.getSafeCanvasState().locked = (cbCanvasLocked.isChecked());
-                Pxls.gameState.getSafeTemplateState().enabled = cbTemplate.isChecked();
-                Pxls.gameState.getSafeTemplateState().moveMode = cbMoveMode.isChecked();
+                prefsHelper.setKeepColorSelected(cbKeepSelected.isChecked());
+                prefsHelper.setAllowGreaterZoom(cbGreaterZoom.isChecked());
+                prefsHelper.setRememberCanvasState(cbRememberState.isChecked());
+                prefsHelper.setRememberTemplate(cbRememberTemplate.isChecked());
+                prefsHelper.setGridEnabled(cbGrid.isChecked());
+                prefsHelper.setHeatmapEnabled(cbGrid.isChecked());
+                prefsHelper.setHideUerCount(cbHideUserCount.isChecked());
+                prefsHelper.setHeatmapEnabled(cbHeatmap.isChecked());
+                prefsHelper.setVirginmapEnabled(cbVirginmapEnabled.isChecked());
+//                prefsHelper.setShouldVibrate(cbShouldVibe.isChecked());
+//                prefsHelper.setShouldPrevibe(cbShouldPrevibe.isChecked());
+//                prefsHelper.setShouldVibeOnStack(cbShouldVibeOnStack.isChecked());
+                Pxls.getGameState().getSafeCanvasState().locked = (cbCanvasLocked.isChecked());
+                Pxls.getGameState().getSafeTemplateState().enabled = cbTemplate.isChecked();
+                Pxls.getGameState().getSafeTemplateState().moveMode = cbMoveMode.isChecked();
 
-                Pxls.gameState.getSafeHeatmapState().opacity = sliderHeatmapOpacity.getValue();
-                Pxls.gameState.getSafeTemplateState().opacity = sliderTemplateOpacity.getValue();
-                Pxls.gameState.getSafeVirginmapState().opacity = sliderVirginmapOpacity.getValue();
+                Pxls.getGameState().getSafeHeatmapState().opacity = sliderHeatmapOpacity.getValue();
+                Pxls.getGameState().getSafeTemplateState().opacity = sliderTemplateOpacity.getValue();
+                Pxls.getGameState().getSafeVirginmapState().opacity = sliderVirginmapOpacity.getValue();
 
                 //Flush modified GameState immediately
-                Pxls.prefsHelper.SaveGameState(Pxls.gameState, true);
+                prefsHelper.SaveGameState(Pxls.getGameState(), true);
 
                 //Return to canvas
                 PxlsGame.i.setScreen(self.canvasScreen);
@@ -197,23 +196,23 @@ public class MenuScreen extends ScreenAdapter {
         });
 
         Table topBarTable = new Table().pad(12);
-        topBarTable.add(new TTFLabel(this.account == null ? "Not Logged In" : this.account.getSanitizedUsername()).wrap(true)).growX().left();
+        topBarTable.add(new TTFLabel(this.user == null ? "Not Logged In" : this.user.getSanitizedUsername(), 16).wrap(true)).growX().left();
         topBarTable.add(closeButton).size(80,80).expandX().right();
 
         table.add(new Stack(new SolidContainer(shadeColor), topBarTable)).growX().row();
 
         Table contentTable = new Table();
-        contentTable.add(tcMisc).padTop(24).growX().row();
+        contentTable.add(tableMisc).padTop(24).growX().row();
 //        contentTable.add(tcVibration).padTop(48).growX().row();
-        contentTable.add(tcHeatmap).padTop(48).growX().row();
-        contentTable.add(tcVirginmap).padTop(48).growX().row();
-        contentTable.add(tcTemplate).padTop(48).growX().row();
+        contentTable.add(tableHeatmap).padTop(48).growX().row();
+        contentTable.add(tableVirginmap).padTop(48).growX().row();
+        contentTable.add(tableTemplate).padTop(48).growX().row();
 
         ScrollPane contentPane = new ScrollPane(contentTable);
         contentPane.setCancelTouchFocus(false);
         table.add(contentPane).grow().padLeft(24).padRight(24).row();
         table.add(new Container()).padBottom(24).colspan(2).growY().row(); //Adds a cell that fills the remaining height between the last cell and the next one. Used as a spacer to stick our logout to the bottom and to ensure everything displays properly
-        if (this.account != null) {
+        if (this.user != null) {
             Table tblLogout = new Table();
             tblLogout.add(logoutIcon).growX().right().size(96, 96);
             tblLogout.add(new TTFLabel("Logout", 32)).right().row();
@@ -249,16 +248,12 @@ public class MenuScreen extends ScreenAdapter {
         stage.draw();
     }
 
-    private TTFLabel makeLabel(String text) {
-        return new TTFLabel(text);
-    }
-
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
         stage.getViewport().update(width, height);
         if (w != width || h != height) {
-            MenuScreen ms = new MenuScreen(canvasScreen, account);
+            MenuScreen ms = new MenuScreen(canvasScreen, user);
             ms.w = width;
             ms.h = height;
             PxlsGame.i.setScreen(ms);

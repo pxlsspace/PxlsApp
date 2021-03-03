@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
+    private final Map<Integer, BitmapFont> _fontCache = new HashMap<Integer, BitmapFont>();
+
     public Skin() {
         addDrawable("pixel", "pixel.png");
         addDrawable("palette", "palette.png");
@@ -38,8 +40,8 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
 
         addPatch("light-patch", "light.9.png", 13, 14, 14, 14);
         addPatch("white-patch", "white.9.png", 5, 5, 5, 5);
-        addPatch("rounded.topLeft", "rounded.topLeft.9.png", 16,5,16,5);
-        addPatch("rounded.topRight", "rounded.topRight.9.png", 5,16,16,5);
+        addPatch("rounded.topLeft", "rounded.topLeft.9.png", 16, 5, 16, 5);
+        addPatch("rounded.topRight", "rounded.topRight.9.png", 5, 16, 16, 5);
 
         add("default-horizontal", new Slider.SliderStyle(new TextureRegionDrawable(new TextureRegion(new Texture("slider.png"))), new TextureRegionDrawable(new TextureRegion(new Texture("slider-knob.png")))));
 
@@ -53,9 +55,9 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
         add("default", font);
         add("default", new Label.LabelStyle(font, Color.BLACK));
 
-        add("default", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 7,7,7,7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 7,7,7,7)), font));
-        add("red", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.red.9.png"), 7,7,7,7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.red.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.red.9.png"), 7,7,7,7)), font));
-        add("blue", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.blue.9.png"), 7,7,7,7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.blue.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.blue.9.png"), 7,7,7,7)), font));
+        add("default", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.9.png"), 7, 7, 7, 7)), font));
+        add("red", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.red.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.red.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.red.9.png"), 7, 7, 7, 7)), font));
+        add("blue", new TextButton.TextButtonStyle(new NinePatchDrawable(new NinePatch(new Texture("btn-up.blue.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-down.blue.9.png"), 7, 7, 7, 7)), new NinePatchDrawable(new NinePatch(new Texture("btn-up.blue.9.png"), 7, 7, 7, 7)), font));
 
         TintedDrawable td = new TintedDrawable();
         td.color = new Color(1, 1, 1, 0.7f);
@@ -69,8 +71,6 @@ public class Skin extends com.badlogic.gdx.scenes.scene2d.ui.Skin {
     private void addPatch(String name, String textureLoc, int left, int right, int top, int bottom) {
         add(name, new NinePatch(new Texture(textureLoc), left, right, top, bottom));
     }
-
-    private final Map<Integer, BitmapFont> _fontCache = new HashMap<Integer, BitmapFont>();
 
     public BitmapFont getFontForDP(int dp, boolean skipCache) {
         BitmapFont toRet = _fontCache.get(dp);

@@ -32,7 +32,7 @@ public class UndoPopup extends Container<Container<Label>> {
         });
 
         container = new Container<Label>(label);
-        container.setBackground(Pxls.skin.getDrawable("background"));
+        container.setBackground(Pxls.getSkin().getDrawable("background"));
         container.pad(8);
         container.fillX();
 

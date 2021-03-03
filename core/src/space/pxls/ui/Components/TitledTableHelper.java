@@ -11,7 +11,7 @@ import space.pxls.Pxls;
 
 public class TitledTableHelper extends Table {
     public TitledTableHelper(String title) {
-        setBackground(new NinePatchDrawable(Pxls.skin.getPatch("white-patch"))); //white-patch is a simple bordered 9patch with white background
+        setBackground(new NinePatchDrawable(Pxls.getSkin().getPatch("white-patch"))); //white-patch is a simple bordered 9patch with white background
         Label label = new TTFLabel(title, 24);
 //        label.getStyle().fontColor = new Color(1f, 1f, 1f, 1f);
         label.setAlignment(Align.center);

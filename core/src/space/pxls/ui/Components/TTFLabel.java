@@ -9,11 +9,11 @@ public class TTFLabel extends Label {
     public boolean noMinWidth = false;
 
     public TTFLabel(String text) {
-        super(text, new Label.LabelStyle(Pxls.skin.getFont(), new Color(0f, 0f, 0f, 1f)));
+        super(text, new Label.LabelStyle(Pxls.getSkin().getFont(), new Color(0f, 0f, 0f, 1f)));
     }
 
     public TTFLabel(String text, int dp) {
-        super(text, new Label.LabelStyle(Pxls.skin.getFontForDP(dp), new Color(0f, 0f, 0f, 1f)));
+        super(text, new Label.LabelStyle(Pxls.getSkin().getFontForDP(dp), new Color(0f, 0f, 0f, 1f)));
     }
 
     public TTFLabel setNoMinWidth(boolean b) {

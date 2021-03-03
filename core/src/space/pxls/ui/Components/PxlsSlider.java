@@ -14,7 +14,7 @@ public class PxlsSlider extends Table {
     private String append = "";
 
     public PxlsSlider() {
-        slider = new Slider(0f, 1f, 0.1f, false, Pxls.skin);
+        slider = new Slider(0f, 1f, 0.1f, false, Pxls.getSkin());
         label = new TTFLabel("0%");
 
         slider.addListener(new ChangeListener() {
@@ -25,8 +25,8 @@ public class PxlsSlider extends Table {
             }
         });
 
-        add(label).left();
-        add(slider).growX().fillY();
+        add(label).center().row();
+        add(slider).growX().fillY().pad(16f);
     }
 
     public PxlsSlider setPrepend(String prepend) {

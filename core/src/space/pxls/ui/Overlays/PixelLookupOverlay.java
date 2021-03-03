@@ -28,7 +28,7 @@ public class PixelLookupOverlay extends Table {
 
 
     public PixelLookupOverlay(final Lookup lookup, Boolean isLoggedIn) {
-        super(Pxls.skin);
+        super(Pxls.getSkin());
         this.lookup = lookup;
         this.isLoggedIn = isLoggedIn;
 
@@ -85,7 +85,7 @@ public class PixelLookupOverlay extends Table {
         }
     }
     private void report(final int x, final int y, final int id) {
-        GDXTextPrompt gdxTextPrompt = Pxls.dialogs.newDialog(GDXTextPrompt.class);
+        GDXTextPrompt gdxTextPrompt = Pxls.getDialogs().newDialog(GDXTextPrompt.class);
         gdxTextPrompt.setTitle("pxls.space");
         gdxTextPrompt.setMessage("Report message:");
         gdxTextPrompt.setMaxLength(500);
@@ -104,14 +104,14 @@ public class PixelLookupOverlay extends Table {
                     return;
                 }
                 Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.POST);
-                req.setUrl(Pxls.domain + "/report");
-                req.setHeader("User-Agent", Pxls.getUA());
+                req.setUrl(Pxls.getDomain() + "/report");
+                req.setHeader("User-Agent", Pxls.getUserAgent());
                 try {
                     req.setContent("id=" + id + "&x=" + x + "&y=" + y + "&message=" + URLEncoder.encode(text, "utf-8"));
                 } catch (UnsupportedEncodingException e) {
                     System.out.println("uho");
                 }
-                req.setHeader("Cookie", "pxls-token=" + Pxls.prefsHelper.getToken());
+                req.setHeader("Cookie", "pxls-token=" + Pxls.getPrefsHelper().getToken());
                 Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
                     @Override
                     public void handleHttpResponse(Net.HttpResponse httpResponse) {

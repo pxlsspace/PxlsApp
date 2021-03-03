@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +19,11 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.graphics.Pixmap;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import space.pxls.ImageHelper;
 import space.pxls.OrientationHelper;
 import space.pxls.PxlsGame;
-import space.pxls.VibrationHelper;
 
 public class AndroidLauncher extends AndroidApplication {
     public static final int CAPTCHA_REQUEST = 1;
@@ -35,8 +31,6 @@ public class AndroidLauncher extends AndroidApplication {
 
     private PxlsGame game;
     private PxlsGame.CaptchaCallback captchaCallback;
-
-    private boolean isResumed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +46,11 @@ public class AndroidLauncher extends AndroidApplication {
 
         game = new PxlsGame(_v);
         game.orientationHelper = new OrientationHelper() {
+            @Override
+            public Orientation getOrientation() {
+                return Orientation.values()[getRequestedOrientation()];
+            }
+
             @Override
             public void setOrientation(Orientation orientation) {
                 switch (orientation) {
@@ -96,7 +95,7 @@ public class AndroidLauncher extends AndroidApplication {
 
             @Override
             public void setOrientation(SimpleOrientation orientation) {
-                switch(orientation) {
+                switch (orientation) {
                     case LANDSCAPE:
                         setOrientation(Orientation.SENSOR_LANDSCAPE);
                         break;
@@ -110,13 +109,9 @@ public class AndroidLauncher extends AndroidApplication {
             }
 
             @Override
-            public Orientation getOrientation() {
-               return Orientation.values()[getRequestedOrientation()];
-            }
-
-            @Override
             public SimpleOrientation getSimpleOrientation() {
-                if (getWindowManager() == null || getWindowManager().getDefaultDisplay() == null) return SimpleOrientation.NA;
+                if (getWindowManager() == null || getWindowManager().getDefaultDisplay() == null)
+                    return SimpleOrientation.NA;
 
                 switch (getWindowManager().getDefaultDisplay().getRotation()) {
                     case Surface.ROTATION_0:
@@ -148,31 +143,28 @@ public class AndroidLauncher extends AndroidApplication {
 //                return vibrator;
 //            }
 //        };
-        game.imageHelper = new ImageHelper() {
-            @Override
-            public Pixmap getPixmapForIS(InputStream inputStream) {
-                Bitmap b = BitmapFactory.decodeStream(inputStream);
+        game.imageHelper = inputStream -> {
+            Bitmap b = BitmapFactory.decodeStream(inputStream);
 
-                int[] pixels = new int[b.getWidth() * b.getHeight()];
-                byte[] toRender = new byte[b.getWidth() * b.getHeight() * 4];
-                b.getPixels(pixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
+            int[] pixels = new int[b.getWidth() * b.getHeight()];
+            byte[] toRender = new byte[b.getWidth() * b.getHeight() * 4];
+            b.getPixels(pixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
 
-                for (int i = 0; i < pixels.length; i++) {
-                    int alpha = ((pixels[i] >> 24) & 0x000000FF);
-                    int red = ((pixels[i] >> 16) & 0x000000FF);
-                    int green = ((pixels[i] >> 8) & 0x000000FF);
-                    int blue = ((pixels[i]) & 0x000000FF);
-                    toRender[i * 4] = (byte) red;
-                    toRender[i * 4 + 1] = (byte) green;
-                    toRender[i * 4 + 2] = (byte) blue;
-                    toRender[i * 4 + 3] = (byte) alpha;
-                }
-
-                Pixmap templatePixmap = new Pixmap(b.getWidth(), b.getHeight(), b.hasAlpha() ? Pixmap.Format.RGBA8888 : Pixmap.Format.RGB888);
-                templatePixmap.getPixels().put(toRender).position(0);
-
-                return templatePixmap;
+            for (int i = 0; i < pixels.length; i++) {
+                int alpha = ((pixels[i] >> 24) & 0x000000FF);
+                int red = ((pixels[i] >> 16) & 0x000000FF);
+                int green = ((pixels[i] >> 8) & 0x000000FF);
+                int blue = ((pixels[i]) & 0x000000FF);
+                toRender[i * 4] = (byte) red;
+                toRender[i * 4 + 1] = (byte) green;
+                toRender[i * 4 + 2] = (byte) blue;
+                toRender[i * 4 + 3] = (byte) alpha;
             }
+
+            Pixmap templatePixmap = new Pixmap(b.getWidth(), b.getHeight(), b.hasAlpha() ? Pixmap.Format.RGBA8888 : Pixmap.Format.RGB888);
+            templatePixmap.getPixels().put(toRender).position(0);
+
+            return templatePixmap;
         };
         Intent intent = getIntent();
         if (intent != null && intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
@@ -183,34 +175,29 @@ public class AndroidLauncher extends AndroidApplication {
                     game.startupURI = uri;
                 }
             } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
         }
-        game.captchaRunner = new PxlsGame.CaptchaRunner() {
-            @Override
-            public void doCaptcha(String token, PxlsGame.CaptchaCallback captchaCallback) {
-                Intent intent = new Intent(AndroidLauncher.this, CaptchaActivity.class);
-                intent.putExtra("token", token);
-                startActivityForResult(intent, CAPTCHA_REQUEST);
+        game.captchaRunner = (token, captchaCallback) -> {
+            Intent intent1 = new Intent(AndroidLauncher.this, CaptchaActivity.class);
+            intent1.putExtra("token", token);
+            startActivityForResult(intent1, CAPTCHA_REQUEST);
 
-                AndroidLauncher.this.captchaCallback = captchaCallback;
-            }
+            AndroidLauncher.this.captchaCallback = captchaCallback;
         };
-        game.loginRunner = new PxlsGame.LoginRunner() {
-            @Override
-            public void doLogin(String method, String url) {
-                if (method.equals("google") || method.equals("discord")) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
-                } else {
-                    if (method.equals("reddit")) {
-                        System.err.println("[pa] Detected reddit login, forcing compact mode (v1/authorize => v1/authorize.compact)");
-                        url = url.replace("v1/authorize?", "v1/authorize.compact?");
-                    }
-                    Intent intent = new Intent(AndroidLauncher.this, LoginActivity.class);
-                    intent.putExtra("method", method);
-                    intent.putExtra("url", url);
-                    startActivityForResult(intent, LOGIN_VIEW);
+        game.loginRunner = (method, url) -> {
+            if (method.equals("google") || method.equals("discord")) {
+                Intent intent12 = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent12);
+            } else {
+                if (method.equals("reddit")) {
+                    System.err.println("[pa] Detected reddit login, forcing compact mode (v1/authorize => v1/authorize.compact)");
+                    url = url.replace("v1/authorize?", "v1/authorize.compact?");
                 }
+                Intent intent12 = new Intent(AndroidLauncher.this, LoginActivity.class);
+                intent12.putExtra("method", method);
+                intent12.putExtra("url", url);
+                startActivityForResult(intent12, LOGIN_VIEW);
             }
         };
         if (Build.VERSION.SDK_INT >= 24) {
@@ -239,6 +226,7 @@ public class AndroidLauncher extends AndroidApplication {
                     game.handleView(uri);
                 }
             } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -246,7 +234,6 @@ public class AndroidLauncher extends AndroidApplication {
     @Override
     protected void onPause() {
         super.onPause();
-        isResumed = false;
     }
 
     @Override
@@ -257,7 +244,6 @@ public class AndroidLauncher extends AndroidApplication {
     @Override
     protected void onResume() {
         super.onResume();
-        isResumed = true;
         if (Build.VERSION.SDK_INT >= 24 && PxlsGame.i != null) {
             PxlsGame.i.isMultiWindow = isInMultiWindowMode();
             PxlsGame.i.isPIP = isInPictureInPictureMode();

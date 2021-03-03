@@ -3,17 +3,15 @@ package space.pxls.renderers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 
 import space.pxls.ui.Screens.CanvasScreen;
 import space.pxls.ui.Screens.LoadScreen;
 
 public class Canvas implements Renderer {
-    private CanvasScreen parent;
     public final LoadScreen.BoardInfo info;
-    public FrameBuffer canvasBuffer;
     public Texture canvasTexture;
+    private CanvasScreen parent;
 
     public Canvas(byte[] initialData, final LoadScreen.BoardInfo info) {
         this.info = info;
@@ -36,8 +34,9 @@ public class Canvas implements Renderer {
         if (parent == null) return;
 
         Pixmap temp = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        temp.setColor(Color.valueOf(info.palette.get(color).value));
-        temp.drawPixel(0,0);
+        // 255 is transparent
+        temp.setColor(color == 255 ? Color.CLEAR : Color.valueOf(info.palette.get(color).value));
+        temp.drawPixel(0, 0);
         canvasTexture.draw(temp, x, y);
         temp.dispose();
     }

@@ -8,7 +8,6 @@ import android.webkit.WebView;
 import space.pxls.Pxls;
 
 public class CaptchaActivity extends Activity {
-    private WebView view;
     private String key;
 
     @Override
@@ -18,12 +17,10 @@ public class CaptchaActivity extends Activity {
         Intent intent = getIntent();
         key = intent.getStringExtra("token");
 
-        view = new WebView(this);
-        // We good, we good
-        // only pxls code :)
+        WebView view = new WebView(this);
         view.addJavascriptInterface(new Context(), "ctx");
         view.getSettings().setJavaScriptEnabled(true);
-        view.loadUrl(Pxls.domain + "/mobile_captcha.html");
+        view.loadUrl(Pxls.getDomain() + "/mobile_captcha.html");
         setContentView(view);
     }
 

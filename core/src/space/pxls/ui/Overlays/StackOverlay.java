@@ -3,15 +3,13 @@ package space.pxls.ui.Overlays;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
-import space.pxls.Pxls;
-import space.pxls.PxlsGame;
 import space.pxls.ui.Components.TTFLabel;
 
 public class StackOverlay extends Container<Container<Label>> {
-    private int count;
-    private int maxCount;
     private final Container<Label> container;
     private final Label countLabel;
+    private int count;
+    private final int maxCount;
     private boolean normal;
     private long cooldownExpiry;
 
@@ -21,7 +19,7 @@ public class StackOverlay extends Container<Container<Label>> {
         this.maxCount = maxCount + 1; // 6
 
         countLabel = new TTFLabel(this.count + "/" + this.maxCount); // 6/6
-        container = new Container<Label>(countLabel);
+        container = new Container<>(countLabel);
         setActor(container);
 
         setClip(true);
@@ -32,7 +30,7 @@ public class StackOverlay extends Container<Container<Label>> {
     public void updateStack(int count, String cause) {
         this.count = count;
         updateStack();
-//        if (Pxls.prefsHelper.getShouldVibrate() && Pxls.prefsHelper.getShouldVibeOnStack() && cause.equals("stackGain")) {
+//        if (Pxls.getPrefsHelper().getShouldVibrate() && Pxls.getPrefsHelper().getShouldVibeOnStack() && cause.equals("stackGain")) {
 //            if (PxlsGame.i.vibrationHelper != null) {
 //                PxlsGame.i.vibrationHelper.vibrate(500);
 //            }
@@ -84,6 +82,6 @@ public class StackOverlay extends Container<Container<Label>> {
     }
 
     public boolean onCooldown() {
-        return cooldownExpiry-System.currentTimeMillis() > 0;
+        return cooldownExpiry - System.currentTimeMillis() > 0;
     }
 }

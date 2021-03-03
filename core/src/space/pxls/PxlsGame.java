@@ -33,33 +33,37 @@ public class PxlsGame extends Game {
     public URI startupURI;
     public String VersionString = "0.0.0";
     public OrientationHelper orientationHelper;
-//    public VibrationHelper vibrationHelper;
+    //public VibrationHelper vibrationHelper;
     public ImageHelper imageHelper;
     public boolean isPIP = false;
     public boolean isMultiWindow = false;
 
-    public PxlsGame() {}
+    public PxlsGame() {
+    }
+
     public PxlsGame(String versionString) {
         VersionString = versionString;
     }
 
+    public static boolean widthGTHeight() {
+        return Gdx.graphics.getWidth() > Gdx.graphics.getHeight();
+    }
+
     @Override
     public void create() {
-        Pxls.init();
-        Pxls.prefsHelper = new PrefsHelper(Gdx.app.getPreferences("pxls"));
+        Pxls.setPrefsHelper(new PrefsHelper(Gdx.app.getPreferences("pxls")));
 
         i = this;
         setScreen(new LoadScreen());
 
-        Pxls.batch = new SpriteBatch();
-        Pxls.skin = new Skin();
+        Pxls.setBatch(new SpriteBatch());
+        Pxls.setSkin(new Skin());
     }
 
     private Map<String, String> parseQuery(String s) {
-        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+        Map<String, String> query_pairs = new LinkedHashMap<>();
         try {
-            String query = s;
-            String[] pairs = query.split("&");
+            String[] pairs = s.split("&");
             for (String pair : pairs) {
                 int idx = pair.indexOf("=");
                 if (idx == -1) {
@@ -71,26 +75,23 @@ public class PxlsGame extends Game {
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            
+            e.printStackTrace();
         }
         return query_pairs;
     }
 
     public void handleView(URI uri) {
-        if (!(screen instanceof CanvasScreen)) {
-            return;
-        }
-        CanvasScreen _screen = (CanvasScreen)screen;
+        if (!(screen instanceof CanvasScreen)) return;
+
+        CanvasScreen _screen = (CanvasScreen) screen;
         if (uri == null) return;
-        
+
         String query = uri.getQuery();
-        if (query == null) {
-            query = "";
-        }
+        if (query == null) query = "";
+
         String hash = uri.getFragment();
-        if (hash == null) {
-            hash = "";
-        }
+        if (hash == null) hash = "";
+
         query = hash + "&" + query; // prioritize # over ?
         Map<String, String> params = parseQuery(query);
         String url = params.get("template");
@@ -99,23 +100,25 @@ public class PxlsGame extends Game {
             String paramY = params.get("y");
             if (paramY != null && paramY.length() > 0) {
                 String paramScale = params.get("scale");
-                int posX = 0;
-                int posY = 0;
+                int posX;
+                int posY;
                 try {
                     float scale = 1f;
                     posX = Integer.parseInt(paramX);
                     posY = Integer.parseInt(paramY);
                     try {
                         scale = Float.parseFloat(paramScale);
-                    } catch (Exception e) { /* ignored */ }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     _screen.moveTo(posX, posY, scale);
                 } catch (Exception e) {
-                    /*ignored*/
+                    e.printStackTrace();
                 }
             }
         }
         if (url == null) {
-//            _screen.template.load(0, 0, -1, 0.5f, "");
+            //_screen.template.load(0, 0, -1, 0.5f, "");
             //TODO: why was this here? we don't want to clear template here... no reason to. people may be clicking a link to jump to a specific spot to fix a grief on their already loaded template.
             return; // nothing to do
         }
@@ -138,25 +141,27 @@ public class PxlsGame extends Game {
         int x = Integer.parseInt(s_x);
         int y = Integer.parseInt(s_y);
         int tw = Integer.parseInt(s_tw);
-        float oo = Float.valueOf(s_oo);
+        float oo = Float.parseFloat(s_oo);
         _screen.template.load(x, y, tw, oo, url);
     }
 
     public void handleAuthenticationCallback(final String url) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
-        req.setHeader("User-Agent", Pxls.getUA());
+        req.setHeader("User-Agent", Pxls.getUserAgent());
         try {
             URI uri = new URI(url);
-            req.setUrl(new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString() + "?"+uri.getQuery()+"&json=1");
+            req.setUrl(new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString() + "?" + uri.getQuery() + "&json=1");
         } catch (URISyntaxException e) {
             System.err.printf("[pa] Auth failed. Attempted to create an invalid URI from the URL %s", url);
 //            alert("Authentification failed");
             input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", getStackTraceAsString(new Error("Auth Failed: Bad Login URI ( " + url + " )", e)), new InputCallback() {
                 @Override
-                public void cancelled() {}
+                public void cancelled() {
+                }
 
                 @Override
-                public void input(String response) {}
+                public void input(String response) {
+                }
             });
             return;
         }
@@ -173,14 +178,16 @@ public class PxlsGame extends Game {
 
                 JsonObject jo = null;
                 try {
-                    jo = Pxls.gson.fromJson(res, JsonObject.class);
+                    jo = Pxls.getGson().fromJson(res, JsonObject.class);
                 } catch (JsonSyntaxException jse) {
                     input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", getStackTraceAsString(new Error(String.format("Failed to parse the response from url '%s' into valid JSON. Response: '%s'", res, url), jse)), new InputCallback() {
                         @Override
-                        public void cancelled() {}
+                        public void cancelled() {
+                        }
 
                         @Override
-                        public void input(String response) {}
+                        public void input(String response) {
+                        }
                     });
                 }
 
@@ -190,10 +197,12 @@ public class PxlsGame extends Game {
                         //                    alert(jo.get("message").getAsString());
                         input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", String.format("Got rejection `%s` for URL `%s`", jo.get("message").getAsString(), url), new InputCallback() {
                             @Override
-                            public void cancelled() {}
+                            public void cancelled() {
+                            }
 
                             @Override
-                            public void input(String response) {}
+                            public void input(String response) {
+                            }
                         });
                         return;
                     }
@@ -215,10 +224,12 @@ public class PxlsGame extends Game {
                 System.err.println("[pa] Auth failed, the WebRequest threw an error. See above");
                 input("PLEASE SEND THIS TO A DEVELOPER *PRIVATELY*. IT CONTAINS SENSITIVE INFORMATION", getStackTraceAsString(new Error("Auth Failed: WebReq Died", t)), new InputCallback() {
                     @Override
-                    public void cancelled() {}
+                    public void cancelled() {
+                    }
 
                     @Override
-                    public void input(String response) {}
+                    public void input(String response) {
+                    }
                 });
             }
 
@@ -237,65 +248,43 @@ public class PxlsGame extends Game {
     }
 
     public void alert(String message) {
-        final GDXButtonDialog gdxButtonDialog = Pxls.dialogs.newDialog(GDXButtonDialog.class);
+        final GDXButtonDialog gdxButtonDialog = Pxls.getDialogs().newDialog(GDXButtonDialog.class);
         gdxButtonDialog.setTitle("pxls.space");
         gdxButtonDialog.setMessage(message);
         gdxButtonDialog.addButton("OK");
-        gdxButtonDialog.setClickListener(new ButtonClickListener() {
-            @Override
-            public void click(int button) {
-                gdxButtonDialog.dismiss();
-            }
-        });
+        gdxButtonDialog.setClickListener(button -> gdxButtonDialog.dismiss());
         gdxButtonDialog.build().show();
     }
 
     public void alert(String message, final ButtonCallback callback) {
-        final GDXButtonDialog gdxButtonDialog = Pxls.dialogs.newDialog(GDXButtonDialog.class);
+        final GDXButtonDialog gdxButtonDialog = Pxls.getDialogs().newDialog(GDXButtonDialog.class);
         gdxButtonDialog.setTitle("pxls.space");
         gdxButtonDialog.setMessage(message);
         gdxButtonDialog.addButton("OK");
-        gdxButtonDialog.setClickListener(new ButtonClickListener() {
-            @Override
-            public void click(int button) {
-                gdxButtonDialog.dismiss();
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.clicked();
-                    }
-                });
-            }
+        gdxButtonDialog.setClickListener(button -> {
+            gdxButtonDialog.dismiss();
+            Gdx.app.postRunnable(callback::clicked);
         });
         gdxButtonDialog.build().show();
     }
 
     public void confirm(String message, final ConfirmCallback callback) {
-        final GDXButtonDialog gdxButtonDialog = Pxls.dialogs.newDialog(GDXButtonDialog.class);
+        final GDXButtonDialog gdxButtonDialog = Pxls.getDialogs().newDialog(GDXButtonDialog.class);
         gdxButtonDialog.setTitle("pxls.space");
         gdxButtonDialog.setMessage(message);
         gdxButtonDialog.addButton("Yes");
         gdxButtonDialog.addButton("No");
-        gdxButtonDialog.setClickListener(new ButtonClickListener() {
-            @Override
-            public void click(final int button) {
-                gdxButtonDialog.dismiss();
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.done(button == 0); //`button` is the Nth button clicked based on `addButton` calls, zero-based. So, if button == 0, then the "yes" button was clicked. return true in that case since this is a confirmation dialog.
-                    }
-                });
-            }
+        gdxButtonDialog.setClickListener(button -> {
+            gdxButtonDialog.dismiss();
+            Gdx.app.postRunnable(() -> {
+                callback.done(button == 0); //`button` is the Nth button clicked based on `addButton` calls, zero-based. So, if button == 0, then the "yes" button was clicked. return true in that case since this is a confirmation dialog.
+            });
         });
         gdxButtonDialog.build().show();
     }
 
-    public void input(String prompt, final InputCallback callback) {
-        input(prompt, "", callback);
-    }
     public void input(String prompt, Object defaultResponse, final InputCallback callback) {
-        GDXTextPrompt gdxTextPrompt = Pxls.dialogs.newDialog(GDXTextPrompt.class);
+        GDXTextPrompt gdxTextPrompt = Pxls.getDialogs().newDialog(GDXTextPrompt.class);
         gdxTextPrompt.setMaxLength(2147483646);
         gdxTextPrompt.setTitle("pxls.space");
         gdxTextPrompt.setMessage(prompt);
@@ -317,7 +306,7 @@ public class PxlsGame extends Game {
     }
 
     private void doSignupPrompt(final String signupToken) {
-        GDXTextPrompt gdxTextPrompt = Pxls.dialogs.newDialog(GDXTextPrompt.class);
+        GDXTextPrompt gdxTextPrompt = Pxls.getDialogs().newDialog(GDXTextPrompt.class);
         gdxTextPrompt.setTitle("pxls.space");
         gdxTextPrompt.setMessage("Please select your username.");
         gdxTextPrompt.setCancelButtonLabel("Cancel");
@@ -335,8 +324,8 @@ public class PxlsGame extends Game {
                 }
 
                 Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.POST);
-                req.setUrl(Pxls.domain + "/signup");
-                req.setHeader("User-Agent", Pxls.getUA());
+                req.setUrl(Pxls.getDomain() + "/signup");
+                req.setHeader("User-Agent", Pxls.getUserAgent());
                 try {
                     req.setContent("username=" + URLEncoder.encode(text, "utf-8") + "&token=" + URLEncoder.encode(signupToken, "utf-8"));
                 } catch (UnsupportedEncodingException e) {
@@ -346,7 +335,7 @@ public class PxlsGame extends Game {
                     @Override
                     public void handleHttpResponse(Net.HttpResponse httpResponse) {
                         String res = httpResponse.getResultAsString();
-                        JsonObject jo = Pxls.gson.fromJson(res, JsonObject.class);
+                        JsonObject jo = Pxls.getGson().fromJson(res, JsonObject.class);
 
                         if (jo.has("error")) {
                             showRetryMessage(signupToken, jo.get("message").getAsString());
@@ -372,25 +361,22 @@ public class PxlsGame extends Game {
     }
 
     private void showRetryMessage(final String signupToken, String error) {
-        final GDXButtonDialog dialog = Pxls.dialogs.newDialog(GDXButtonDialog.class);
+        final GDXButtonDialog dialog = Pxls.getDialogs().newDialog(GDXButtonDialog.class);
         dialog.setTitle("pxls.space");
         dialog.setMessage(error);
         dialog.addButton("Cancel");
         dialog.addButton("Retry");
-        dialog.setClickListener(new ButtonClickListener() {
-            @Override
-            public void click(int button) {
-                if (button == 1) {
-                    doSignupPrompt(signupToken);
-                }
-                dialog.dismiss();
+        dialog.setClickListener(button -> {
+            if (button == 1) {
+                doSignupPrompt(signupToken);
             }
+            dialog.dismiss();
         });
         dialog.build().show();
     }
 
     private void applyToken(String token) {
-        Pxls.prefsHelper.setToken(token);
+        Pxls.getPrefsHelper().setToken(token);
         if (screen instanceof CanvasScreen) {
             ((CanvasScreen) screen).reconnect();
         }
@@ -400,14 +386,34 @@ public class PxlsGame extends Game {
         applyToken("");
     }
 
-    private String getCookieHeader(Net.HttpResponse httpResponse) {
-        String cookie = null;
-        for (Map.Entry<String, List<String>> stringListEntry : httpResponse.getHeaders().entrySet()) {
-            if (stringListEntry.getKey() != null && stringListEntry.getKey().equalsIgnoreCase("Set-Cookie")) {
-                cookie = stringListEntry.getValue().get(0);
+    public Map<String, String> parseTemplateURL(String URL) {
+        try {
+            URI uri = URI.create(URL);
+            if (uri.getFragment().length() > 0) {
+                String[] split = uri.getFragment().split("&");
+                Map<String, String> uriArgs = new HashMap<>();
+                for (String arg : split) {
+                    String[] argSplit = arg.split("=");
+                    uriArgs.put(argSplit[0], argSplit[1]);
+                }
+                if (uriArgs.containsKey("template") && uriArgs.containsKey("tw") && uriArgs.containsKey("ox") && uriArgs.containsKey("oy")) {
+                    Map<String, String> toRet = new HashMap<>(uriArgs);
+                    if (!toRet.containsKey("tw")) {
+                        toRet.put("tw", "-1");
+                    }
+                    if (!toRet.containsKey("oo")) {
+                        toRet.put("oo", "0.5");
+                    }
+                    return toRet;
+                } else {
+                    return null;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return cookie;
+
+        return null;
     }
 
     public interface CaptchaRunner {
@@ -432,39 +438,7 @@ public class PxlsGame extends Game {
 
     public interface InputCallback {
         void cancelled();
+
         void input(String response);
-    }
-
-    public Map<String, String> parseTemplateURL(String URL) {
-        try {
-            URI uri = URI.create(URL);
-            //https://pxls.space/#template=https://i.trg0d.com/2mL4534Ka6Z&tw=100&oo=1&ox=10&oy=15&x=0&y=0&scale=30
-            if (uri.getFragment().length() > 0) {
-                String[] split = uri.getFragment().split("&");
-                Map<String, String> uriArgs = new HashMap<String,String>();
-                for (String arg : split) {
-                    String[] argSplit = arg.split("=");
-                    uriArgs.put(argSplit[0], argSplit[1]);
-                }
-                if (uriArgs.containsKey("template") && uriArgs.containsKey("tw") && uriArgs.containsKey("ox") && uriArgs.containsKey("oy")) {
-                    Map<String, String> toRet = new HashMap<String, String>(uriArgs);
-                    if (!toRet.containsKey("tw")) {
-                        toRet.put("tw", "-1");
-                    }
-                    if (!toRet.containsKey("oo")) {
-                        toRet.put("oo", "0.5");
-                    }
-                    return toRet;
-                } else {
-                    return null;
-                }
-            }
-        } catch (Exception e) {/*ignored*/}
-
-        return null;
-    }
-
-    public static boolean widthGTHeight() {
-        return Gdx.graphics.getWidth() > Gdx.graphics.getHeight();
     }
 }

@@ -48,10 +48,10 @@ public class CooldownOverlay {
         float timeLeft = (cooldownExpiry - now) / 1000f;
         final boolean hasTimeLeft = timeLeft > 0;
 
-        int stateI = ((int)Math.floor(timeLeft)) + 1;
-//        if (Pxls.prefsHelper.getShouldVibrate() && timeLeft >= -1 && timeLeft <= 2 && PxlsGame.i.vibrationHelper != null) {
+//        int stateI = ((int)Math.floor(timeLeft)) + 1;
+//        if (Pxls.getPrefsHelper().getShouldVibrate() && timeLeft >= -1 && timeLeft <= 2 && PxlsGame.i.vibrationHelper != null) {
 //            if (!vibeState[stateI]) {
-//                if (Pxls.prefsHelper.getShouldPrevibe()) {
+//                if (Pxls.getPrefsHelper().getShouldPrevibe()) {
 //                    PxlsGame.i.vibrationHelper.vibrate(stateI > 0 ? 50 : 500);
 //                } else {
 //                    if (stateI == 0) {

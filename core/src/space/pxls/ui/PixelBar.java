@@ -29,22 +29,12 @@ import space.pxls.ui.Overlays.CooldownOverlay;
 import space.pxls.ui.Screens.LoadScreen.PaletteEntry;
 
 public class PixelBar extends Stack {
-    enum PopState {
-        UP,
-        DOWN,
-        TOGGLE
-    }
-
     private final Table pixelListTable;
     private final Container<Label> cooldownContainer;
-    private final Label cooldownLabel;
-    private List<PaletteEntry> palette;
+    private final boolean[] isUp;
     private int currentColor = -1;
-    private boolean[] isUp;
-
     public PixelBar(final List<PaletteEntry> palette) {
         super();
-        this.palette = palette;
         isUp = new boolean[palette.size()];
 
         pixelListTable = new Table();
@@ -53,7 +43,7 @@ public class PixelBar extends Stack {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (Pxls.prefsHelper.getKeepColorSelected()) {
+                if (Pxls.getPrefsHelper().getKeepColorSelected()) {
                     Actor a = pixelListTable.hit(x, y, false);
                     if (a instanceof PixelImage) {
                         changeColor(((PixelImage) a).idx);
@@ -73,7 +63,7 @@ public class PixelBar extends Stack {
             isUp[i] = false;
 
             Color c = Color.valueOf(s);
-            final PixelImage img = new PixelImage(Pxls.skin, "palette");
+            final PixelImage img = new PixelImage(Pxls.getSkin(), "palette");
             img.setColor(c);
 
             final int finalI = i;
@@ -111,8 +101,8 @@ public class PixelBar extends Stack {
 
         add(pixelListTable);
 
-        cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
-        cooldownContainer = new Container<Label>(cooldownLabel);
+        Label cooldownLabel = CooldownOverlay.getInstance().getCooldownLabel();
+        cooldownContainer = new Container<>(cooldownLabel);
         cooldownContainer.fillX().align(Align.center).background(new TextureRegionDrawable(new TextureRegion(new Texture(SolidContainer.getFilled(new Color(1f, 1f, 1f, .9f))))));
         add(cooldownContainer);
 
@@ -149,14 +139,10 @@ public class PixelBar extends Stack {
         }
     }
 
-    private void pop(int i) {
-        pop(i, PopState.TOGGLE);
-    }
-
     private void pop(int i, PopState forceState) {
         if (forceState == null) forceState = PopState.TOGGLE;
-        if (i < 0 || i > isUp.length-1) return;
-        switch(forceState) {
+        if (i < 0 || i > isUp.length - 1) return;
+        switch (forceState) {
             case UP:
                 if (isUp[i]) return;
                 popUp(i);
@@ -176,34 +162,28 @@ public class PixelBar extends Stack {
     }
 
     private void popUp(final int i) {
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                if (isUp[i]) return;
-                MoveByAction mba = new MoveByAction();
-                mba.setAmountY(8);
-                mba.setDuration(0.1f);
-                mba.setInterpolation(Interpolation.exp5);
-                isUp[i] = true;
+        Gdx.app.postRunnable(() -> {
+            if (isUp[i]) return;
+            MoveByAction mba = new MoveByAction();
+            mba.setAmountY(8);
+            mba.setDuration(0.1f);
+            mba.setInterpolation(Interpolation.exp5);
+            isUp[i] = true;
 
-                pixelListTable.getChildren().get(i).addAction(mba);
-            }
+            pixelListTable.getChildren().get(i).addAction(mba);
         });
     }
 
     private void popDown(final int i) {
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                if (!isUp[i]) return;
-                MoveByAction mba = new MoveByAction();
-                mba.setAmountY(-8f);
-                mba.setDuration(0.1f);
-                mba.setInterpolation(Interpolation.exp5);
-                isUp[i] = false;
+        Gdx.app.postRunnable(() -> {
+            if (!isUp[i]) return;
+            MoveByAction mba = new MoveByAction();
+            mba.setAmountY(-8f);
+            mba.setDuration(0.1f);
+            mba.setInterpolation(Interpolation.exp5);
+            isUp[i] = false;
 
-                pixelListTable.getChildren().get(i).addAction(mba);
-            }
+            pixelListTable.getChildren().get(i).addAction(mba);
         });
     }
 
@@ -212,14 +192,20 @@ public class PixelBar extends Stack {
         super.act(delta);
         CooldownOverlay.getInstance().simulateAct();
         boolean stillCooled = ((CooldownOverlay.getInstance().getCooldownExpiry() - System.currentTimeMillis()) / 1000f) > 0;
-        cooldownContainer.setVisible(!Pxls.prefsHelper.getKeepColorSelected() && stillCooled);
+        cooldownContainer.setVisible(!Pxls.getPrefsHelper().getKeepColorSelected() && stillCooled);
     }
 
     public void updateSelected() {
         pop(currentColor, PopState.UP);
     }
 
-    class PixelImage extends Image {
+    enum PopState {
+        UP,
+        DOWN,
+        TOGGLE
+    }
+
+    static class PixelImage extends Image {
         public int idx = -1;
 
         public PixelImage(Skin skin, String palette) {

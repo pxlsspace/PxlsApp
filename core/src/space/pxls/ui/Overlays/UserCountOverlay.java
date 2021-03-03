@@ -28,11 +28,11 @@ public class UserCountOverlay extends Stack {
         lblOnlineCount = new TTFLabel("");
         onlineCount = new Table();
         onlineCount.pad(8);
-        userIconCell = onlineCount.add(new Image(Pxls.skin.getDrawable("user"))).growX().right().size(32, 32).padRight(8);
+        userIconCell = onlineCount.add(new Image(Pxls.getSkin().getDrawable("user"))).growX().right().size(32, 32).padRight(8);
         onlineCount.add(lblOnlineCount).right().row();
 
         bgContainer = new Container();
-        bgContainer.setBackground(new NinePatchDrawable(Pxls.skin.getPatch("rounded.topLeft")));
+        bgContainer.setBackground(new NinePatchDrawable(Pxls.getSkin().getPatch("rounded.topLeft")));
         add(bgContainer);
         add(onlineCount);
     }
@@ -47,7 +47,7 @@ public class UserCountOverlay extends Stack {
     }
 
     public void setCount(int count) {
-        if (!Pxls.prefsHelper.getHideUserCount() && !isVisible()) setVisible(true);
+        if (!Pxls.getPrefsHelper().getHideUserCount() && !isVisible()) setVisible(true);
         receivedCount = true;
 
         this.lblOnlineCount.setText(String.valueOf(count));

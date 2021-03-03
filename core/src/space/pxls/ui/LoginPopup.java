@@ -55,7 +55,7 @@ public class LoginPopup extends Container<Container<Table>> {
         
     
         container = new Container<Table>(table);
-        container.setBackground(Pxls.skin.getDrawable("background"));
+        container.setBackground(Pxls.getSkin().getDrawable("background"));
         container.pad(8);
         setActor(container);
         setClip(true);
@@ -93,12 +93,12 @@ public class LoginPopup extends Container<Container<Table>> {
 
     private void launchLogin(final String id) {
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
-        req.setUrl(Pxls.domain + "/signin/" + id);
-        req.setHeader("User-Agent", Pxls.getUA());
+        req.setUrl(Pxls.getDomain() + "/signin/" + id);
+        req.setHeader("User-Agent", Pxls.getUserAgent());
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                JsonObject jo = Pxls.gson.fromJson(httpResponse.getResultAsString(), JsonObject.class);
+                JsonObject jo = Pxls.getGson().fromJson(httpResponse.getResultAsString(), JsonObject.class);
                 PxlsGame.i.loginRunner.doLogin(id, jo.get("url").getAsString());
             }
 

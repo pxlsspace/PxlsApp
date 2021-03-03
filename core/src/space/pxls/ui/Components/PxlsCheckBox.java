@@ -15,22 +15,22 @@ import space.pxls.Pxls;
  * A button with 2 states to represent checked/unchecked, and a label. Pretty simple.
  */
 public class PxlsCheckBox extends Table {
-    private boolean _checked = false;
-    private Drawable _checkedButton = null;
-    private Drawable _uncheckedButton = null;
-    private Image _drawnImage = null;
-    private Cell buttonCell = null;
-    private TTFLabel label;
+    private boolean checked;
+    private final Drawable checkedButton;
+    private final Drawable uncheckedButton;
+    private final Image drawnImage;
+    private final Cell buttonCell;
+    private final TTFLabel label;
 
     public PxlsCheckBox(String text) {
         this(text, false);
     }
     public PxlsCheckBox(String text, boolean checked) {
-        this._checked = checked;
-        this._checkedButton = (Pxls.skin.getDrawable("checked"));
-        this._uncheckedButton = (Pxls.skin.getDrawable("unchecked"));
-        this._drawnImage = new Image(checked ? this._checkedButton : this._uncheckedButton);
-        this.buttonCell = add(this._drawnImage).left().size(32, 32).padRight(16);
+        this.checked = checked;
+        this.checkedButton = (Pxls.getSkin().getDrawable("checked"));
+        this.uncheckedButton = (Pxls.getSkin().getDrawable("unchecked"));
+        this.drawnImage = new Image(checked ? this.checkedButton : this.uncheckedButton);
+        this.buttonCell = add(this.drawnImage).left().size(48f, 48f).pad(8f).padRight(16f);
         this.label = new TTFLabel(text);
         add(label).expandX().row();
 
@@ -39,7 +39,7 @@ public class PxlsCheckBox extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                self._checked = !self._checked;
+                self.checked = !self.checked;
                 self.fire(new ChangeListener.ChangeEvent());
             }
         });
@@ -47,7 +47,7 @@ public class PxlsCheckBox extends Table {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        this._drawnImage.setDrawable(this._checked ? this._checkedButton : this._uncheckedButton);
+        this.drawnImage.setDrawable(this.checked ? this.checkedButton : this.uncheckedButton);
         super.draw(batch, parentAlpha);
     }
 
@@ -60,10 +60,10 @@ public class PxlsCheckBox extends Table {
     }
 
     public boolean isChecked() {
-        return _checked;
+        return checked;
     }
 
     public void setChecked(boolean _checked) {
-        this._checked = _checked;
+        this.checked = _checked;
     }
 }

@@ -1,6 +1,14 @@
 package space.pxls;
 
 public interface OrientationHelper {
+    Orientation getOrientation();
+
+    void setOrientation(Orientation orientation);
+
+    void setOrientation(SimpleOrientation orientation);
+
+    SimpleOrientation getSimpleOrientation();
+
     enum Orientation {
         BEHIND,
         FULL_SENSOR,
@@ -15,13 +23,10 @@ public interface OrientationHelper {
         UNSPECIFIED,
         USER
     }
+
     enum SimpleOrientation {
         LANDSCAPE,
         PORTRAIT,
         NA
     }
-    void setOrientation(Orientation orientation);
-    void setOrientation(SimpleOrientation orientation);
-    Orientation getOrientation();
-    SimpleOrientation getSimpleOrientation();
 }

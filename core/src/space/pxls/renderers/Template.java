@@ -29,19 +29,19 @@ public class Template implements Renderer {
         _width = 0;
         url = "";
         //load(x, y, 211, "https://i.imgur.com/Pr8tuTT.png");
-        TemplateState templateState = Pxls.gameState.getSafeTemplateState();
-        if (Pxls.prefsHelper.getRememberTemplate() && templateState.URL.length() > 0) {
+        TemplateState templateState = Pxls.getGameState().getSafeTemplateState();
+        if (Pxls.getPrefsHelper().getRememberTemplate() && templateState.URL.length() > 0) {
             _initial = true;
             load(templateState.offsetX, templateState.offsetY, templateState.totalWidth, templateState.opacity, templateState.URL);
         }
     }
 
     public void load(int _x, int _y, final float _tw, float _opacity, String _url) {
-        Pxls.gameState.getSafeTemplateState().offsetX = _x;
-        Pxls.gameState.getSafeTemplateState().offsetY = _y;
-        Pxls.gameState.getSafeTemplateState().totalWidth = _tw;
-        Pxls.gameState.getSafeTemplateState().opacity = _opacity;
-        Pxls.gameState.getSafeTemplateState().URL = _url;
+        Pxls.getGameState().getSafeTemplateState().offsetX = _x;
+        Pxls.getGameState().getSafeTemplateState().offsetY = _y;
+        Pxls.getGameState().getSafeTemplateState().totalWidth = _tw;
+        Pxls.getGameState().getSafeTemplateState().opacity = _opacity;
+        Pxls.getGameState().getSafeTemplateState().URL = _url;
 //        Pxls.gameState.getSafeTemplateState().enabled = false;
 
         if (url.equals(_url)) {
@@ -50,18 +50,18 @@ public class Template implements Renderer {
                 width = _width * scale;
                 height = _height * scale;
             }
-            Pxls.gameState.getSafeTemplateState().enabled = true;
+            Pxls.getGameState().getSafeTemplateState().enabled = true;
             return;
         }
         // fetch the new temaplate image
         url = _url;
         if (url.isEmpty()) {
-            Pxls.gameState.getSafeTemplateState().enabled = false;
+            Pxls.getGameState().getSafeTemplateState().enabled = false;
             return;
         }
         Net.HttpRequest req = new Net.HttpRequest(Net.HttpMethods.GET);
         req.setUrl(url);
-        req.setHeader("User-Agent", Pxls.getUA());
+        req.setHeader("User-Agent", Pxls.getUserAgent());
         req.setHeader("Accept", "image/png, image/jpg, image/jpeg");
         Gdx.net.sendHttpRequest(req, new Net.HttpResponseListener() {
             @Override
@@ -69,8 +69,8 @@ public class Template implements Renderer {
                 final String contentType = httpResponse.getHeader("Content-Type");
                 if (!(contentType.equalsIgnoreCase("image/png") || contentType.equalsIgnoreCase("image/jpg") || contentType.equalsIgnoreCase("image/jpeg"))) {
                     PxlsGame.i.alert("The requested template image is not a supported format.");
-                    Pxls.gameState.getSafeTemplateState().enabled = false;
-                    Pxls.gameState.getSafeTemplateState().URL = "";
+                    Pxls.getGameState().getSafeTemplateState().enabled = false;
+                    Pxls.getGameState().getSafeTemplateState().URL = "";
                     return;
                 }
                 final Pixmap p = PxlsGame.i.imageHelper.getPixmapForIS(httpResponse.getResultAsStream());
@@ -99,7 +99,7 @@ public class Template implements Renderer {
                         if (_initial) {
                             _initial = false;
                         } else {
-                            Pxls.gameState.getSafeTemplateState().enabled = true;
+                            Pxls.getGameState().getSafeTemplateState().enabled = true;
                         }
                     }
                 });
@@ -109,19 +109,19 @@ public class Template implements Renderer {
             public void failed(Throwable t) {
                 t.printStackTrace();
                 System.err.println("Failed to fetch Template image");
-                Pxls.gameState.getSafeTemplateState().enabled = false;
+                Pxls.getGameState().getSafeTemplateState().enabled = false;
             }
 
             @Override
             public void cancelled() {
                 System.out.println("template fetch webreq was cancelled");
-                Pxls.gameState.getSafeTemplateState().enabled = false;
+                Pxls.getGameState().getSafeTemplateState().enabled = false;
             }
         });
     }
 
     public void render(float zoom, Vector2 screenCenter, Vector2 canvasSize, Vector2 canvasCorner) {
-        TemplateState ts = Pxls.gameState.getSafeTemplateState();
+        TemplateState ts = Pxls.getGameState().getSafeTemplateState();
         if (!ts.enabled) {
             return;
         }
@@ -140,8 +140,8 @@ public class Template implements Renderer {
     }
 
     public String makePxlsURL() {
-        TemplateState ts = Pxls.gameState.getSafeTemplateState();
-        return String.format("%s/#template=%s&ox=%s&oy=%s&oo=%s&tw=%s&x=%s&y=%s&scale=%s", Pxls.domain, ts.URL, ts.offsetX, ts.offsetY, ts.opacity, ts.totalWidth, parent.panX(), parent.panY(true), parent.panZoom());
+        TemplateState ts = Pxls.getGameState().getSafeTemplateState();
+        return String.format("%s/#template=%s&ox=%s&oy=%s&oo=%s&tw=%s&x=%s&y=%s&scale=%s", Pxls.getDomain(), ts.URL, ts.offsetX, ts.offsetY, ts.opacity, ts.totalWidth, parent.panX(), parent.panY(true), parent.panZoom());
     }
 
     public void pixel(int x, int y, int color) {}
